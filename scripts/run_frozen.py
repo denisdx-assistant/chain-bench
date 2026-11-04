@@ -67,7 +67,7 @@ def main():
     files = sorted(glob.glob(os.path.join(a.dir, "*.py")))
     if a.limit:
         files = files[:a.limit]
-    print("dir: %s | model: %s | programs: %d" % (a.dir, a.model, len(files)), flush=True)
+    print("dir: %s | model: %s | programs: %d | max_tokens: %d" % (a.dir, a.model, len(files), a.max_tokens), flush=True)
 
     rows = []
     for path in files:

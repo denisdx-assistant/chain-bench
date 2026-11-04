@@ -45,7 +45,7 @@ Temperature | default |
 
 The 16000 budget was chosen experimentally for Q6: at 700 and 3000 tokens the reasoning consumes the whole allowance and the response comes back empty (`finish=length`). Empty responses are treated as a harness artefact and counted separately from wrong answers.
 
-**Model-specific budgets are part of the method.** Qwen3.8-27B Q6 works at 16000. Flash-Next deliberates much longer: 16000 is not enough (calls stop with `finish=length`), 32000 is borderline, and 48000–65535 covers the tested tasks. The model does not loop — it reasons at length. With too small a budget a stronger model silently loses to a weaker one, because its answers are truncated to empty.
+**Budget is not the lever; loop control is.** Qwen3.8-27B Q6 works at 16000. Flash-Next first looked like it needed 48–65k: calls stopped with `finish=length`. Inspection showed those long generations were degenerate repetition — the model looped over the same noise block. With `frequency_penalty` and `presence_penalty` at 0.3, temperature 0.3, and a streaming repetition guard (abort when an 8-word shingle repeats more than 40 times), 32000 tokens is sufficient. Raising the cap blindly does not help: a loop consumes any budget.
 
 ## 4. Results
 

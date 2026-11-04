@@ -74,7 +74,7 @@ Conclusion: the model reliably sums offsets along a chain but loses rules when t
 5. **Prefix cache.** Re-sending the same document yields `cached_tokens` ≈ 99.9% and response times below one second. A series of questions over one document barely loads prefill.
 6. **Heartbeats.** System jobs cannot be disabled through the cron CLI. They defer under active traffic but may take a slot when idle.
 7. **Concurrency.** Q6 reports `max_concurrent_requests: 2`; a third request waits.
-8. **Flash-Next needs a large reasoning budget.** Unlike Q6, this model deliberates much longer without looping. Measured: 16000 tokens is not enough (calls stop with `finish=length`), 32000 is borderline, 48000–65535 covers the tested tasks. For this model the budget is a first-class parameter of the method, not a detail: too small a value silently converts capability into empty answers.
+8. **Flash-Next: budget is not the lever, the loop guard is.** Long generations on hard tasks turned out to be degenerate repetition (looping over the same noise block), not genuine reasoning. With `frequency_penalty` and `presence_penalty` at 0.3 and a streaming repetition guard (abort when an 8-word shingle repeats more than 40 times), 32000 tokens is sufficient. Raising the cap blindly does not help: a loop consumes any budget. Corrected earlier note: the model does not need 48–65k; it needs loop control.
 
 ## 6. Open questions
 

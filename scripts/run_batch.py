@@ -89,8 +89,8 @@ def main():
     tasks = d["tasks"]
     prompt = build_prompt(d["document"], tasks)
 
-    print("датасет: %s | модель: %s | задач: %d | промпт: %.0f КБ"
-          % (a.dataset, a.model, len(tasks), len(prompt.encode()) / 1024))
+    print("датасет: %s | модель: %s | задач: %d | max_tokens: %d | промпт: %.0f КБ"
+          % (a.dataset, a.model, len(tasks), a.max_tokens, len(prompt.encode()) / 1024))
 
     out = call(prompt, a.model, a.max_tokens)
     if out.get("error"):
