@@ -88,7 +88,7 @@ def gen(seed, ops, comments, extras, traps):
             real.append("bump_if")
         elif kind < 0.92:
             L.append("for i in range(0, 10, %d):" % rng.choice([2, 3]))
-            L.append("    if arr[i] %% 2 == 0:")
+            L.append("    if arr[i] % 2 == 0:")
             L.append("        arr[i] += %d" % rng.randint(1, 5))
             L.append("    else:")
             L.append("        arr[i] -= %d" % rng.randint(1, 5))
