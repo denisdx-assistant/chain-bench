@@ -1,138 +1,140 @@
 # chain-bench
 
-**Приватный бенчмарк для локальных языковых моделей: многоходовые цепочки и исполнение кода с шумом**
+**A private benchmark for local language models: multi-hop chains and code execution under noise**
 
 ---
 
-## Аннотация
+## Abstract
 
-Публичные бенчмарки подвержены контаминации: модели могли видеть их задачи при обучении. Мы описываем небольшой приватный набор, который измеряет не знание, а **способность удерживать зависимости**: многоходовые цепочки с шумом и мысленное исполнение программы с ловушками в комментариях и строках. Эталоны вычисляются кодом или запуском программы, а не руками. Набор калибруется так, чтобы слабая модель ошибалась примерно в половине случаев — иначе тест упирается в потолок и не различает модели.
+Public benchmarks are prone to contamination: models may have seen their tasks during training. We describe a small private suite that measures not knowledge but the ability to **hold dependencies together**: multi-hop chains embedded in noise, and mental execution of a program whose comments and strings contain decoy code. Ground truth is computed by code or by running the program, never by hand. The suite is calibrated so that a weak model fails roughly half the time; otherwise the test saturates and stops discriminating between models.
 
-Калибровка проведена на Qwen3.8-27B (квант Q6), 2×V100. Результаты: тест 1 — **41% ошибок** при поштучной подаче и **76%** при подаче всех задач одним запросом; тест 2 — **12% ошибок** в двух конфигурациях. Профиль ошибок устойчив: арифметические цепочки модель проходит, а комбинирование правил и признаков — нет.
+Calibration was performed on Qwen3.8-27B (quant Q6) on 2×V100. Results: Test 1 — **41% errors** when questions are asked one at a time and **76%** when all questions are sent in a single request; Test 2 — **12%** at moderate difficulty and **60%** at the final difficulty level. The error profile is stable: the model solves arithmetic chains but fails when it has to combine two rules or attributes.
 
-## 1. Введение
+## 1. Introduction
 
-При сравнении локальных моделей обычно опираются на публичные бенчмарки. У этого две проблемы: контаминация и нерелевантность. Нам важно не «сколько модель знает», а удержит ли она цепочку из десяти зависимостей и не перепутает ли код с текстом.
+Local model comparisons usually rely on public benchmarks. This has two problems: contamination and irrelevance. What matters for agentic work is not how much a model knows, but whether it can follow a chain of ten dependencies and tell code from text.
 
-Требования к набору:
+Requirements for the suite:
 
-1. Ответ проверяется однозначно — целое число.
-2. Эталон вычисляется программно.
-3. Задачи приватны: конкретные тексты не встречаются в обучающих корпусах.
-4. Сложность регулируется так, чтобы целевая модель ошибалась примерно в 50% случаев.
+1. Answers are checked unambiguously — a single integer or an array.
+2. Ground truth is computed programmatically.
+3. Tasks are private: the exact texts do not appear in training corpora.
+4. Difficulty is adjustable so that the target model fails about 50% of the time.
 
-## 2. Дизайн тестов
+## 2. Test design
 
-### 2.1 Тест 1 — многоходовые цепочки
+### 2.1 Test 1 — multi-hop chains
 
-17 задач, по одному типу хода на задачу: линейная сумма смещений, групповые правила по кратности, «звезда» с минимумом и максимумом, ветвление, возраст и псевдоним, последовательные проценты, масса и цвет с порогами, пробег и признаки автомобиля, счёт по двум признакам, отношение «во сколько раз», приоритет правил, группа против группы, способность и размер, производное свойство, денежная ловушка, изменение состояния переменных, отмена записи по порядку упоминания.
+Seventeen tasks, one move type each: linear sums of offsets, group rules based on divisibility, star-shaped min/max, branching, age with aliases, sequential percentages, mass and colour thresholds, car attributes, counting by two features, ratios, rule priority, group versus group, ability and size, derived properties, a money trap, variable state mutation, and cancellation by order of mention.
 
-Каждая задача окружена шумом того же типа: те же предикаты, но другие сущности; почти-двойники номеров; групповые правила про другие классы. Имена сущностей задач в шум не попадают — проверяется автоматически.
+Each task is surrounded by noise of the same type: identical predicates applied to other entities, near-duplicate identifiers, group rules about other classes. Entity names from the tasks never appear in the noise; this is checked automatically.
 
-### 2.2 Тест 2 — исполнение программы
+### 2.2 Test 2 — program execution
 
-Небольшая программа на Python над массивом из 10 чисел: swap, `+=`, `-=`, `*=`, сортировка срезов, reverse, ветвления, циклы, вызов функции. Шум — комментарии и строковые константы, внутри которых лежит **код, который не исполняется**. Модель должна мысленно выполнить программу и назвать сумму массива. Эталон получается запуском программы.
+A small Python program over an array of ten integers: swaps, `+=`, `-=`, `*=`, slice sorting, reversal, conditionals, loops, recursion, regular expressions, type coercion with `str(a) + str(b)`, and aliasing (`arr2 = arr`). Noise consists of comments and string constants that contain **code which is never executed**. The model must mentally execute the program and report the final array and its sum. Ground truth is obtained by running the program.
 
-## 3. Установка
+## 3. Experimental setup
 
-| Параметр | Значение |
+| Parameter | Value |
 |---|---|
-Железо | 2× NVIDIA V100 |
-Модель калибровки | Qwen3.8-27B, квант Q6 |
-Оркестратор | aidir, OpenAI-совместимый endpoint |
+Hardware | 2× NVIDIA V100 |
+Calibration model | Qwen3.8-27B, quant Q6 |
+Orchestrator | aidir, OpenAI-compatible endpoint |
 `max_tokens` | 16000 |
-Температура | по умолчанию |
+Temperature | default |
 
-Бюджет 16000 выбран экспериментально: при 700 и 3000 токенах reasoning съедает весь лимит и ответ приходит пустым (`finish=length`). Пустой ответ считается артефактом стенда и отделяется от неверного.
+The 16000 budget was chosen experimentally: at 700 and 3000 tokens the reasoning consumes the whole allowance and the response comes back empty (`finish=length`). Empty responses are treated as a harness artefact and counted separately from wrong answers.
 
-## 4. Результаты
+## 4. Results
 
-### 4.1 Тест 1
+### 4.1 Test 1
 
-| Режим | Верно | Ошибок | Время |
+| Mode | Correct | Errors | Time |
 |---|---|---|---|
-По одной задаче | 10/17 | **41%** | ~17 мин |
-Все 17 в одном запросе | 4/17 | **76%** | 90 с |
+One question per request | 10/17 | **41%** | ~17 min |
+All 17 in one request | 4/17 | **76%** | 90 s |
 
-### 4.2 Тест 2
+### 4.2 Test 2
 
-| Конфигурация | Условия | Верно | Ошибок |
+| Configuration | Conditions | Correct | Errors |
 |---|---|---|---|
-v1 «тяжёлый» | ops=15, comments=800, extras=300, traps=80 | 7/8 | 12% |
-v2 с ветвлениями | ops=12, comments=600, extras=200, traps=60 | 7/8 | 12% |
+v1 heavy | ops=15, comments=800, extras=300, traps=80 | 7/8 | 12% |
+v2 control flow | ops=12, comments=600, extras=200, traps=60 | 7/8 | 12% |
+v3 nested | ops=25, comments=1500, extras=500, traps=120 | 7/8 | 12% |
+v4 final | ops=20, comments=7400, extras=800, traps=150, ~106k tokens, array+sum | 2/5 | **60%** |
 
-На простом наборе (24 задачи без шума) обе модели дали 24/24 — потолок, который не различает.
+On a simple set of 24 tasks without noise both models scored 24/24 — a ceiling that does not discriminate.
 
-## 5. Анализ ошибок
+## 5. Error analysis
 
-В тесте 1 ошибочными оказались задачи 2, 7, 9, 13, 14, 15, 17 — все на комбинирование правил и признаков. Чисто арифметические цепочки (1, 3, 4, 6, 8, 10, 11, 12, 16) пройдены полностью.
+In Test 1 the failures were tasks 2, 7, 9, 13, 14, 15 and 17 — all requiring combination of rules or attributes. Pure arithmetic chains (1, 3, 4, 6, 8, 10, 11, 12, 16) were solved completely.
 
-Интерпретация: модель уверенно складывает смещения по цепочке, но теряет правило, когда их два и нужно выбрать или скомбинировать. Это именно тот навык, который требуется в агентских циклах, где инструкции наслаиваются.
+In Test 2 the final configuration produced two distinct failure modes: a near miss (one element off by two, sum 332 instead of 330) and large deviations where an entire branch of operations was lost.
 
-## 6. Обсуждение
+## 6. Discussion
 
-1. **Одна задача на запрос заметно лучше.** Пакетный режим в 11 раз быстрее, но ошибается вдвое чаще. Для реальной работы это аргумент в пользу узких запросов.
-2. **`reasoning_effort` не спасает.** Параметр меняет длину рассуждения (12 088 → 14 919 символов), но не правильность.
-3. **Бюджет — часть методики.** Малый `max_tokens` превращает тест в проверку лимита, а не способностей.
+1. **One task per request is markedly better.** The batched mode is about eleven times faster but twice as error-prone. For real work this argues for narrow requests.
+2. **`reasoning_effort` does not help.** The parameter changes the length of reasoning (12,088 → 14,919 characters) but not correctness.
+3. **Budget is part of the method.** A small `max_tokens` turns the test into a limit check rather than a capability check.
+4. **Structural complexity beats volume.** Adding comments up to 65–100k tokens did not raise the error rate; recursion, regex, type coercion and aliasing did.
 
-## 7. Ограничения
+## 7. Limitations
 
-- Мало задач: 17 и 8 программ — статистика слабая, выводы касаются профиля ошибок, а не точных долей.
-- Один язык (русский) и один домен сущностей.
-- Одна конфигурация железа и одна модель на этапе калибровки.
+- Few tasks: 17 chains and 5 programs — the statistics are weak, conclusions concern error profiles rather than exact rates.
+- One hardware configuration and one model at the calibration stage.
+- Language variants currently cover eight representative chain tasks.
 
-## 8. Воспроизводимость
+## 8. Reproducibility
 
 ```bash
-# задачи и эталоны
+# tasks and ground truth
 python3 scripts/build_tasks.py
 
-# датасет с шумом
+# chain dataset with noise
 python3 scripts/gen_noise.py --seed 21 --tokens 20000 --noise 300 --out dataset_20k
 
-# тест 1: поштучно и пакетом
+# test 1: one by one and batched
 python3 scripts/run_chains.py --dataset dataset_20k.json --model local-only
 python3 scripts/run_batch.py  --dataset dataset_20k.json --model local-only
 
-# тест 2: программы
-python3 scripts/run_programs.py --model local-only --n 8 --ops 15 --comments 800 --extras 300 --traps 80
-python3 scripts/run_programs.py --model local-only --gen gen_program_v2 --n 8 --ops 12 --comments 600 --extras 200 --traps 60
+# test 2: programs
+python3 scripts/run_programs_v4.py --model local-only --n 5 --comments 7400 --extras 800 --traps 150
 ```
 
-Все генераторы детерминированы по сиду: при одинаковых параметрах получаются байт-в-байт те же данные.
+All generators are deterministic by seed: identical parameters produce byte-identical data.
 
-## Приложение A. Типы задач
+## Appendix A. Task types
 
-| № | Тип хода | Ответ |
+| # | Move type | Answer |
 |---|---|---|
-1 | линейная цепочка, сумма смещений | 13 |
-2 | групповые правила по кратности | 6 |
-3 | звезда, максимум минус минимум | 40 |
-4 | ветвление, два пути | 6 |
-5 | возраст, псевдоним | 2 |
-6 | последовательные проценты | 1760 |
-7 | масса + цвет, пороги | 5 |
-8 | пробег + цвет + кратность номера | 40 |
-9 | счёт по двум признакам | 2 |
-10 | отношение (во сколько раз) | 3 |
-11 | приоритет правил | 14 |
-12 | группа против группы | 100 |
-13 | способность + размер, знак разности | -5 |
-14 | производное свойство | 5 |
-15 | денежная ловушка | 120 |
-16 | изменение состояния переменных | 39 |
-17 | отмена по порядку упоминания | 110 |
+1 | linear chain, sum of offsets | 13 |
+2 | group rules by divisibility | 6 |
+3 | star, max minus min | 40 |
+4 | branching, two paths | 6 |
+5 | age and alias | 2 |
+6 | sequential percentages | 1760 |
+7 | mass + colour thresholds | 5 |
+8 | mileage + colour + divisibility | 40 |
+9 | counting by two features | 2 |
+10 | ratio instead of difference | 3 |
+11 | rule priority | 14 |
+12 | group versus group | 100 |
+13 | ability and size, signed difference | -5 |
+14 | derived property | 5 |
+15 | money trap | 120 |
+16 | variable state mutation | 39 |
+17 | cancellation by order of mention | 110 |
 
-## Приложение B. Структура репозитория
+## Appendix B. Repository layout
 
 ```
-scripts/    генераторы задач, шума и программ; раннеры
-tasks/      задачи и эталоны (md + json)
-datasets/   chains/ — документ с шумом; programs/ — программы и их эталоны
-results/    результаты прогонов (json)
-protocol.md журнал испытаний: стенд, правила, наблюдения
+scripts/    generators for tasks, noise and programs; runners
+tasks/      tasks and ground truth (md + json)
+datasets/   chains/ — noisy documents; programs/ — programs with expected outputs
+results/    run results (json)
+protocol.md test log: setup, rules, observations
 ```
 
-## Лицензия
+## License
 
-Код — MIT. Тексты и датасеты — CC BY 4.0.
+Code — MIT. Texts and datasets — CC BY 4.0.
