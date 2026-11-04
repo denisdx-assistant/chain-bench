@@ -47,6 +47,7 @@ Ground truth | computed by code or by running the program, never by hand |
 2026-11-05 01:10 | Language series: Test 1 | Q6 | 8 tasks per language, 3 documents | **ru 4/8 (50% errors), en 4/8 (50%), zh 5/8 (38%)** | language effect is small |
 2026-11-05 01:20 | Test 2: v4 seeds 400–404 | Q6 | ~106k tokens, ops=20 | **5/5 (0% errors)** | high variance between batches |
 2026-11-05 01:36 | Test 2: v4 × 20 programs | Qwen3.8-27b Q6 | ~106k tokens, ops=20, seeds 300–319 | **11/20 (45% errors)** | stable estimate, frozen for replay |
+2026-11-05 05:32 | Test 2: v4 × 20 programs | Flash-Next IQ3_S (`local-only` route) | guarded stream, max_tokens 32000, temp 0.3, freq/pres 0.3, seeds 300–319 | **3/20 (85% errors), loops 0** | same frozen set as Q6 11/20; failures are confident-wrong with short reasoning, not loops |
 
 ### Batch mode versus one-by-one
 
@@ -70,11 +71,12 @@ Conclusion: the model reliably sums offsets along a chain but loses rules when t
 1. **Token budget is the main trap.** Q6 reasoning on a hard task takes **8–12 thousand characters** (≈3–4 thousand tokens), and more on difficult ones. At `max_tokens=700` or `3000` the answer is empty (`finish=length`). Working value: **16000**, with an automatic retry up to 32000 and a 2400 s request timeout.
 2. **`reasoning_effort` barely matters.** Measured on one task with a 16k budget: `none` — 12,088 characters of reasoning, answer 0; `low` — 13,932, answer 10; `medium` — 14,458, answer 10; `high` — 14,919, answer 10. The length changes slightly, correctness does not.
 3. **An empty answer is not a wrong answer.** They are counted separately. Example: task 2 with a full budget returned **10** instead of **6** — a genuine reasoning error.
-4. **Routing.** `model: "qwen3.8-27b"` is a smart route that leads to another host running Q4. The exact id `Qwen3.8-27b-Q6_K_XL` is required for Q6; `local-only` currently points at Q6.
+4. **Routing.** `model: "qwen3.8-27b"` is a smart route that leads to another host running Q4. The exact id `Qwen3.8-27b-Q6_K_XL` is required for Q6; `local-only` currently resolves to Flash-Next IQ3_S (`qwen3.8-flash-next-ista-iq3_s`), verified 2026-11-05 via the router echo; it pointed at Q6 earlier, so always record the resolved id with a run.
 5. **Prefix cache.** Re-sending the same document yields `cached_tokens` ≈ 99.9% and response times below one second. A series of questions over one document barely loads prefill.
 6. **Heartbeats.** System jobs cannot be disabled through the cron CLI. They defer under active traffic but may take a slot when idle.
 7. **Concurrency.** Q6 reports `max_concurrent_requests: 2`; a third request waits.
 8. **Flash-Next: budget is not the lever, the loop guard is.** Long generations on hard tasks turned out to be degenerate repetition (looping over the same noise block), not genuine reasoning. With `frequency_penalty` and `presence_penalty` at 0.3 and a streaming repetition guard (abort when an 8-word shingle repeats more than 40 times), 32000 tokens is sufficient. Raising the cap blindly does not help: a loop consumes any budget. Corrected earlier note: the model does not need 48–65k; it needs loop control.
+9. **Flash-Next error shape (v4 programs, frozen 20).** 17 of 20 failed with `finish=stop`, 11–16k characters of reasoning and both `arr` and `sum` wrong — a confident wrong answer, not starvation or repetition. The 3 correct ones all hit `finish=length` at 32000 tokens (≈86k characters of reasoning) in 372–390 s, so on this model the cap matters only for the cases it solves. No `kind=loop` in the whole run: with penalties at 0.3 the guard never fired.
 
 ## 6. Open questions
 
@@ -87,3 +89,5 @@ Conclusion: the model reliably sums offsets along a chain but loses rules when t
 1. Append a row to the run log: date, dataset, model, conditions, result.
 2. If a result is unexpected, add a note under Observations with the cause.
 3. Reference result files as `[[name.json]]` in the Obsidian vault, or as plain paths in this repository.
+
+10. **Retry policy for `finish=length`.** A response that stops on the length cap without repetition is a genuine under-budget case, not a loop (observed twice: chain task 12, run f23bd575; agent run 714bf1d7). Such items are re-run separately with a 4x budget (131072) and the guard still on; the retry result is reported next to the original, and the original is never silently replaced. Loop aborts (`kind=loop`) are not retried with a bigger budget: the cap is not the cause.
