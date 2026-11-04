@@ -44,7 +44,9 @@ Ground truth | computed by code or by running the program, never by hand |
 2026-11-04 19:30 | Test 2: v3 nested | Q6 | ops=25, comments=1500, extras=500, traps=120 | **7/8 (12% errors)** | still easy |
 2026-11-04 20:00 | Noise sweep: 2 shapes × 3 levels | Q6 | low/mid/high | **6/6 (0% errors)** | noise volume is not the lever |
 2026-11-04 22:05 | Test 2: v4 × 5 programs | Q6 | ~106k tokens, ops=20, array + sum | **2/5 (60% errors)** | target reached and exceeded |
-2026-11-04 22:11 | Language series (ru/en/zh) and v4 seeds 400–404 | Q6 | 8 tasks per language, ~106k tokens | **in progress** | language effect |
+2026-11-05 01:10 | Language series: Test 1 | Q6 | 8 tasks per language, 3 documents | **ru 4/8 (50% errors), en 4/8 (50%), zh 5/8 (38%)** | language effect is small |
+2026-11-05 01:20 | Test 2: v4 seeds 400–404 | Q6 | ~106k tokens, ops=20 | **5/5 (0% errors)** | high variance between batches |
+2026-11-05 01:36 | Test 2: v4 × 20 programs | Qwen3.8-27b Q6 | ~106k tokens, ops=20, seeds 300–319 | **11/20 (45% errors)** | stable estimate, frozen for replay |
 
 ### Batch mode versus one-by-one
 
