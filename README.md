@@ -43,7 +43,9 @@ Orchestrator | aidir, OpenAI-compatible endpoint |
 `max_tokens` | 16000 |
 Temperature | default |
 
-The 16000 budget was chosen experimentally: at 700 and 3000 tokens the reasoning consumes the whole allowance and the response comes back empty (`finish=length`). Empty responses are treated as a harness artefact and counted separately from wrong answers.
+The 16000 budget was chosen experimentally for Q6: at 700 and 3000 tokens the reasoning consumes the whole allowance and the response comes back empty (`finish=length`). Empty responses are treated as a harness artefact and counted separately from wrong answers.
+
+**Model-specific budgets are part of the method.** Qwen3.8-27B Q6 works at 16000. Flash-Next deliberates much longer: 16000 is not enough (calls stop with `finish=length`), 32000 is borderline, and 48000–65535 covers the tested tasks. The model does not loop — it reasons at length. With too small a budget a stronger model silently loses to a weaker one, because its answers are truncated to empty.
 
 ## 4. Results
 
