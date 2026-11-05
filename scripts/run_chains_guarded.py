@@ -51,6 +51,8 @@ def main():
         out = ask_guarded(prompt, a.model, max_tokens=a.max_tokens,
                           timeout=a.timeout, temperature=TEMP_DEFAULT,
                           frequency_penalty=a.fp, presence_penalty=a.pp)
+        if "answer" not in t:
+            raise SystemExit("schema error: task %s has no answer field" % t.get("id"))
         got = parse_int(out.get("content"))
         ok = (got == t["answer"])
         kind = "ok" if ok else ("loop" if out.get("loop") else

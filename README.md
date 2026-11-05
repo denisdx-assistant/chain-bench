@@ -65,6 +65,8 @@ at four times the budget; provenance recorded with every run. Rules are in
 - Runners: [scripts/run_chains_guarded.py](scripts/run_chains_guarded.py),
   [scripts/run_frozen_guarded.py](scripts/run_frozen_guarded.py)
 - Loop guard: [scripts/guard.py](scripts/guard.py)
+- Scoring self-test: [scripts/selftest_scoring.py](scripts/selftest_scoring.py)
+- Re-score saved answers: [scripts/rescore.py](scripts/rescore.py)
 
 ## 2. Test series
 

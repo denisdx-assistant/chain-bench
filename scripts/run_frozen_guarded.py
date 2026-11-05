@@ -69,6 +69,26 @@ def parse_sum(text):
     return None
 
 
+def expected_of(exp):
+    """Read the expected answer from either schema; raise if neither is present."""
+    arr = exp.get("expected_array", exp.get("array"))
+    tot = exp.get("expected_sum", exp.get("sum"))
+    if arr is None or tot is None:
+        raise ValueError("dataset has no expected_array/expected_sum")
+    if isinstance(arr, str):
+        arr = json.loads(arr.replace("'", '"'))
+    return arr, tot
+
+
+def score_program(exp, content):
+    """Score one answer. Returns (ok, ok_array, ok_sum, got_array, got_sum)."""
+    exp_arr, exp_sum = expected_of(exp)
+    got_arr, got_sum = parse_array(content), parse_sum(content)
+    ok_arr = got_arr is not None and got_arr == exp_arr
+    ok_sum = got_sum is not None and got_sum == exp_sum
+    return (ok_arr and ok_sum), ok_arr, ok_sum, got_arr, got_sum
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", required=True)
@@ -101,6 +121,9 @@ def main():
         except Exception:
             print("  %s | нет ожидаемого json, пропуск" % os.path.basename(path), flush=True)
             continue
+        if "expected_array" not in exp and "array" not in exp:
+            raise SystemExit("schema error in %s: expected_array/array missing; refusing to score"
+                             % os.path.basename(stem))
         out = ask_guarded(code + QUESTION, a.model, max_tokens=a.max_tokens,
                           timeout=a.timeout, temperature=TEMP_DEFAULT,
                           frequency_penalty=a.fp, presence_penalty=a.pp,
@@ -108,16 +131,10 @@ def main():
         got_arr = parse_array(out.get("content"))
         got_sum = parse_sum(out.get("content"))
         # a missing answer must never compare equal to a missing expectation
-        if out.get("error") or got_arr is None or got_sum is None:
-            ok_arr = ok_sum = False
+        if out.get("error"):
+            ok, ok_arr, ok_sum, got_arr, got_sum = False, False, False, None, None
         else:
-            exp_arr = exp.get("expected_array", exp.get("array"))
-            exp_sum = exp.get("expected_sum", exp.get("sum"))
-            if isinstance(exp_arr, str):
-                exp_arr = json.loads(exp_arr.replace("'", '"'))
-            ok_arr = got_arr == exp_arr
-            ok_sum = got_sum == exp_sum
-        ok = bool(ok_arr and ok_sum)
+            ok, ok_arr, ok_sum, got_arr, got_sum = score_program(exp, out.get("content") or "")
         kind = "ok" if ok else ("loop" if out.get("loop") else
                                 ("timeout" if out.get("timeout") else
                                  ("error" if out.get("error") else "wrong")))
@@ -127,6 +144,8 @@ def main():
                      "finish": out.get("finish"),
                      "reasoning_chars": out.get("reasoning_chars"),
                      "raw": (out.get("content") or "")[:600],
+                     "expected_array": exp.get("expected_array", exp.get("array")),
+                     "expected_sum": exp.get("expected_sum", exp.get("sum")),
                      "error": out.get("error")})
         print("  %-22s | %-7s | arr %s | sum %s | %6.1f c"
               % (os.path.basename(path), kind, "ok" if ok_arr else "no",

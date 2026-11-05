@@ -88,6 +88,21 @@ Batch runs that ask one request to answer all tasks at once are kept for the
 record but excluded from tables: parsing, not the model, decides the score.
 They live in `results/_invalid/`.
 
+### 4.7 Scoring is validated, not assumed
+
+Two guards protect against a silently wrong verdict:
+
+- The runner reads the expected answer from `expected_array`/`expected_sum` (or
+  the legacy `array`/`sum`) and **stops with a schema error** if neither is
+  present, instead of scoring every answer wrong.
+- `scripts/selftest_scoring.py` checks the scoring function on exact answers,
+  alternative wording, altered array, altered sum, empty and truncated answers,
+  the legacy schema, and a missing schema. It runs in under a second and is the
+  first thing to run before a series.
+- `scripts/rescore.py` re-parses saved raw answers and reports any row whose
+  verdict would change. Since every row keeps the raw answer, a scoring bug can
+  be corrected afterwards without re-running the model.
+
 ## 5. Scoring
 
 - Correct — exact match. Programs require both array and sum.
