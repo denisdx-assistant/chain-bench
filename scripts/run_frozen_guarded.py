@@ -117,6 +117,18 @@ def main():
                    "presence_penalty": a.pp, "rows": rows},
                   open(a.out, "w"), ensure_ascii=False, indent=1)
 
+    errors = [r for r in rows if r.get("kind") == "error"]
+    if errors:
+        out_failed = a.out.replace(".json", ".failed.json")
+        json.dump({"dir": a.dir, "model": a.model, "max_tokens": a.max_tokens,
+                   "aborted": True, "errors": len(errors), "rows": rows},
+                  open(out_failed, "w"), ensure_ascii=False, indent=1)
+        if os.path.exists(a.out):
+            os.remove(a.out)
+        print("\nabort_transport: %d/%d requests failed (%s) -> %s; result discarded"
+              % (len(errors), len(rows), errors[0].get("error"), out_failed))
+        sys.exit(2)
+
     ok_n = sum(1 for r in rows if r["ok"])
     loops = sum(1 for r in rows if r["kind"] == "loop")
     print("\nTOTAL: %d/%d correct (%.0f%% errors) | loops: %d"

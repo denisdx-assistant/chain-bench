@@ -63,6 +63,17 @@ def main():
               % (t["id"], t["answer"], ("%5d" % got) if got is not None else "    —",
                  kind, out.get("latency", 0)), flush=True)
 
+    errors = [r for r in rows if r.get("kind") == "error"]
+    if errors:
+        # the route changed under us or the model was unloaded: keep nothing
+        out_failed = a.out.replace(".json", ".failed.json")
+        json.dump({"dataset": a.dataset, "model": a.model, "max_tokens": a.max_tokens,
+                   "temperature": a.temp, "aborted": True, "errors": len(errors), "rows": rows},
+                  open(out_failed, "w"), ensure_ascii=False, indent=1)
+        print("\nabort_transport: %d/%d requests failed (%s) -> %s; result discarded"
+              % (len(errors), len(rows), errors[0].get("error"), out_failed))
+        sys.exit(2)
+
     ok_n = sum(1 for r in rows if r["ok"])
     loops = sum(1 for r in rows if r["kind"] == "loop")
     print("\nTOTAL: %d/%d correct (%.0f%% errors) | loops: %d"
