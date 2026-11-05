@@ -17,12 +17,26 @@ import json
 import os
 import re
 import sys
+import urllib.request
 
+BASE = 'http://192.168.1.111:21434'
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from guard import ask_guarded
 
 QUESTION = ("\n\nQuestion: name the final array arr after running this program and its sum. "
             "Answer strictly as:\nARRAY: [numbers, comma separated]\nSUM: number")
+
+
+def fetch_meta(model):
+    """Provenance: which concrete model/provider the router resolved."""
+    try:
+        with urllib.request.urlopen(BASE + '/v1/models/' + model, timeout=10) as r:
+            d = json.load(r)
+        a = d.get('aidir') or {}
+        return {"resolved_provider": a.get("resolved_provider"),
+                "resolved_model": a.get("resolved_model")}
+    except Exception as e:
+        return {"resolved_provider": None, "resolved_model": None, "meta_error": str(e)[:120]}
 
 
 def parse_array(text):
@@ -51,10 +65,12 @@ def main():
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
 
+    meta = fetch_meta(a.model)
     files = sorted(glob.glob(os.path.join(a.dir, "*.py")))
     if a.only:
         want = {x.strip() for x in a.only.split(",") if x.strip()}
         files = [f for f in files if os.path.splitext(os.path.basename(f))[0] in want]
+    print("resolved: %s / %s" % (meta.get("resolved_provider"), meta.get("resolved_model")), flush=True)
     print("dir: %s | model: %s | programs: %d | max_tokens: %d | timeout: %d s | temp: %.2f"
           % (a.dir, a.model, len(files), a.max_tokens, a.timeout, a.temp), flush=True)
 
@@ -88,7 +104,10 @@ def main():
         print("  %-22s | %-7s | arr %s | sum %s | %6.1f c"
               % (os.path.basename(path), kind, "ok" if ok_arr else "no",
                  "ok" if ok_sum else "no", out.get("latency", 0)), flush=True)
-        json.dump({"dir": a.dir, "model": a.model, "max_tokens": a.max_tokens,
+        json.dump({"dir": a.dir, "model": a.model,
+                   "resolved_provider": meta.get("resolved_provider"),
+                   "resolved_model": meta.get("resolved_model"),
+                   "max_tokens": a.max_tokens,
                    "temperature": a.temp, "frequency_penalty": a.fp,
                    "presence_penalty": a.pp, "rows": rows},
                   open(a.out, "w"), ensure_ascii=False, indent=1)
