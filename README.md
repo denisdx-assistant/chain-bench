@@ -1,141 +1,233 @@
 # chain-bench
 
-**A private benchmark for local language models: multi-hop chains and code execution under noise**
+**A private benchmark for local language models: multi-hop chains and program
+execution under noise.**
+
+Languages: **English** · [Русский](README.ru.md) · [中文](README.zh.md)
 
 ---
 
 ## Abstract
 
-Public benchmarks are prone to contamination: models may have seen their tasks during training. We describe a small private suite that measures not knowledge but the ability to **hold dependencies together**: multi-hop chains embedded in noise, and mental execution of a program whose comments and strings contain decoy code. Ground truth is computed by code or by running the program, never by hand. The suite is calibrated so that a weak model fails roughly half the time; otherwise the test saturates and stops discriminating between models.
+Public benchmarks suffer from contamination: a model may have seen the tasks
+during training. This suite measures something else — the ability to **hold
+dependencies together**. Test 1 embeds multi-hop arithmetic chains in a long
+document of semantically neutral noise; Test 2 asks the model to mentally
+execute a small Python program whose comments and strings contain code that is
+never executed. Ground truth is always computed by code, never by hand.
 
-Calibration was performed on Qwen3.8-27B (quant Q6) on 2×V100. Results: Test 1 — **41% errors** when questions are asked one at a time and **76%** when all questions are sent in a single request; Test 2 — **12%** at moderate difficulty and **60%** at the final difficulty level. The error profile is stable: the model solves arithmetic chains but fails when it has to combine two rules or attributes.
+The project has two separate aspects:
 
-## 1. Introduction
+1. **The harness** — a reusable methodology: frozen datasets, recorded
+   provenance, a loop guard, a strict retry policy for length cuts, and results
+   stored per model. It is designed so that a later run on another machine is
+   comparable with an earlier one.
+2. **Current results** — a small, honest snapshot of how three
+   quantisations/configurations actually behave. Sample sizes are deliberately
+   modest; the value is in the error profile, not in the third significant
+   digit.
 
-Local model comparisons usually rely on public benchmarks. This has two problems: contamination and irrelevance. What matters for agentic work is not how much a model knows, but whether it can follow a chain of ten dependencies and tell code from text.
+## 1. What is measured
 
-Requirements for the suite:
+Two skills that matter for agent loops and that public benchmarks do not
+isolate:
 
-1. Answers are checked unambiguously — a single integer or an array.
-2. Ground truth is computed programmatically.
-3. Tasks are private: the exact texts do not appear in training corpora.
-4. Difficulty is adjustable so that the target model fails about 50% of the time.
+- **Rule combination under noise.** Summing offsets along a chain is easy;
+  selecting and combining two rules while thousands of near-duplicate
+  statements surround them is not.
+- **Mental execution of code.** Comments and string constants that contain
+  plausible code are a direct trap for a model that reads rather than executes.
 
-## 2. Test design
+Accuracy and wall-clock latency are both recorded. Degenerate behaviour (loops,
+length cuts) is counted separately from ordinary wrong answers.
 
-### 2.1 Test 1 — multi-hop chains
+## 2. Test 1 — arithmetic chains in noise
 
-Seventeen tasks, one move type each: linear sums of offsets, group rules based on divisibility, star-shaped min/max, branching, age with aliases, sequential percentages, mass and colour thresholds, car attributes, counting by two features, ratios, rule priority, group versus group, ability and size, derived properties, a money trap, variable state mutation, and cancellation by order of mention.
+- A document of roughly 20k tokens (300 noise lines, ~72k characters) is
+  generated from the same generator and seed for every language. The noise is
+  semantically neutral: the same predicates applied to other entities,
+  near-duplicate identifiers, group rules about other classes. Entity names
+  from the tasks never appear in the noise.
+- 17 tasks cover sums of offsets, divisibility rules, star-shaped min/max,
+  branching, age with aliases, sequential percentages, mass and colour
+  thresholds, mileage with divisibility, counting by two features, ratios,
+  rule priority, group versus group, ability and size, derived properties, a
+  money trap, variable mutation, and cancellation by order of mention.
+- The answer is a single integer. Ground truth is computed by code.
 
-Each task is surrounded by noise of the same type: identical predicates applied to other entities, near-duplicate identifiers, group rules about other classes. Entity names from the tasks never appear in the noise; this is checked automatically.
+## 3. Test 2 — frozen programs
 
-### 2.2 Test 2 — program execution
+- 20 Python programs (seeds 300–319) build a 10-element integer array with
+  swaps, `+=`, `-=`, `*=`, slice sorting, reversal, conditionals, loops,
+  recursion, regular expressions, type coercion with `str(a) + str(b)`, and
+  aliasing (`arr2 = arr`).
+- Noise is code inside comments and string constants that is never executed.
+- The model returns the final array and its sum in a fixed format
+  (`ARRAY: [...]`, `SUM: n`). Both must match exactly; there is no partial
+  credit.
+- The set is frozen: every model sees byte-identical input.
 
-A small Python program over an array of ten integers: swaps, `+=`, `-=`, `*=`, slice sorting, reversal, conditionals, loops, recursion, regular expressions, type coercion with `str(a) + str(b)`, and aliasing (`arr2 = arr`). Noise consists of comments and string constants that contain **code which is never executed**. The model must mentally execute the program and report the final array and its sum. Ground truth is obtained by running the program.
+## 4. Harness rules
 
-## 3. Experimental setup
-
-| Parameter | Value |
+| Rule | Value |
 |---|---|
-Hardware | 2× NVIDIA V100 |
-Calibration model | Qwen3.8-27B, quant Q6 |
-Orchestrator | aidir, OpenAI-compatible endpoint |
-`max_tokens` | 16000 |
-Temperature | default |
+| One task per request | always for scoring; batch runs are kept as invalid experiments |
+| Loop guard | streamed 8-word shingles; abort when one shingle repeats > 40 times, mark `kind=loop` |
+| Sampling for guarded runs | temperature 0.3, `frequency_penalty` 0.3, `presence_penalty` 0.3 |
+| Budget, 27B class | 16k |
+| Budget, Flash-Next class | 32k with the guard |
+| Length-cut retry | re-run at 4× budget (131072), reported next to the original |
+| Provenance | router queried before the run; `resolved_provider` and `resolved_model` stored in the result |
+| Empty answer | counted as a harness artefact, never as a model error |
 
-The 16000 budget was chosen experimentally for Q6: at 700 and 3000 tokens the reasoning consumes the whole allowance and the response comes back empty (`finish=length`). Empty responses are treated as a harness artefact and counted separately from wrong answers.
+**Budget is a parameter, not a detail.** Too small a budget turns a capable
+model into an empty answer: reasoning alone can exceed it. A budget that is too
+large does not help a loop: a loop consumes any budget. The measured correction
+is that long generations on hard tasks were often degenerate repetition, so the
+lever is loop control plus a moderate budget, not a bigger cap.
 
-**Budget is not the lever; loop control is.** Qwen3.8-27B Q6 works at 16000. Flash-Next first looked like it needed 48–65k: calls stopped with `finish=length`. Inspection showed those long generations were degenerate repetition — the model looped over the same noise block. With `frequency_penalty` and `presence_penalty` at 0.3, temperature 0.3, and a streaming repetition guard (abort when an 8-word shingle repeats more than 40 times), 32000 tokens is sufficient. Raising the cap blindly does not help: a loop consumes any budget.
+## 5. Datasets (frozen 2026-11-05)
 
-## 4. Results
+`datasets/MANIFEST.json` records the exact files, sizes and SHA-256 hashes.
+Frozen data is never edited; a new variant is added as a new file.
 
-### 4.1 Test 1
+| Set | Language | Tasks | Document | Note |
+|---|---|---|---|---|
+| `chains/ru/dataset_20k_17tasks.json` | ru | 17 | 20k tokens, 300 noise lines | full set |
+| `chains/ru/dataset_20k_8tasks.json` | ru | 8 | same document, same tasks 1–8 | trilingual subset |
+| `chains/en/dataset_20k_8tasks.json` | en | 8 | translated document and tasks | trilingual subset |
+| `chains/zh/dataset_20k_8tasks.json` | zh | 8 | translated document and tasks | trilingual subset |
+| `programs/v4/` | — | 20 | 20 `.py` + expected `.json` | no language split |
 
-| Mode | Correct | Errors | Time |
-|---|---|---|---|
-One question per request | 10/17 | **41%** | ~17 min |
-All 17 in one request | 4/17 | **76%** | 90 s |
+The asymmetry is deliberate and documented: the Russian set covers all 17
+tasks, the English and Chinese sets cover the first 8. They bound the language
+effect on a common subset; they are not a full translation of the suite.
 
-### 4.2 Test 2
+## 6. Results
 
-| Configuration | Conditions | Correct | Errors |
-|---|---|---|---|
-v1 heavy | ops=15, comments=800, extras=300, traps=80 | 7/8 | 12% |
-v2 control flow | ops=12, comments=600, extras=200, traps=60 | 7/8 | 12% |
-v3 nested | ops=25, comments=1500, extras=500, traps=120 | 7/8 | 12% |
-v4 final | ops=20, comments=7400, extras=800, traps=150, ~106k tokens, array+sum | 2/5 | **60%** |
+### 6.1 Test 1, full 17-task set (Russian, one task per request)
 
-On a simple set of 24 tasks without noise both models scored 24/24 — a ceiling that does not discriminate.
+| Model | Budget | Correct | Errors | Median latency | Median reasoning | Length cuts | Loops |
+|---|---|---|---|---|---|---|---|
+| Qwen3.8-27B-UD-Q6_K_XL | 16k | 10/17 | 41% | 61 s | 11.9k chars | 0 | 0 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1M | 65535, default sampling | 12/17 | 29% | 83 s | 23.7k chars | 0 | 0 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1M | 32k, guarded | 10/17 | 41% | 82 s | — | 1 | 0 |
 
-## 5. Error analysis
+The 32k guarded run is the only one where one task hit the cap (task 12). A
+separate retry of that task at 131072 returned the correct value in 214 s,
+which classifies it as a genuine long reasoning case, not a loop.
 
-In Test 1 the failures were tasks 2, 7, 9, 13, 14, 15 and 17 — all requiring combination of rules or attributes. Pure arithmetic chains (1, 3, 4, 6, 8, 10, 11, 12, 16) were solved completely.
+### 6.2 Test 1, 8-task trilingual subset
 
-In Test 2 the final configuration produced two distinct failure modes: a near miss (one element off by two, sum 332 instead of 330) and large deviations where an entire branch of operations was lost.
+| Model | Language | Budget | Correct | Errors | Median latency |
+|---|---|---|---|---|---|
+| Qwen3.8-27B-UD-Q6_K_XL | ru | 16k | 4/8 | 50% | 45 s |
+| Qwen3.8-27B-UD-Q6_K_XL | en | 16k | 4/8 | 50% | 48 s |
+| Qwen3.8-27B-UD-Q6_K_XL | zh | 16k | 5/8 | 38% | 33 s |
 
-## 6. Discussion
+### 6.3 Test 2, 20 frozen programs
 
-1. **One task per request is markedly better.** The batched mode is about eleven times faster but twice as error-prone. For real work this argues for narrow requests.
-2. **`reasoning_effort` does not help.** The parameter changes the length of reasoning (12,088 → 14,919 characters) but not correctness.
-3. **Budget is part of the method.** A small `max_tokens` turns the test into a limit check rather than a capability check.
-4. **Structural complexity beats volume.** Adding comments up to 65–100k tokens did not raise the error rate; recursion, regex, type coercion and aliasing did.
+| Model | Budget | Correct | Errors | Median latency | Median reasoning | Length cuts | Loops |
+|---|---|---|---|---|---|---|---|
+| Qwen3.8-27B-UD-Q6_K_XL | 16k | 11/20 | 45% | 296 s | — | 0 | 0 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1M | 32k, guarded | 3/20 | 85% | 129 s | 14.1k chars | 3 | 0 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S | 32k, guarded | 2/20 | 90% | 130 s | 15.3k chars | 2 | 0 |
 
-## 7. Limitations
+Speed here is median wall-clock seconds per task, including queue time. It is
+not pure inference throughput and should not be compared with vendor numbers.
 
-- Few tasks: 17 chains and 5 programs — the statistics are weak, conclusions concern error profiles rather than exact rates.
-- One hardware configuration and one model at the calibration stage.
-- Language variants currently cover eight representative chain tasks.
+### 6.4 Calibration findings (context, not scored)
 
-## 8. Reproducibility
+- Batch mode — all 17 chain tasks in one request — is about eleven times
+  faster but roughly twice as error-prone (4/17, 76%). It is excluded from
+  scoring.
+- Raising noise volume from 20k to 65–100k tokens did not raise the error rate;
+  structural complexity did.
+- `reasoning_effort` changes reasoning length (12.1k → 14.9k characters) but
+  not correctness.
+
+## 7. Qualitative comparison
+
+1. **Q6 is the strongest of the three on both tests.** It is also the slowest on
+   programs (296 s median), because it thinks longer before committing.
+2. **Flash-Next is not simply "Q6 with less budget".** On test 2 its failures
+   are confident wrong answers with 11–16k characters of reasoning and
+   `finish=stop`, not starvation. On test 1 its accuracy is comparable to Q6 at
+   a large budget, which suggests the program-execution task is where the gap
+   really is.
+3. **YaRN is not the cause of degradation.** The base 262k variant scored 2/20
+   against 3/20 for the YaRN 1M variant on the same frozen set — a difference
+   inside the noise of one run. Removing YaRN did not recover accuracy.
+4. **The cap matters only where the model succeeds.** In test 2 the length cuts
+   coincide with correct answers on both Flash-Next variants: a model that
+   knows the answer reasons long enough to hit 32k; a model that does not
+   answers quickly and wrongly.
+5. **Loops are rare, and controllable.** The guard never fired in the scored
+   runs with penalties at 0.3. The one loop observed earlier (before the guard)
+   repeated a single noise block verbatim and consumed the entire budget.
+6. **Error profile is stable across models.** On test 1 the same task types
+   fail: rule combination, attribute selection, cancellation by order of
+   mention. Plain arithmetic chains pass.
+
+## 8. Model registry
+
+Exact names as used in the runner configuration. Short forms are not permitted
+in results or tables.
+
+| Model | Status | Runs |
+|---|---|---|
+| `Qwen3.8-27B-UD-Q6_K_XL` | measured | test 1 (ru 17, ru/en/zh 8), test 2 (20) |
+| `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1m` | measured | test 1 (ru 17, two budgets), test 2 (20) |
+| `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | measured | test 2 (20) |
+| `Qwen3.8-Flash-Next-UD-Q4_K_XL` | planned | — |
+| `Qwen3.8-Flash-Next-UD-IQ4_XS` | planned | — |
+| `Qwen3.8-Flash-Next-IQ3_M` | planned | — |
+| `Qwen3.8-27B-UD-Q8_K_XL` | planned | — |
+
+## 9. Reproducing a run
 
 ```bash
-# tasks and ground truth
-python3 scripts/build_tasks.py
+# one task per request, guarded, provenance recorded
+python3 scripts/run_chains.py --dataset datasets/chains/ru/dataset_20k_17tasks.json \
+    --model local-only --max-tokens 32000 --timeout 900 --temp 0.3 --fp 0.3 --pp 0.3 \
+    --out results/<model>/chains_ru_20k_32k_guarded.json
 
-# chain dataset with noise
-python3 scripts/gen_noise.py --seed 21 --tokens 20000 --noise 300 --out dataset_20k
-
-# test 1: one by one and batched
-python3 scripts/run_chains.py --dataset dataset_20k.json --model local-only
-python3 scripts/run_batch.py  --dataset dataset_20k.json --model local-only
-
-# test 2: programs
-python3 scripts/run_programs_v4.py --model local-only --n 5 --comments 7400 --extras 800 --traps 150
+# frozen programs, same guard
+python3 scripts/run_frozen_guarded.py --dir datasets/programs/v4 --model local-only \
+    --max-tokens 32000 --timeout 900 --temp 0.3 --fp 0.3 --pp 0.3 \
+    --out results/<model>/programs_v4_32k_guarded.json
 ```
 
-All generators are deterministic by seed: identical parameters produce byte-identical data.
+Generators are deterministic by seed: identical parameters produce
+byte-identical data.
 
-## Appendix A. Task types
-
-| # | Move type | Answer |
-|---|---|---|
-1 | linear chain, sum of offsets | 13 |
-2 | group rules by divisibility | 6 |
-3 | star, max minus min | 40 |
-4 | branching, two paths | 6 |
-5 | age and alias | 2 |
-6 | sequential percentages | 1760 |
-7 | mass + colour thresholds | 5 |
-8 | mileage + colour + divisibility | 40 |
-9 | counting by two features | 2 |
-10 | ratio instead of difference | 3 |
-11 | rule priority | 14 |
-12 | group versus group | 100 |
-13 | ability and size, signed difference | -5 |
-14 | derived property | 5 |
-15 | money trap | 120 |
-16 | variable state mutation | 39 |
-17 | cancellation by order of mention | 110 |
-
-## Appendix B. Repository layout
+## 10. Repository layout
 
 ```
-scripts/    generators for tasks, noise and programs; runners
-tasks/      tasks and ground truth (md + json)
-datasets/   chains/ — noisy documents; programs/ — programs with expected outputs
-results/    run results (json)
-protocol.md test log: setup, rules, observations
+README.md            this file (English, primary)
+README.ru.md         Russian translation
+README.zh.md         Chinese translation
+docs/methodology.md  the harness as an artifact: rules, guard, retry policy
+docs/run-log.md      chronological log of runs and calibration
+datasets/            frozen data + MANIFEST.json with SHA-256 hashes
+  chains/{ru,en,zh}/ noisy documents and tasks
+  programs/v4/       20 frozen programs with expected arrays and sums
+results/             one folder per model, exact model name
+  <model>/series.json    machine-readable index of runs
+  <model>/*.json         one file per run
+results/_invalid/    batch experiments kept for the record, excluded from tables
+scripts/             generators, runners, loop guard
 ```
+
+## 11. Limitations
+
+- Small samples: 17 chains and 20 programs. Conclusions concern error profiles
+  and relative ordering, not precise rates.
+- One hardware configuration (2× V100, single local endpoint).
+- Median latency includes queue time and is affected by concurrency.
+- The trilingual coverage is an 8-task subset, not the full 17.
+- The four planned quantisations have no runs yet; their rows exist so that
+  results land in a fixed place.
 
 ## License
 
