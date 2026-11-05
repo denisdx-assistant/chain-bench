@@ -128,6 +128,12 @@ loop needs.
 6. **Language** has a small effect on test 1; the trilingual subset was run to
    bound it, not to prove a trend.
 
+7. **Concurrency is a hard limit.** The 27B model cannot serve two requests at
+   once on this host: a parallel probe returns HTTP 503 and can break an active
+   series. The harness is strictly sequential and `scripts/probe.sh` refuses to
+   run while a series is active. Do not health-check the endpoint by hand during
+   a run.
+
 ## 8. Open questions
 
 - Whether the language of a document shifts accuracy on rule-combination
