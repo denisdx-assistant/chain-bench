@@ -8,29 +8,28 @@ cap, R aborted by the loop guard, · task not in this set.
 
 | Run | T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9 | T10 | T11 | T12 | T13 | T14 | T15 | T16 | T17 | Score |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Qwen3.8-27B-UD-Q6_K_XL · ru · 16k · default | 23s ✓ | 78s ✗ | 10s ✓ | 8s ✓ | 9s ✓ | 7s ✓ | 73s ✗ | 9s ✓ | 68s ✗ | 51s ✓ | 73s ✓ | 70s ✓ | 62s ✗ | 73s ✗ | 61s ✗ | 74s ✓ | 61s ✗ | 10/17 |
-| Qwen3.8-27B-UD-Q8_K_XL · en · 16k · default | 70s ✓ | 78s ✗ | 7s ✓ | 7s ✓ | 7s ✓ | 11s ✓ | 75s ✗ | 13s ✓ | 77s ✗ | 12s ✓ | 79s ✗ | 75s ✗ | 70s ✗ | 76s ✓ | 73s ✓ | 80s ✓ | 72s ✓ | 11/17 |
-| Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · default | 32s ✓ | 80s ✗ | 9s ✓ | 8s ✓ | 10s ✓ | 8s ✓ | 74s ✗ | 14s ✓ | 75s ✗ | 76s ✓ | 82s ✓ | 76s ✗ | 81s ✗ | 78s ✗ | 80s ✓ | 82s ✓ | 75s ✗ | 10/17 |
-| Qwen3.8-27B-UD-Q8_K_XL · zh · 16k · default | 115s ✓ | 83s ✓ | 10s ✓ | 9s ✓ | 11s ✓ | 10s ✓ | 83s ✗ | 40s ✓ | 84s ✗ | 68s ✓ | 87s ✗ | 86s ✓ | 83s ✗ | 87s ✗ | 88s ✓ | 49s ✓ | 83s ✗ | 11/17 |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ru · 32k · guarded | 157s ✓ | 73s ✗ | 9s ✓ | 8s ✓ | 11s ✓ | 6s ✓ | 131s ✗ | 10s ✓ | 168s ✗ | 27s ✓ | 203s ✓ | 379s L | 202s ✗ | 82s ✗ | 75s ✓ | 97s ✓ | 183s ✗ | 10/17 |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ru · 65535 · default | 62s ✓ | 168s ✗ | 7s ✓ | 6s ✓ | 8s ✓ | 5s ✓ | 250s ✗ | 13s ✓ | 83s ✓ | 20s ✓ | 117s ✓ | 102s ✓ | 320s ✗ | 206s ✗ | 102s ✓ | 53s ✓ | 156s ✗ | 12/17 |
+| Qwen3.8-27B-UD-Q6_K_XL · ru · 16k · default | 23sw ✓ | 78sw ✗ | 10sw ✓ | 8sw ✓ | 9sw ✓ | 7sw ✓ | 73sw ✗ | 9sw ✓ | 68sw ✗ | 51sw ✓ | 73sw ✓ | 70sw ✓ | 62sw ✗ | 73sw ✗ | 61sw ✗ | 74sw ✓ | 61sw ✗ | 10/17 |
+| Qwen3.8-27B-UD-Q8_K_XL · en · 16k · default | 70sw ✓ | 78sw ✗ | 7sw ✓ | 7sw ✓ | 7sw ✓ | 11sw ✓ | 75sw ✗ | 13sw ✓ | 77sw ✗ | 12sw ✓ | 79sw ✗ | 75sw ✗ | 70sw ✗ | 76sw ✓ | 73sw ✓ | 80sw ✓ | 72sw ✓ | 11/17 |
+| Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · default | 32sw ✓ | 80sw ✗ | 9sw ✓ | 8sw ✓ | 10sw ✓ | 8sw ✓ | 74sw ✗ | 14sw ✓ | 75sw ✗ | 76sw ✓ | 82sw ✓ | 76sw ✗ | 81sw ✗ | 78sw ✗ | 80sw ✓ | 82sw ✓ | 75sw ✗ | 10/17 |
+| Qwen3.8-27B-UD-Q8_K_XL · zh · 16k · default | 115sw ✓ | 83sw ✓ | 10sw ✓ | 9sw ✓ | 11sw ✓ | 10sw ✓ | 83sw ✗ | 40sw ✓ | 84sw ✗ | 68sw ✓ | 87sw ✗ | 86sw ✓ | 83sw ✗ | 87sw ✗ | 88sw ✓ | 49sw ✓ | 83sw ✗ | 11/17 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ru · 32k · guarded | 157sw ✓ | 73sw ✗ | 9sw ✓ | 8sw ✓ | 11sw ✓ | 6sw ✓ | 131sw ✗ | 10sw ✓ | 168sw ✗ | 27sw ✓ | 203sw ✓ | 379sw L | 202sw ✗ | 82sw ✗ | 75sw ✓ | 97sw ✓ | 183sw ✗ | 10/17 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ru · 65535 · default | 62sw ✓ | 168sw ✗ | 7sw ✓ | 6sw ✓ | 8sw ✓ | 5sw ✓ | 250sw ✗ | 13sw ✓ | 83sw ✓ | 20sw ✓ | 117sw ✓ | 102sw ✓ | 320sw ✗ | 206sw ✗ | 102sw ✓ | 53sw ✓ | 156sw ✗ | 12/17 |
 
 ### Test 1 — 8-task subset
 
 | Run | T1 | T2 | T3 | T6 | T7 | T9 | T13 | T17 | Score |
 |---|---|---|---|---|---|---|---|---|---|
-| Qwen3.8-27B-UD-Q6_K_XL · en · 16k · 8tasks | 33s ✓ | 6s ✓ | 5s ✓ | 6s ✓ | 70s ✗ | 63s ✗ | 71s ✗ | 65s ✗ | 4/8 |
-| Qwen3.8-27B-UD-Q6_K_XL · ru · 16k · 8tasks | 44s ✓ | 8s ✓ | 6s ✓ | 5s ✓ | 46s ✗ | 46s ✗ | 70s ✗ | 59s ✗ | 4/8 |
-| Qwen3.8-27B-UD-Q6_K_XL · zh · 16k · 8tasks | 40s ✓ | 11s ✓ | 9s ✓ | 9s ✓ | 37s ✗ | 29s ✗ | 79s ✗ | 394s ✓ | 5/8 |
-| Qwen3.8-27B-UD-Q8_K_XL · en · 16k · 8tasks | 22s ✓ | 7s ✓ | 5s ✓ | 5s ✓ | 76s ✗ | 15s ✗ | 56s ✗ | 72s ✗ | 4/8 |
-| Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · 8tasks | 24s ✓ | 10s ✓ | 6s ✓ | 6s ✓ | 70s ✗ | 49s ✗ | 74s ✗ | 75s ✓ | 5/8 |
-| Qwen3.8-27B-UD-Q8_K_XL · zh · 16k · 8tasks | 39s ✓ | 12s ✓ | 10s ✓ | 7s ✓ | 26s ✗ | 50s ✗ | 84s ✗ | 75s ✗ | 4/8 |
+| Qwen3.8-27B-UD-Q6_K_XL · en · 16k · 8tasks | 33sw ✓ | 6sw ✓ | 5sw ✓ | 6sw ✓ | 70sw ✗ | 63sw ✗ | 71sw ✗ | 65sw ✗ | 4/8 |
+| Qwen3.8-27B-UD-Q6_K_XL · ru · 16k · 8tasks | 44sw ✓ | 8sw ✓ | 6sw ✓ | 5sw ✓ | 46sw ✗ | 46sw ✗ | 70sw ✗ | 59sw ✗ | 4/8 |
+| Qwen3.8-27B-UD-Q6_K_XL · zh · 16k · 8tasks | 40sw ✓ | 11sw ✓ | 9sw ✓ | 9sw ✓ | 37sw ✗ | 29sw ✗ | 79sw ✗ | 394sw ✓ | 5/8 |
+| Qwen3.8-27B-UD-Q8_K_XL · en · 16k · 8tasks | 22sw ✓ | 7sw ✓ | 5sw ✓ | 5sw ✓ | 76sw ✗ | 15sw ✗ | 56sw ✗ | 72sw ✗ | 4/8 |
+| Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · 8tasks | 24sw ✓ | 10sw ✓ | 6sw ✓ | 6sw ✓ | 70sw ✗ | 49sw ✗ | 74sw ✗ | 75sw ✓ | 5/8 |
+| Qwen3.8-27B-UD-Q8_K_XL · zh · 16k · 8tasks | 39sw ✓ | 12sw ✓ | 10sw ✓ | 7sw ✓ | 26sw ✗ | 50sw ✗ | 84sw ✗ | 75sw ✗ | 4/8 |
 
 ### Test 2 — 20 frozen programs
 
 | Run | S100 | S101 | S102 | S103 | S104 | S105 | S106 | S107 | S300 | S301 | S302 | S303 | S304 | S305 | S306 | S307 | S308 | S309 | S310 | S311 | S312 | S313 | S314 | S315 | S316 | S317 | S318 | S319 | Score |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Qwen3.8-27B-UD-Q6_K_XL · - · 8k · legacy | 54s ✓ | 46s ✓ | 109s ✓ | 58s ✗ | 202s ✓ | 98s ✓ | 61s ✓ | 57s ✓ | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | 7/28 |
-| Qwen3.8-27B-UD-Q6_K_XL · - · 8k · legacy | 81s ✓ | 63s ✓ | 80s ✓ | 139s ✗ | 202s ✓ | 102s ✓ | 68s ✓ | 96s ✓ | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | 7/28 |
-| Qwen3.8-27B-UD-Q6_K_XL · - · 16k · default | · | · | · | · | · | · | · | · | 292s ✓ | 306s ✗ | 292s ✗ | 288s ✗ | 597s ✓ | 294s ✓ | 304s ✓ | 292s ✓ | 291s ✓ | 595s ✓ | 296s ✗ | 306s ✗ | 298s ✗ | 296s ✗ | 593s ✓ | 292s ✓ | 484s ✗ | 294s ✓ | 597s ✗ | 292s ✓ | 11/28 |
-| Qwen3.8-27B-UD-Q8_K_XL · - · 16k · default | · | · | · | · | · | · | · | · | 738s ✗ | 322s ✗ | 140s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0s ✗ | 0/28 |
+| Qwen3.8-27B-UD-Q6_K_XL · - · 8k · legacy | 54sw ✓ | 46sw ✓ | 109sw ✓ | 58sw ✗ | 202sw ✓ | 98sw ✓ | 61sw ✓ | 57sw ✓ | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | 7/28 |
+| Qwen3.8-27B-UD-Q6_K_XL · - · 8k · legacy | 81sw ✓ | 63sw ✓ | 80sw ✓ | 139sw ✗ | 202sw ✓ | 102sw ✓ | 68sw ✓ | 96sw ✓ | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | 7/28 |
+| Qwen3.8-27B-UD-Q6_K_XL · - · 16k · default | · | · | · | · | · | · | · | · | 292sw ✓ | 306sw ✗ | 292sw ✗ | 288sw ✗ | 597sw ✓ | 294sw ✓ | 304sw ✓ | 292sw ✓ | 291sw ✓ | 595sw ✓ | 296sw ✗ | 306sw ✗ | 298sw ✗ | 296sw ✗ | 593sw ✓ | 292sw ✓ | 484sw ✗ | 294sw ✓ | 597sw ✗ | 292sw ✓ | 11/28 |

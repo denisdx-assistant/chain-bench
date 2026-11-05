@@ -106,9 +106,18 @@ def collect():
             continue
         row = {"model": meta.get("resolved_model") or folder, "folder": folder,
                "lang": lang, "budget": budget, "subset": subset,
-               "variant": variant, "tasks": tasks, "file": os.path.basename(path)}
+               "variant": variant, "tasks": tasks, "file": os.path.basename(path),
+               "expected": expected_items(kind, subset, os.path.basename(path)),
+               "partial": len(tasks) < expected_items(kind, subset, os.path.basename(path))}
         (chains if kind == "chains" else programs).append(row)
     return chains, programs
+
+
+def expected_items(kind, subset, name=""):
+    if kind == "programs":
+        # the frozen v4 set has 20 programs; the legacy v2 sets have 8
+        return 8 if re.search(r"v2_|_8\.json", name) else 20
+    return 8 if subset else 17
 
 
 def sort_key(x):
@@ -150,7 +159,12 @@ def table(rows, ids, kind):
         label = "%s · %s · %s%s · %s" % (r["folder"], r["lang"], r["budget"], bk, r["variant"])
         cells = [cell(r["tasks"].get(i)) for i in ids]
         ok = sum(1 for i in ids if r["tasks"].get(i, ("",))[0] == OK)
-        lines.append("| %s | %s | %d/%d |" % (label, " | ".join(cells), ok, len(ids)))
+        if r.get("partial"):
+            done = len(r["tasks"])
+            lines.append("| %s | %s | %d/%d (partial %d/%d) |"
+                         % (label, " | ".join(cells), ok, done, done, r.get("expected", done)))
+        else:
+            lines.append("| %s | %s | %d/%d |" % (label, " | ".join(cells), ok, len(ids)))
     return "\n".join(lines)
 
 
@@ -179,11 +193,11 @@ def summary():
     rows = []
     for (folder, _ctx, _yarn, _temp, _pen, _budget, _guard), g in sorted(groups.items(), key=lambda kv: str(kv[0])):
         def pick(lang):
-            full = [r for r in g["chains"] if r["lang"] == lang and not r["subset"]]
+            full = [r for r in g["chains"] if r["lang"] == lang and not r["subset"] and not r.get("partial")]
             if full:
                 full.sort(key=lambda r: (r["variant"] != "guarded", -len(r["tasks"])))
                 return full[0], False
-            sub = [r for r in g["chains"] if r["lang"] == lang]
+            sub = [r for r in g["chains"] if r["lang"] == lang and not r.get("partial")]
             if sub:
                 sub.sort(key=lambda r: -len(r["tasks"]))
                 return sub[0], True
@@ -203,7 +217,8 @@ def summary():
             cells["t1_" + lang] = {"t": t, "ok": ok, "n": n, "subset": subset}
             total_t += t; total_ok += ok; total_n += n
 
-        pr = g["programs"][0] if g["programs"] else None
+        complete_programs = [r for r in g["programs"] if not r.get("partial")]
+        pr = complete_programs[0] if complete_programs else None
         if pr:
             t = sum(((v[2] if len(v) > 2 and v[2] is not None else v[1]) or 0)
                     for v in pr["tasks"].values())
