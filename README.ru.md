@@ -91,13 +91,13 @@ YaRN, температурой или бюджетом — контекст по
 результатов.
 
 <!-- summary:start -->
-| Run | Overall | Test 1 en | Test 1 ru | Test 1 zh | Test 2 |
+| Run | Overall (errors) | Test 1 en (correct) | Test 1 ru (correct) | Test 1 zh (correct) | Test 2 (correct) |
 |---|---|---|---|---|---|
-| Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default · budget 16k | 28m57s 42% | 5m19s 4/8 (8) | 13m30s 10/17 | 10m08s 5/8 (8) | — |
-| Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · budget 16k · guard | 30m22s 38% | 14m42s 11/17 | 15m40s 10/17 | — | — |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · ctx 262k · no YaRN · T 0.3 · pen 0.3 · budget 32k · guard | 54m01s 90% | — | — | — | 54m01s 2/20 |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T 0.3 · pen 0.3 · budget 32k · guard | 94m29s 65% | — | 30m21s 10/17 | — | 64m08s 3/20 |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T default · budget 65535 · provenance inferred | 27m58s 29% | — | 27m58s 12/17 | — | — |
+| Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default · budget 16k | 28m57s · 42% err | 5m19s 4/8 (8) | 13m30s 10/17 | 10m08s 5/8 (8) | — |
+| Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · budget 16k · guard | 30m22s · 38% err | 14m42s 11/17 | 15m40s 10/17 | — | — |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · ctx 262k · no YaRN · T 0.3 · pen 0.3 · budget 32k · guard | 54m01s · 90% err | — | — | — | 54m01s 2/20 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T 0.3 · pen 0.3 · budget 32k · guard | 94m29s · 65% err | — | 30m21s 10/17 | — | 64m08s 3/20 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T default · budget 65535 · provenance inferred | 27m58s · 29% err | — | 27m58s 12/17 | — | — |
 <!-- summary:end -->
 
 **Детали.**

@@ -202,7 +202,7 @@ def summary():
         rows.append({"label": "%s · %s" % (folder, cfg_label(g["cfg"], budget)),
                      "cells": cells, "overall": (total_t, total_ok, total_n)})
 
-    head = "| Run | Overall | Test 1 en | Test 1 ru | Test 1 zh | Test 2 |"
+    head = "| Run | Overall (errors) | Test 1 en (correct) | Test 1 ru (correct) | Test 1 zh (correct) | Test 2 (correct) |"
     sep = "|---|---|---|---|---|---|"
     lines = [head, sep]
     for r in rows:
@@ -214,7 +214,7 @@ def summary():
                 mark += " (8)"
             return "%s %s" % (human(c["t"]), mark)
         t, ok, n = r["overall"]
-        overall = "%s %d%%" % (human(t), round(100 * (n - ok) / n) if n else 0)
+        overall = "%s · %d%% err" % (human(t), round(100 * (n - ok) / n) if n else 0)
         lines.append("| %s | %s | %s | %s | %s | %s |" % (
             r["label"], overall, fmt(r["cells"]["t1_en"]), fmt(r["cells"]["t1_ru"]),
             fmt(r["cells"]["t1_zh"]), fmt(r["cells"]["t2"])))
