@@ -27,11 +27,15 @@ is computed by code. Difficulty was calibrated on
 the 50% target. Series were then run for three Flash-Next configurations and for
 `Qwen3.8-27B-UD-Q8_K_XL`.
 
-**What it shows.** Q6 is the strongest on both tests. Flash-Next variants are
-comparable on chains at a large budget but three to five times worse on program
-execution. The base 262k variant and the YaRN 1M variant differ within the noise
-of a single run, so YaRN is not what costs accuracy. Degenerate loops are rare
-and are contained by a streaming guard rather than by a bigger budget.
+**What it shows.** On program execution Q6 is clearly ahead: 11/20 against 3/20
+and 2/20 for the Flash-Next variants. That is the only gap in this suite that
+survives its own sample size (95% intervals for the correct share: 33–77%
+against 0–31% and 0–23%). On chains the models are **not** separated: Q6 10/17,
+Flash-Next 12/17 at a large budget and 10/17 at 32k, Q8 10/17 on Russian and
+11/17 on English — one or two tasks apart on a 17-task set, well inside the
+interval. YaRN 1M and the 262k base differ by one program, also inside noise.
+Degenerate loops are rare and are contained by a streaming guard rather than by
+a bigger budget.
 
 ## 1. Methodology
 
