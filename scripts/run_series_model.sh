@@ -7,7 +7,7 @@ MODEL="$1"; PROFILE="${2:-27b}"
 OUT="results/$MODEL"
 mkdir -p "$OUT"
 case "$PROFILE" in
-  27b-32)        COMMON="--model local-only --max-tokens 32000 --timeout 3600 --temp -1 --fp 0 --pp 0" ;;
+  27b-32)        COMMON="--model local-only --max-tokens 32000 --timeout 2400 --temp -1 --fp 0 --pp 0" ;;
   flash-next)    COMMON="--model local-only --max-tokens 32000 --timeout 2400 --temp 0.3 --fp 0.3 --pp 0.3" ;;
   flash-next-02) COMMON="--model local-only --max-tokens 32000 --timeout 2400 --temp -1 --fp 0.2 --pp 0.2" ;;
   *)          COMMON="--model local-only --max-tokens 16000 --timeout 2400 --temp -1 --fp 0 --pp 0" ;;
