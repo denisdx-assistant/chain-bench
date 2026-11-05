@@ -14,6 +14,7 @@
 import argparse
 import importlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -24,7 +25,10 @@ import urllib.request
 
 from gen_program import gen
 
-BASE = "http://192.168.1.111:21434"
+_cfg = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "endpoint")
+BASE = (os.environ.get("CHAIN_BENCH_ENDPOINT")
+        or (open(_cfg).read().strip() if os.path.exists(_cfg) else "")
+        or "http://127.0.0.1:21434")
 CLIENT = "openclaw-programs"
 
 QUESTION = ("\n\nВопрос: чему равна сумма элементов массива arr после выполнения этой программы? "

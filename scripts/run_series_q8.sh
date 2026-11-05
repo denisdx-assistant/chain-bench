@@ -3,7 +3,7 @@
 # Sequential on purpose: the local endpoint serves one heavy model at a time.
 # Resume-safe: a run whose result file exists is skipped.
 set -u
-cd /home/clawvm/.openclaw/workspace/chain-bench || exit 1
+cd "$(dirname "$0")/.." || exit 1
 
 MODEL="Qwen3.8-27B-UD-Q8_K_XL"
 OUT="results/$MODEL"

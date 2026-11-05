@@ -9,12 +9,16 @@ closes the connection once one shingle repeats more than `max_repeat` times.
 Returns a dict with `loop: True` when aborted, plus partial content.
 """
 import json
+import os
 import re
 import time
 import urllib.error
 import urllib.request
 
-BASE = 'http://192.168.1.111:21434'
+_cfg = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "endpoint")
+BASE = (os.environ.get("CHAIN_BENCH_ENDPOINT")
+        or (open(_cfg).read().strip() if os.path.exists(_cfg) else "")
+        or "http://127.0.0.1:21434")
 
 
 def _shingles(text, n=8):

@@ -2,9 +2,9 @@
 # Wait until the Q8 model is schedulable again, then resume its series.
 # Refuses to start on any other provider: results must not be filed under Q8
 # if a different model is loaded on the shared local route.
-cd /home/clawvm/.openclaw/workspace/chain-bench || exit 1
+cd "$(dirname "$0")/.." || exit 1
 WANT="local_Qwen3.8-27B-UD-Q8_K_XL"
-API="http://192.168.1.111:21434"
+API="${CHAIN_BENCH_ENDPOINT:-$(cat config/endpoint 2>/dev/null || echo http://127.0.0.1:21434)}"
 
 for i in $(seq 1 288); do   # up to 24 hours at 5-minute steps
   prov=$(curl -s --max-time 10 "$API/v1/models/local-only" \

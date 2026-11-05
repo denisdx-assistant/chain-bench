@@ -2,7 +2,7 @@
 # Full test series for one model folder. Usage: run_series_model.sh <folder> <profile>
 # profile: 27b (16k, default sampling) | flash-next (32k, temp 0.3, penalties 0.3)
 set -u
-cd /home/clawvm/.openclaw/workspace/chain-bench || exit 1
+cd "$(dirname "$0")/.." || exit 1
 MODEL="$1"; PROFILE="${2:-27b}"
 OUT="results/$MODEL"
 mkdir -p "$OUT"

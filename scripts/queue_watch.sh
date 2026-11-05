@@ -1,8 +1,8 @@
 #!/bin/sh
 # Run the full series for a queued model as soon as the local route serves it.
 # Refuses to run while another series is active; matches by model name only.
-cd /home/clawvm/.openclaw/workspace/chain-bench || exit 1
-API="http://192.168.1.111:21434"
+cd "$(dirname "$0")/.." || exit 1
+API="${CHAIN_BENCH_ENDPOINT:-$(cat config/endpoint 2>/dev/null || echo http://127.0.0.1:21434)}"
 for i in $(seq 1 288); do
   if pgrep -f "run_series_(q8|model)" >/dev/null 2>&1; then sleep 180; continue; fi
   loaded=$(curl -s --max-time 10 "$API/v1/models/local-only" | python3 -c "

@@ -16,7 +16,10 @@ import time
 import urllib.error
 import urllib.request
 
-BASE = 'http://192.168.1.111:21434'
+_cfg = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "endpoint")
+BASE = (os.environ.get("CHAIN_BENCH_ENDPOINT")
+        or (open(_cfg).read().strip() if os.path.exists(_cfg) else "")
+        or "http://127.0.0.1:21434")
 CLIENT = 'openclaw-frozen'
 QUESTION = ("\n\nQuestion: name the final array arr after running this program and its sum. "
             "Answer strictly as:\nARRAY: [numbers, comma separated]\nSUM: number")
