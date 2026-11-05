@@ -26,4 +26,5 @@ before the fields were captured show “—”.
 | Qwen3.8-27B-UD-Q8_K_XL · programs · 16k · v4_16k | default | 20 | 40.3 | 722.1 | 2 | 4145 | 142558 | 103 s |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · chains ru · 32k | guarded | 17 | — | — | 0 | — | — | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · chains ru · 65535 | default | 17 | — | — | 0 | — | — | — |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · chains en · 16k | default | 17 | 78.0 | 1135.9 | 17 | 4112 | 14062 | 54 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains ru · 16k | default | 17 | 73.6 | 1166.7 | 4 | 4605 | 19260 | 64 s |
