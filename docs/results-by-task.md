@@ -28,7 +28,9 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-27B-UD-Q8_K_XL · en · 16k · 8tasks | 22sw ✓ | 7sw ✓ | 5sw ✓ | 5sw ✓ | 76sw ✗ | 15sw ✗ | 56sw ✗ | 72sw ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · 8tasks | 24sw ✓ | 10sw ✓ | 6sw ✓ | 6sw ✓ | 70sw ✗ | 49sw ✗ | 74sw ✗ | 75sw ✓ | 5/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · zh · 16k · 8tasks | 39sw ✓ | 12sw ✓ | 10sw ✓ | 7sw ✓ | 26sw ✗ | 50sw ✗ | 84sw ✗ | 75sw ✗ | 4/8 |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · en · 16k · 8tasks | 7s ✓ | 3s ✓ | 3s ✓ | 3s ✓ | 74s ✗ | 15s ✗ | 63s ✗ | 281s ✗ | 4/8 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · ru · 16k · 8tasks | 6s ✓ | 7s ✓ | 5s ✓ | 3s ✓ | 82s ✗ | 55s ✗ | 45s ✗ | 141s ✓ | 5/8 |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · zh · 16k · 8tasks | 19s ✓ | 9s ✓ | 5s ✓ | 4s ✓ | 69s ✗ | 27s ✓ | 65s ✗ | 238s ✓ | 6/8 |
 
 ### Test 2 — 20 frozen programs
 
@@ -38,3 +40,4 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-27B-UD-Q6_K_XL · - · 8k · legacy | 81sw ✓ | 63sw ✓ | 80sw ✓ | 139sw ✗ | 202sw ✓ | 102sw ✓ | 68sw ✓ | 96sw ✓ | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | 7/28 |
 | Qwen3.8-27B-UD-Q6_K_XL · - · 16k · default | · | · | · | · | · | · | · | · | 292sw ✓ | 306sw ✗ | 292sw ✗ | 288sw ✗ | 597sw ✓ | 294sw ✓ | 304sw ✓ | 292sw ✓ | 291sw ✓ | 595sw ✓ | 296sw ✗ | 306sw ✗ | 298sw ✗ | 296sw ✗ | 593sw ✓ | 292sw ✓ | 484sw ✗ | 294sw ✓ | 597sw ✗ | 292sw ✓ | 11/28 |
 | Qwen3.8-27B-UD-Q8_K_XL · - · 16k · default | · | · | · | · | · | · | · | · | 103s ✓ | 103s ✗ | 105s ✗ | 105s ✗ | 102s ✓ | 100s ✓ | 104s ✓ | 102s ✓ | 103s ✓ | 105s ✓ | 95s ✗ | 187s ✗ | 102s ✓ | 103s ✓ | 101s ✓ | 101s ✓ | 104s ✓ | 94s ✓ | 100s ✓ | 104s ✗ | 14/28 |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · - · 16k · default | · | · | · | · | · | · | · | · | 161s ✓ | 49s ✗ | 315s L | 107s ✓ | 91s ✓ | 149s ✓ | 60s ✓ | 75s ✓ | 57s ✗ | 70s ✓ | 374s L | 80s ✗ | 83s ✓ | 51s ✗ | 91s ✓ | 97s ✓ | 54s ✓ | 55s ✓ | 113s ✓ | 137s ✓ | 14/28 |
