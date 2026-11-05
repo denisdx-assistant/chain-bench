@@ -16,6 +16,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ru · 65535 · default | 62sw ✓ | 168sw ✗ | 7sw ✓ | 6sw ✓ | 8sw ✓ | 5sw ✓ | 250sw ✗ | 13sw ✓ | 83sw ✓ | 20sw ✓ | 117sw ✓ | 102sw ✓ | 320sw ✗ | 206sw ✗ | 102sw ✓ | 53sw ✓ | 156sw ✗ | 12/17 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · en · 16k · default | 32s ✓ | 183s ✓ | 4s ✓ | 3s ✓ | 4s ✓ | 4s ✓ | 140s ✓ | 4s ✓ | 107s ✗ | 22s ✓ | 87s ✗ | 315s ✗ | 230s ✗ | 155s ✓ | 54s ✓ | 27s ✓ | 389s ✓ | 13/17 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · ru · 16k · default | 49s ✓ | 117s ✗ | 5s ✓ | 4s ✓ | 6s ✓ | 3s ✓ | 127s ✗ | 16s ✓ | 129s ✗ | 17s ✓ | 120s ✓ | 290s ✓ | 203s ✗ | 232s ✗ | 64s ✓ | 49s ✓ | 188s ✗ | 11/17 |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · zh · 16k · default | 48s ✓ | 131s ✓ | 4s ✓ | 5s ✓ | 7s ✓ | 5s ✓ | 246s ✓ | 39s ✓ | 66s ✓ | 41s ✓ | 110s ✗ | 267s ✓ | 228s ✗ | 159s ✓ | 64s ✓ | 68s ✓ | 327s ✗ | 14/17 |
 
 ### Test 1 — 8-task subset
 
@@ -27,6 +28,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-27B-UD-Q8_K_XL · en · 16k · 8tasks | 22sw ✓ | 7sw ✓ | 5sw ✓ | 5sw ✓ | 76sw ✗ | 15sw ✗ | 56sw ✗ | 72sw ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · 8tasks | 24sw ✓ | 10sw ✓ | 6sw ✓ | 6sw ✓ | 70sw ✗ | 49sw ✗ | 74sw ✗ | 75sw ✓ | 5/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · zh · 16k · 8tasks | 39sw ✓ | 12sw ✓ | 10sw ✓ | 7sw ✓ | 26sw ✗ | 50sw ✗ | 84sw ✗ | 75sw ✗ | 4/8 |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · ru · 16k · 8tasks | 6s ✓ | 7s ✓ | 5s ✓ | 3s ✓ | 82s ✗ | 55s ✗ | 45s ✗ | 141s ✓ | 5/8 |
 
 ### Test 2 — 20 frozen programs
 
