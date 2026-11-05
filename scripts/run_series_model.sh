@@ -4,6 +4,13 @@
 set -u
 cd "$(dirname "$0")/.." || exit 1
 MODEL="$1"; PROFILE="${2:-27b}"
+# single-instance lock: only one series may run at a time
+LOCK="results/.series.lock"
+if ! mkdir "$LOCK" 2>/dev/null; then
+  echo "another series holds $LOCK, exit"
+  exit 0
+fi
+trap 'rmdir "$LOCK" 2>/dev/null' EXIT INT TERM
 OUT="results/$MODEL"
 mkdir -p "$OUT"
 case "$PROFILE" in

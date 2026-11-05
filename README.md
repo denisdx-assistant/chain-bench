@@ -98,7 +98,7 @@ Each cell is one test series: total wall-clock time and score. `(8)` marks the
 | Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default · budget 16k | 150m36s · 43% err | 5m19s 4/8 (8) | 13m30s 10/17 | 10m08s 5/8 (8) | 121m39s 11/20 |
 | Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default · budget 8 · legacy 8-program set | 11m25s · 12% err | — | — | — | 11m25s 7/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · budget 16k · guard | 48m18s · 37% err | 14m42s 11/17 | 15m40s 10/17 | 17m56s 11/17 | — |
-| Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · budget 32k · guard | 0s · 0% err | — | — | — | — |
+| Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · budget 32k · guard | 35m23s · 30% err | — | — | — | 35m23s 14/20 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T 0.3 · pen 0.3 · budget 32k · guard | 30m21s · 41% err | — | 30m21s 10/17 | — | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T default · budget 65535 · provenance inferred | 27m58s · 29% err | — | 27m58s 12/17 | — | — |
 <!-- summary:end -->
