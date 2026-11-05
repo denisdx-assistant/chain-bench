@@ -97,21 +97,35 @@ Frozen data is never edited; a new variant is added as a new file.
 | `chains/ru/dataset_20k_8tasks.json` | ru | 8 | same document, same tasks 1–8 | trilingual subset |
 | `chains/en/dataset_20k_8tasks.json` | en | 8 | translated document and tasks | trilingual subset |
 | `chains/zh/dataset_20k_8tasks.json` | zh | 8 | translated document and tasks | trilingual subset |
+| `chains/en/dataset_20k_17tasks.json` | en | 17 | translated document and tasks | full set, added 2026-11-05 |
+| `chains/zh/dataset_20k_17tasks.json` | zh | 17 | translated document and tasks | full set, added 2026-11-05 |
 | `programs/v4/` | — | 20 | 20 `.py` + expected `.json` | no language split |
 
-The asymmetry is deliberate and documented: the Russian set covers all 17
-tasks, the English and Chinese sets cover the first 8. They bound the language
-effect on a common subset; they are not a full translation of the suite.
+Coverage is now symmetric for the full set: all three languages have a 17-task
+document. The Russian set was produced by the original noise generator; the
+English and Chinese 17-task sets use the trilingual generator at seed 21 and the
+same noise parameters (20 000 tokens, 300 lines), so they are parallel to each
+other. Russian and non-Russian full sets differ in noise wording by construction;
+the 8-task translations are kept as the earlier frozen subset.
 
 ## 6. Results
 
 ### 6.1 Test 1, full 17-task set (Russian, one task per request)
 
-| Model | Budget | Correct | Errors | Median latency | Median reasoning | Length cuts | Loops |
-|---|---|---|---|---|---|---|---|
-| Qwen3.8-27B-UD-Q6_K_XL | 16k | 10/17 | 41% | 61 s | 11.9k chars | 0 | 0 |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1M | 65535, default sampling | 12/17 | 29% | 83 s | 23.7k chars | 0 | 0 |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1M | 32k, guarded | 10/17 | 41% | 82 s | — | 1 | 0 |
+| Model | Lang | Budget | Correct | Errors | Median latency | Median reasoning | Length cuts | Loops |
+|---|---|---|---|---|---|---|---|---|
+| Qwen3.8-27B-UD-Q6_K_XL | ru | 16k | 10/17 | 41% | 61 s | 11.9k chars | 0 | 0 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1m | ru | 65535, default sampling | 12/17 | 29% | 83 s | 23.7k chars | 0 | 0 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1m | ru | 32k, guarded | 10/17 | 41% | 82 s | — | 1 | 0 |
+| Qwen3.8-27B-UD-Q6_K_XL | en | 16k | — | — | — | — | — | — |
+| Qwen3.8-27B-UD-Q6_K_XL | zh | 16k | — | — | — | — | — | — |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1m | en | 32k, guarded | — | — | — | — | — | — |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1m | zh | 32k, guarded | — | — | — | — | — | — |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S | en | 32k, guarded | — | — | — | — | — | — |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S | zh | 32k, guarded | — | — | — | — | — | — |
+
+Rows with dashes are frozen sets that have not been run yet. They are kept in the
+table so that results land in a fixed place.
 
 The 32k guarded run is the only one where one task hit the cap (task 12). A
 separate retry of that task at 131072 returned the correct value in 214 s,
