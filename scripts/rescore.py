@@ -41,7 +41,7 @@ def rescore_programs(rows):
     for r in rows:
         raw = r.get("raw")
         # legacy sets stored only the parsed number, not the model's answer
-        if "expected_array" not in r and "expected" in r:
+        if "got_array" not in r and "got" in r:
             ok = r.get("got") == r.get("expected")
             r["ok_rescored"] = ok
             if ok != bool(r.get("ok")):
