@@ -98,7 +98,7 @@ def gen(seed, ops, comments, extras, traps):
             real.append("reverse")
 
         # шум между операциями
-        for _ in range(max(1, comments // max(1, ops))):
+        for _ in range(0 if comments <= 0 else max(1, comments // max(1, ops))):
             if rng.random() < 0.5:
                 L.append("# %s: %s — не выполняется" % (
                     rng.choice(TOPICS),
