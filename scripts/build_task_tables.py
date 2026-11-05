@@ -10,6 +10,7 @@ Writes docs/results-by-task.md and prints the block for the README.
 import glob
 import json
 import os
+import sys
 import re
 
 OK, BAD, LEN, LOOP, NA = "✓", "✗", "L", "R", "·"
@@ -223,11 +224,7 @@ def main():
     c17 = [r for r in chains if not r["subset"]]
     c8 = [r for r in chains if r["subset"]]
 
-    parts = ["### Summary by test group\n",
-             "Cell format: total wall-clock time of the group and correct/total.\n",
-             "`(8)` marks a run on the 8-task subset instead of the full set.\n",
-             summary(),
-             "\n### Test 1 — full 17-task set\n",
+    parts = ["### Test 1 — full 17-task set\n",
              table(c17, ids_for(c17), "chains") if c17 else "_No runs yet._",
              "\n### Test 1 — 8-task subset\n",
              table(c8, ids_for(c8), "chains") if c8 else "_No runs yet._",
@@ -245,4 +242,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if "--summary" in sys.argv:
+        print(summary())
+    else:
+        main()

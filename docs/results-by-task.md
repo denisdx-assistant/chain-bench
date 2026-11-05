@@ -4,20 +4,6 @@ Generated from the result files by `scripts/build_task_tables.py`.
 Cell format: `seconds mark` — ✓ correct, ✗ wrong, L stopped on the length
 cap, R aborted by the loop guard, · task not in this set.
 
-### Summary by test group
-
-Cell format: total wall-clock time of the group and correct/total.
-
-`(8)` marks a run on the 8-task subset instead of the full set.
-
-| Run | Overall | Test 1 en | Test 1 ru | Test 1 zh | Test 2 |
-|---|---|---|---|---|---|
-| Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default · budget 16k | 28m57s 42% | 5m19s 4/8 (8) | 13m30s 10/17 | 10m08s 5/8 (8) | — |
-| Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · budget 16k · guard | 30m22s 38% | 14m42s 11/17 | 15m40s 10/17 | — | — |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · ctx 262k · no YaRN · T 0.3 · pen 0.3 · budget 32k · guard | 54m01s 90% | — | — | — | 54m01s 2/20 |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T 0.3 · pen 0.3 · budget 32k · guard | 94m29s 65% | — | 30m21s 10/17 | — | 64m08s 3/20 |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T default · budget 65535 | 27m58s 29% | — | 27m58s 12/17 | — | — |
-
 ### Test 1 — full 17-task set
 
 | Run | T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9 | T10 | T11 | T12 | T13 | T14 | T15 | T16 | T17 | Score |

@@ -90,8 +90,12 @@ def main():
                           client='openclaw-frozen-guard')
         got_arr = parse_array(out.get("content"))
         got_sum = parse_sum(out.get("content"))
-        ok_arr = got_arr == exp.get("array")
-        ok_sum = got_sum == exp.get("sum")
+        # a missing answer must never compare equal to a missing expectation
+        if out.get("error") or got_arr is None or got_sum is None:
+            ok_arr = ok_sum = False
+        else:
+            ok_arr = got_arr == exp.get("array")
+            ok_sum = got_sum == exp.get("sum")
         ok = bool(ok_arr and ok_sum)
         kind = "ok" if ok else ("loop" if out.get("loop") else
                                 ("timeout" if out.get("timeout") else
