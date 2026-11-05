@@ -121,6 +121,7 @@ the 8-task translations are kept as the earlier frozen subset.
 | Qwen3.8-27B-UD-Q6_K_XL | zh | 16k | — | — | — | — | — | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1m | en | 32k, guarded | — | — | — | — | — | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1m | zh | 32k, guarded | — | — | — | — | — | — |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S | ru | 32k, guarded | — | — | — | — | — | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S | en | 32k, guarded | — | — | — | — | — | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S | zh | 32k, guarded | — | — | — | — | — | — |
 
