@@ -111,8 +111,12 @@ def main():
         if out.get("error") or got_arr is None or got_sum is None:
             ok_arr = ok_sum = False
         else:
-            ok_arr = got_arr == exp.get("array")
-            ok_sum = got_sum == exp.get("sum")
+            exp_arr = exp.get("expected_array", exp.get("array"))
+            exp_sum = exp.get("expected_sum", exp.get("sum"))
+            if isinstance(exp_arr, str):
+                exp_arr = json.loads(exp_arr.replace("'", '"'))
+            ok_arr = got_arr == exp_arr
+            ok_sum = got_sum == exp_sum
         ok = bool(ok_arr and ok_sum)
         kind = "ok" if ok else ("loop" if out.get("loop") else
                                 ("timeout" if out.get("timeout") else

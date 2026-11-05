@@ -21,9 +21,7 @@
 的错误率，接近 50% 的目标。随后对三种 Flash-Next 配置和
 `Qwen3.8-27B-UD-Q8_K_XL` 分别运行了系列测试。
 
-**结论。** 在程序执行上 Q6 明显领先：11/20 对 Flash-Next 各变体的 3/20 与 2/20。
-这是本套件中唯一超出自身样本噪声的差距（正确率 95% 区间：33–77% 对 0–31% 与
-0–23%）。在链条上各模型**没有**拉开差距：Q6 10/17，Flash-Next 在大预算下 12/17、
+**结论。** 在链条上各模型**没有**拉开差距：Q6 10/17，Flash-Next 在大预算下 12/17、
 32k 下 10/17，Q8 俄语 10/17、英语 11/17——在 17 题集合上相差一到两题，完全落在
 区间内。YaRN 1M 与 262k 基础版相差一段程序，同样在噪声范围内。退化循环罕见，
 由流式检测器而不是更大的预算控制。
@@ -80,7 +78,7 @@
 |---|---|---|---|---|---|
 | Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default · budget 16k | 150m36s · 43% err | 5m19s 4/8 (8) | 13m30s 10/17 | 10m08s 5/8 (8) | 121m39s 11/20 |
 | Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default · budget 8 · legacy 8-program set | 11m25s · 12% err | — | — | — | 11m25s 7/8 |
-| Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · budget 16k · guard | 56m18s · 42% err | 14m42s 11/17 | 15m40s 10/17 | 17m56s 11/17 | 8m00s 0/4 |
+| Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · budget 16k · guard | 48m18s · 37% err | 14m42s 11/17 | 15m40s 10/17 | 17m56s 11/17 | — |
 | Qwen3.8-27B-UD-Q8_K_XL · budget 16 | 20m00s · 100% err | — | — | — | 20m00s 0/20 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T 0.3 · pen 0.3 · budget 32k · guard | 30m21s · 41% err | — | 30m21s 10/17 | — | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T default · budget 65535 · provenance inferred | 27m58s · 29% err | — | 27m58s 12/17 | — | — |
@@ -144,6 +142,12 @@ results/_invalid/    批量实验留档，不计入表格
 scripts/             生成器、运行器、循环检测、表格构建
 ```
 
+**关于程序得分。** 早期的受保护运行器用 `array`/`sum` 键比较，而数据集里是
+`expected_array`/`expected_sum`，因此那些运行中的每段程序都被判为错误。受影响的
+运行（Flash-Next 各变体）已从表格中撤回，并正以修正后的比较重新运行；Q6 的程序
+得分可由其保存的回答复现。
+
+## 许可
 ## 许可
 
 代码 — MIT。文本与数据集 — CC BY 4.0。
