@@ -39,6 +39,8 @@ def cfg_label(cfg, budget):
         parts.append("guard")
     if cfg.get("reasoning") not in (None, "default"):
         parts.append("reasoning %s" % cfg["reasoning"])
+    if cfg.get("provenance") == "inferred":
+        parts.append("provenance inferred")
     return " · ".join(parts)
 
 
