@@ -1,7 +1,7 @@
 # chain-bench
 
-**A private benchmark for local language models: multi-hop chains and program
-execution under noise.**
+**A contamination-free benchmark for local language models: multi-hop chains and
+program execution under noise.**
 
 Languages: **English** · [Русский](README.ru.md) · [中文](README.zh.md)
 
@@ -164,6 +164,12 @@ results/run-configs.json  serving configuration per run
 results/_invalid/    batch experiments kept for the record, excluded from tables
 scripts/             generators, runners, loop guard, table builder
 ```
+
+## Published data
+
+The repository is public. It contains the frozen datasets, the harness and all
+results. Endpoint addresses in the scripts are placeholders for a local model
+server; no credentials, keys or private corpora are included.
 
 ## License
 
