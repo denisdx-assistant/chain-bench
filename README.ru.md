@@ -98,7 +98,8 @@ YaRN, температурой или бюджетом — контекст по
 |---|---|---|---|---|---|
 | Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default · budget 16k | 150m36s · 43% err | 5m19s 4/8 (8) | 13m30s 10/17 | 10m08s 5/8 (8) | 121m39s 11/20 |
 | Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default · budget 8 · legacy 8-program set | 11m25s · 12% err | — | — | — | 11m25s 7/8 |
-| Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · budget 16k · guard | 60m36s · 38% err | 14m42s 11/17 | 15m40s 10/17 | 17m56s 11/17 | 12m18s 0/1 |
+| Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · budget 16k · guard | 56m18s · 42% err | 14m42s 11/17 | 15m40s 10/17 | 17m56s 11/17 | 8m00s 0/4 |
+| Qwen3.8-27B-UD-Q8_K_XL · budget 16 | 20m00s · 100% err | — | — | — | 20m00s 0/20 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T 0.3 · pen 0.3 · budget 32k · guard | 30m21s · 41% err | — | 30m21s 10/17 | — | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T default · budget 65535 · provenance inferred | 27m58s · 29% err | — | 27m58s 12/17 | — | — |
 <!-- summary:end -->
