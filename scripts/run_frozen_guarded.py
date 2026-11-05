@@ -150,9 +150,17 @@ def main():
                      "expected_array": exp.get("expected_array", exp.get("array")),
                      "expected_sum": exp.get("expected_sum", exp.get("sum")),
                      "error": out.get("error")})
-        print("  %-22s | %-7s | arr %s | sum %s | %6.1f c"
+        st = out.get("timings") or {}
+        speed = ""
+        if isinstance(st, dict) and st.get("predicted_per_second"):
+            speed = " | gen %.1f t/s (%d tok, %.1fs) | prefill %.0f t/s (%d tok)" % (
+                st["predicted_per_second"], st.get("predicted_n", 0),
+                (st.get("predicted_ms") or 0) / 1000.0,
+                st.get("prompt_per_second") or 0,
+                (st.get("prompt_n") or 0) + (st.get("cache_n") or 0))
+        print("  %-22s | %-7s | arr %s | sum %s | %6.1f c%s"
               % (os.path.basename(path), kind, "ok" if ok_arr else "no",
-                 "ok" if ok_sum else "no", out.get("latency", 0)), flush=True)
+                 "ok" if ok_sum else "no", out.get("latency", 0), speed), flush=True)
         json.dump({"dir": a.dir, "model": a.model,
                    "resolved_provider": meta.get("resolved_provider"),
                    "resolved_model": meta.get("resolved_model"),

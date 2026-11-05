@@ -108,6 +108,8 @@ Each cell is one test series: total wall-clock time and score. `(8)` marks the
   [docs/results-by-task.md](docs/results-by-task.md)
 - Per-run tables with reasoning sizes and length cuts:
   [results/README.md](results/README.md)
+- Performance per run, from server timings: generation and prefill speed, tokens
+  spent per task: [docs/performance.md](docs/performance.md)
 - Chronological log of runs and calibration:
   [docs/run-log.md](docs/run-log.md)
 

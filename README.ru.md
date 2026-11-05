@@ -106,6 +106,8 @@ YaRN, температурой или бюджетом — контекст по
   [docs/results-by-task.md](docs/results-by-task.md)
 - Таблицы по прогонам с объёмом рассуждений и обрывами:
   [results/README.md](results/README.md)
+- Производительность по прогонам из серверных таймингов: скорость генерации и
+  префилла, расход токенов на задачу: [docs/performance.md](docs/performance.md)
 - Хронологический журнал прогонов и калибровки:
   [docs/run-log.md](docs/run-log.md)
 

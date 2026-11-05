@@ -64,9 +64,15 @@ def main():
                      "raw": (out.get("content") or "")[:20000],
                      "raw_tail": (out.get("content") or "")[-400:],
                      "server_timings": out.get("timings")})
-        print("  %2d | expected %5d | got %s | %-7s | %6.1f c"
+        _st = out.get("timings") or {}
+        _sp = ""
+        if isinstance(_st, dict) and _st.get("predicted_per_second"):
+            _sp = " | gen %.1f t/s (%d tok) | prefill %.0f t/s" % (
+                _st["predicted_per_second"], _st.get("predicted_n", 0),
+                _st.get("prompt_per_second") or 0)
+        print("  %2d | expected %5d | got %s | %-7s | %6.1f c%s"
               % (t["id"], t["answer"], ("%5d" % got) if got is not None else "    —",
-                 kind, out.get("latency", 0)), flush=True)
+                 kind, out.get("latency", 0), _sp), flush=True)
 
     errors = [r for r in rows if r.get("kind") == "error"]
     if errors:
