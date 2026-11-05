@@ -164,11 +164,13 @@ not pure inference throughput and should not be compared with vendor numbers.
 <!-- per-task:start -->
 ## 6.5 Summary and per-task results
 
-The first table is the summary: one row per model and budget, one column per
-test group, each cell is the total wall-clock time of that group and the score.
-The tables below it give the same runs task by task.
-Everything here is generated from the result files by
-`scripts/build_task_tables.py`; do not edit by hand.
+The first table is the summary: one row per run configuration, one column per
+test group, each cell is the total wall-clock time of that series and its score.
+A model may appear in several rows when it was served with a different context,
+YaRN setting, temperature or budget; the row label carries the configuration.
+The tables below give the same runs task by task.
+Everything here is generated from the result files and `results/run-configs.json`
+by `scripts/build_task_tables.py`; do not edit by hand.
 
 ### Summary by test group
 
@@ -178,16 +180,18 @@ Cell format: total wall-clock time of the group and correct/total.
 
 | Run | Overall | Test 1 en | Test 1 ru | Test 1 zh | Test 2 |
 |---|---|---|---|---|---|
-| Qwen3.8-27B-UD-Q6_K_XL · 16k · 8tasks/default | 28m57s 42% | 5m19s 4/8 (8) | 13m30s 10/17 | 10m08s 5/8 (8) | — |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · 32k · guarded | 54m01s 90% | — | — | — | 54m01s 2/20 |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · 32k · guarded | 94m29s 65% | — | 30m21s 10/17 | — | 64m08s 3/20 |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · 65535 · default | 27m58s 29% | — | 27m58s 12/17 | — | — |
+| Qwen3.8-27B-UD-Q6_K_XL · ctx 150k · no YaRN · T default · budget 16k | 28m57s 42% | 5m19s 4/8 (8) | 13m30s 10/17 | 10m08s 5/8 (8) | — |
+| Qwen3.8-27B-UD-Q8_K_XL · ctx ? · no YaRN · T default · budget 16k · guard | 15m40s 41% | — | 15m40s 10/17 | — | — |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · ctx 262k · no YaRN · T 0.3 · pen 0.3 · budget 32k · guard | 54m01s 90% | — | — | — | 54m01s 2/20 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T 0.3 · pen 0.3 · budget 32k · guard | 94m29s 65% | — | 30m21s 10/17 | — | 64m08s 3/20 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T default · budget 65535 | 27m58s 29% | — | 27m58s 12/17 | — | — |
 
 ### Test 1 — full 17-task set
 
 | Run | T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9 | T10 | T11 | T12 | T13 | T14 | T15 | T16 | T17 | Score |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Qwen3.8-27B-UD-Q6_K_XL · ru · 16k · default | 23s ✓ | 78s ✗ | 10s ✓ | 8s ✓ | 9s ✓ | 7s ✓ | 73s ✗ | 9s ✓ | 68s ✗ | 51s ✓ | 73s ✓ | 70s ✓ | 62s ✗ | 73s ✗ | 61s ✗ | 74s ✓ | 61s ✗ | 10/17 |
+| Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · default | 32s ✓ | 80s ✗ | 9s ✓ | 8s ✓ | 10s ✓ | 8s ✓ | 74s ✗ | 14s ✓ | 75s ✗ | 76s ✓ | 82s ✓ | 76s ✗ | 81s ✗ | 78s ✗ | 80s ✓ | 82s ✓ | 75s ✗ | 10/17 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ru · 32k · guarded | 157s ✓ | 73s ✗ | 9s ✓ | 8s ✓ | 11s ✓ | 6s ✓ | 131s ✗ | 10s ✓ | 168s ✗ | 27s ✓ | 203s ✓ | 379s L | 202s ✗ | 82s ✗ | 75s ✓ | 97s ✓ | 183s ✗ | 10/17 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ru · 65535 · default | 62s ✓ | 168s ✗ | 7s ✓ | 6s ✓ | 8s ✓ | 5s ✓ | 250s ✗ | 13s ✓ | 83s ✓ | 20s ✓ | 117s ✓ | 102s ✓ | 320s ✗ | 206s ✗ | 102s ✓ | 53s ✓ | 156s ✗ | 12/17 |
 

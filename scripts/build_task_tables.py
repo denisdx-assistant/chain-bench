@@ -14,6 +14,32 @@ import re
 
 OK, BAD, LEN, LOOP, NA = "✓", "✗", "L", "R", "·"
 
+RUN_CONFIGS = {}
+if os.path.exists("results/run-configs.json"):
+    RUN_CONFIGS = {k: v for k, v in json.load(open("results/run-configs.json")).items()
+                   if not k.startswith("_")}
+
+
+def cfg_for(folder, file):
+    return RUN_CONFIGS.get("%s/%s" % (folder, file), {})
+
+
+def cfg_label(cfg, budget):
+    if not cfg:
+        return "budget %s" % budget
+    parts = ["ctx %s" % cfg.get("ctx", "?"),
+             "YaRN" if cfg.get("yarn") else "no YaRN",
+             "T %s" % cfg.get("temp", "default")]
+    pen = cfg.get("penalty", "-")
+    if pen and pen != "-":
+        parts.append("pen %s" % pen)
+    parts.append("budget %s" % budget)
+    if cfg.get("guard"):
+        parts.append("guard")
+    if cfg.get("reasoning") not in (None, "default"):
+        parts.append("reasoning %s" % cfg["reasoning"])
+    return " · ".join(parts)
+
 
 def classify(path):
     """Return (kind, lang, budget, subset, variant) from a result filename."""
@@ -127,12 +153,14 @@ def summary():
     chains, programs = collect()
     groups = {}
     for r in chains + programs:
-        key = (r["folder"], r["budget"])
-        groups.setdefault(key, {"chains": [], "programs": []})
-        groups[key]["programs" if r["file"].startswith("programs_") else "chains"].append(r)
+        cfg = cfg_for(r["folder"], r["file"])
+        sig = (r["folder"], cfg.get("ctx"), cfg.get("yarn"), cfg.get("temp"),
+               cfg.get("penalty"), cfg.get("budget", r["budget"]), bool(cfg.get("guard")))
+        groups.setdefault(sig, {"chains": [], "programs": [], "cfg": cfg})
+        groups[sig]["programs" if r["file"].startswith("programs_") else "chains"].append(r)
 
     rows = []
-    for (folder, budget), g in sorted(groups.items()):
+    for (folder, _ctx, _yarn, _temp, _pen, _budget, _guard), g in sorted(groups.items(), key=lambda kv: str(kv[0])):
         def pick(lang):
             full = [r for r in g["chains"] if r["lang"] == lang and not r["subset"]]
             if full:
@@ -167,10 +195,8 @@ def summary():
         else:
             cells["t2"] = None
 
-        variants = sorted({r["variant"] for r in g["chains"] + g["programs"]})
-        rows.append({"label": "%s · %s%s · %s" % (folder, budget,
-                     "k" if str(budget).isdigit() and int(budget) <= 200 else "",
-                     "/".join(variants) or "-"),
+        budget = g["cfg"].get("budget", g["chains"][0]["budget"] if g["chains"] else g["programs"][0]["budget"])
+        rows.append({"label": "%s · %s" % (folder, cfg_label(g["cfg"], budget)),
                      "cells": cells, "overall": (total_t, total_ok, total_n)})
 
     head = "| Run | Overall | Test 1 en | Test 1 ru | Test 1 zh | Test 2 |"
