@@ -43,16 +43,30 @@ def fetch_meta(model):
 
 
 def parse_array(text):
-    m = re.search(r'ARRAY:\s*\[([^\]]*)\]', text or '')
-    if not m:
-        return None
-    nums = [int(x) for x in re.findall(r'-?\d+', m.group(1))]
-    return nums if len(nums) == 10 else None
+    """Accept the requested format and obvious variants; the last valid list wins."""
+    text = text or ''
+    candidates = []
+    m = re.search(r'ARRAY:\s*\[([^\]]*)\]', text, re.I)
+    if m:
+        candidates.append(m.group(1))
+    for m in re.finditer(r'\[([^\[\]]{0,200})\]', text):
+        candidates.append(m.group(1))
+    for body in reversed(candidates):
+        nums = [int(x) for x in re.findall(r'-?\d+', body)]
+        if len(nums) == 10:
+            return nums
+    return None
 
 
 def parse_sum(text):
-    m = re.search(r'SUM:\s*(-?\d+)', text or '')
-    return int(m.group(1)) if m else None
+    text = text or ''
+    patterns = [r'SUM:\s*(-?\d+)', r'\bsum\b[^0-9\-]{0,20}(-?\d+)',
+                r'\btotal\b[^0-9\-]{0,20}(-?\d+)']
+    for pat in patterns:
+        m = re.search(pat, text, re.I)
+        if m:
+            return int(m.group(1))
+    return None
 
 
 def main():
@@ -108,6 +122,7 @@ def main():
                      "latency_s": round(out.get("latency", 0), 1),
                      "finish": out.get("finish"),
                      "reasoning_chars": out.get("reasoning_chars"),
+                     "raw": (out.get("content") or "")[:600],
                      "error": out.get("error")})
         print("  %-22s | %-7s | arr %s | sum %s | %6.1f c"
               % (os.path.basename(path), kind, "ok" if ok_arr else "no",

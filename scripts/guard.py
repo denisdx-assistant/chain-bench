@@ -46,8 +46,22 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
     finish = None
     counts = {}
     checked_at = 0
+    r = None
+    for attempt in range(1, 4):
+        try:
+            r = urllib.request.urlopen(req, timeout=timeout)
+            break
+        except urllib.error.HTTPError as e:
+            if e.code >= 500 and attempt < 3:
+                time.sleep(15)
+                continue
+            return {"error": "HTTP %s" % e.code, "latency": time.time() - t0}
+        except Exception as e:
+            if attempt < 3:
+                time.sleep(15)
+                continue
+            return {"error": str(e)[:150], "latency": time.time() - t0}
     try:
-        r = urllib.request.urlopen(req, timeout=timeout)
         for raw in r:
             if time.time() - t0 > timeout:
                 r.close()
