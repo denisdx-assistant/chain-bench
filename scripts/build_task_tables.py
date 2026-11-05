@@ -37,6 +37,8 @@ def cfg_label(cfg, budget):
     parts.append("budget %s" % budget)
     if cfg.get("guard"):
         parts.append("guard")
+    if cfg.get("note"):
+        parts.append(cfg["note"])
     if cfg.get("reasoning") not in (None, "default"):
         parts.append("reasoning %s" % cfg["reasoning"])
     if cfg.get("provenance") == "inferred":
@@ -68,8 +70,14 @@ def load(path):
     for r in rows:
         if not isinstance(r, dict):
             continue
-        tid = r.get("id") if "id" in r else r.get("file")
-        if tid is None:
+        if "id" in r:
+            tid = r["id"]
+        elif "file" in r and r["file"]:
+            m = re.search(r"seed(\d+)", str(r["file"]))
+            tid = "S" + m.group(1) if m else str(r["file"])
+        elif "seed" in r:
+            tid = "S" + str(r["seed"])
+        else:
             continue
         mark = OK if r.get("ok") else (LOOP if r.get("kind") == "loop"
                                       else (LEN if r.get("finish") == "length" else BAD))
@@ -115,7 +123,7 @@ def ids_for(rows):
 
 def col_label(kind, task):
     if kind == "programs":
-        m = re.search(r"seed(\d+)", task)
+        m = re.search(r"seed(\d+)", str(task)) or re.match(r"S(\d+)$", str(task))
         return "S" + m.group(1) if m else str(task)
     return "T" + str(task)
 
