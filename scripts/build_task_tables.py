@@ -111,12 +111,97 @@ def table(rows, ids, kind):
     return "\n".join(lines)
 
 
+
+def human(seconds):
+    """12m34s / 95s"""
+    if seconds is None:
+        return "—"
+    seconds = int(round(seconds))
+    if seconds < 60:
+        return "%ds" % seconds
+    return "%dm%02ds" % (seconds // 60, seconds % 60)
+
+
+def summary():
+    """Compact cross-test matrix: rows are runs, columns are test groups."""
+    chains, programs = collect()
+    groups = {}
+    for r in chains + programs:
+        key = (r["folder"], r["budget"])
+        groups.setdefault(key, {"chains": [], "programs": []})
+        groups[key]["programs" if r["file"].startswith("programs_") else "chains"].append(r)
+
+    rows = []
+    for (folder, budget), g in sorted(groups.items()):
+        def pick(lang):
+            full = [r for r in g["chains"] if r["lang"] == lang and not r["subset"]]
+            if full:
+                full.sort(key=lambda r: (r["variant"] != "guarded", -len(r["tasks"])))
+                return full[0], False
+            sub = [r for r in g["chains"] if r["lang"] == lang]
+            if sub:
+                sub.sort(key=lambda r: -len(r["tasks"]))
+                return sub[0], True
+            return None, False
+
+        cells = {}
+        total_t = total_ok = total_n = 0
+        for lang in ("en", "ru", "zh"):
+            r, subset = pick(lang)
+            if r is None:
+                cells["t1_" + lang] = None
+                continue
+            t = sum((v[1] or 0) for v in r["tasks"].values())
+            ok = sum(1 for v in r["tasks"].values() if v[0] == OK)
+            n = len(r["tasks"])
+            cells["t1_" + lang] = {"t": t, "ok": ok, "n": n, "subset": subset}
+            total_t += t; total_ok += ok; total_n += n
+
+        pr = g["programs"][0] if g["programs"] else None
+        if pr:
+            t = sum((v[1] or 0) for v in pr["tasks"].values())
+            ok = sum(1 for v in pr["tasks"].values() if v[0] == OK)
+            n = len(pr["tasks"])
+            cells["t2"] = {"t": t, "ok": ok, "n": n}
+            total_t += t; total_ok += ok; total_n += n
+        else:
+            cells["t2"] = None
+
+        variants = sorted({r["variant"] for r in g["chains"] + g["programs"]})
+        rows.append({"label": "%s · %s%s · %s" % (folder, budget,
+                     "k" if str(budget).isdigit() and int(budget) <= 200 else "",
+                     "/".join(variants) or "-"),
+                     "cells": cells, "overall": (total_t, total_ok, total_n)})
+
+    head = "| Run | Overall | Test 1 en | Test 1 ru | Test 1 zh | Test 2 |"
+    sep = "|---|---|---|---|---|---|"
+    lines = [head, sep]
+    for r in rows:
+        def fmt(c):
+            if not c:
+                return "—"
+            mark = "%d/%d" % (c["ok"], c["n"])
+            if c.get("subset"):
+                mark += " (8)"
+            return "%s %s" % (human(c["t"]), mark)
+        t, ok, n = r["overall"]
+        overall = "%s %d%%" % (human(t), round(100 * (n - ok) / n) if n else 0)
+        lines.append("| %s | %s | %s | %s | %s | %s |" % (
+            r["label"], overall, fmt(r["cells"]["t1_en"]), fmt(r["cells"]["t1_ru"]),
+            fmt(r["cells"]["t1_zh"]), fmt(r["cells"]["t2"])))
+    return "\n".join(lines)
+
+
 def main():
     chains, programs = collect()
     c17 = [r for r in chains if not r["subset"]]
     c8 = [r for r in chains if r["subset"]]
 
-    parts = ["### Test 1 — full 17-task set\n",
+    parts = ["### Summary by test group\n",
+             "Cell format: total wall-clock time of the group and correct/total.\n",
+             "`(8)` marks a run on the 8-task subset instead of the full set.\n",
+             summary(),
+             "\n### Test 1 — full 17-task set\n",
              table(c17, ids_for(c17), "chains") if c17 else "_No runs yet._",
              "\n### Test 1 — 8-task subset\n",
              table(c8, ids_for(c8), "chains") if c8 else "_No runs yet._",

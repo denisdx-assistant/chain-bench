@@ -162,11 +162,26 @@ not pure inference throughput and should not be compared with vendor numbers.
   not correctness.
 
 <!-- per-task:start -->
-## 6.5 Per-task results
+## 6.5 Summary and per-task results
 
-One row per run, one column per task. The cell shows how long the answer took
-and whether it was correct. The table is generated from the result files by
-`scripts/build_task_tables.py`; do not edit it by hand.
+The first table is the summary: one row per model and budget, one column per
+test group, each cell is the total wall-clock time of that group and the score.
+The tables below it give the same runs task by task.
+Everything here is generated from the result files by
+`scripts/build_task_tables.py`; do not edit by hand.
+
+### Summary by test group
+
+Cell format: total wall-clock time of the group and correct/total.
+
+`(8)` marks a run on the 8-task subset instead of the full set.
+
+| Run | Overall | Test 1 en | Test 1 ru | Test 1 zh | Test 2 |
+|---|---|---|---|---|---|
+| Qwen3.8-27B-UD-Q6_K_XL · 16k · 8tasks/default | 28m57s 42% | 5m19s 4/8 (8) | 13m30s 10/17 | 10m08s 5/8 (8) | — |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · 32k · guarded | 54m01s 90% | — | — | — | 54m01s 2/20 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · 32k · guarded | 94m29s 65% | — | 30m21s 10/17 | — | 64m08s 3/20 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · 65535 · default | 27m58s 29% | — | 27m58s 12/17 | — | — |
 
 ### Test 1 — full 17-task set
 
