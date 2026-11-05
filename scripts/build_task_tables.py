@@ -82,7 +82,11 @@ def load(path):
         mark = OK if r.get("ok") else (LOOP if r.get("kind") == "loop"
                                       else (LEN if r.get("finish") == "length" else BAD))
         lat = r.get("latency_s")
-        out[str(tid)] = (mark, round(lat) if isinstance(lat, (int, float)) else None)
+        gen = None
+        st = r.get("server_timings") or {}
+        if isinstance(st, dict) and isinstance(st.get("predicted_ms"), (int, float)):
+            gen = round(st["predicted_ms"] / 1000.0)
+        out[str(tid)] = (mark, round(lat) if isinstance(lat, (int, float)) else None, gen)
     meta = {} if isinstance(d, list) else d
     return out, meta
 
@@ -131,8 +135,10 @@ def col_label(kind, task):
 def cell(t):
     if not t:
         return NA
-    mark, lat = t
-    return "%s %s" % (("%ds" % lat) if lat is not None else "—", mark)
+    mark, lat, gen = (t + (None,))[:3] if len(t) == 2 else t
+    secs = gen if gen is not None else lat
+    suffix = "" if gen is not None else ("w" if lat is not None else "")
+    return "%s%s %s" % (("%ds" % secs) if secs is not None else "—", suffix, mark)
 
 
 def table(rows, ids, kind):
@@ -190,7 +196,8 @@ def summary():
             if r is None:
                 cells["t1_" + lang] = None
                 continue
-            t = sum((v[1] or 0) for v in r["tasks"].values())
+            t = sum(((v[2] if len(v) > 2 and v[2] is not None else v[1]) or 0)
+                    for v in r["tasks"].values())
             ok = sum(1 for v in r["tasks"].values() if v[0] == OK)
             n = len(r["tasks"])
             cells["t1_" + lang] = {"t": t, "ok": ok, "n": n, "subset": subset}
@@ -198,7 +205,8 @@ def summary():
 
         pr = g["programs"][0] if g["programs"] else None
         if pr:
-            t = sum((v[1] or 0) for v in pr["tasks"].values())
+            t = sum(((v[2] if len(v) > 2 and v[2] is not None else v[1]) or 0)
+                    for v in pr["tasks"].values())
             ok = sum(1 for v in pr["tasks"].values() if v[0] == OK)
             n = len(pr["tasks"])
             cells["t2"] = {"t": t, "ok": ok, "n": n}

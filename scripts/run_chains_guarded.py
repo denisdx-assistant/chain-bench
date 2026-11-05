@@ -61,7 +61,9 @@ def main():
         rows.append({"id": t["id"], "answer": t["answer"], "got": got, "ok": ok,
                      "kind": kind, "latency_s": round(out.get("latency", 0), 1),
                      "finish": out.get("finish"), "error": out.get("error"),
-                     "raw": (out.get("content") or "")[:600]})
+                     "raw": (out.get("content") or "")[:20000],
+                     "raw_tail": (out.get("content") or "")[-400:],
+                     "server_timings": out.get("timings")})
         print("  %2d | expected %5d | got %s | %-7s | %6.1f c"
               % (t["id"], t["answer"], ("%5d" % got) if got is not None else "    —",
                  kind, out.get("latency", 0)), flush=True)

@@ -143,7 +143,10 @@ def main():
                      "latency_s": round(out.get("latency", 0), 1),
                      "finish": out.get("finish"),
                      "reasoning_chars": out.get("reasoning_chars"),
-                     "raw": (out.get("content") or "")[:600],
+                     "raw": (out.get("content") or "")[:20000],
+                     "raw_tail": (out.get("content") or "")[-800:],
+                     "server_timings": out.get("timings"),
+                     "usage": out.get("usage"),
                      "expected_array": exp.get("expected_array", exp.get("array")),
                      "expected_sum": exp.get("expected_sum", exp.get("sum")),
                      "error": out.get("error")})

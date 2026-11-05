@@ -43,6 +43,8 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
     t0 = time.time()
     content = []
     reasoning = []
+    timings = None
+    usage = None
     finish = None
     counts = {}
     checked_at = 0
@@ -77,6 +79,10 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
                 obj = json.loads(data)
             except Exception:
                 continue
+            if obj.get('timings'):
+                timings = obj['timings']
+            if obj.get('usage'):
+                usage = obj['usage']
             ch = (obj.get('choices') or [{}])[0]
             delta = ch.get('delta') or {}
             if delta.get('content'):
@@ -95,6 +101,7 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
                     r.close()
                     return {"content": ''.join(content), "loop": True, "timeout": False,
                             "latency": time.time() - t0, "finish": "loop",
+                            "timings": timings, "usage": usage,
                             "reasoning_chars": len(''.join(reasoning))}
     except urllib.error.HTTPError as e:
         return {"error": "HTTP %s" % e.code, "latency": time.time() - t0}
@@ -103,4 +110,5 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
 
     return {"content": ''.join(content), "loop": False, "timeout": False,
             "latency": time.time() - t0, "finish": finish,
+            "timings": timings, "usage": usage,
             "reasoning_chars": len(''.join(reasoning))}
