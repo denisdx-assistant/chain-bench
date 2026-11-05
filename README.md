@@ -119,8 +119,8 @@ tables.
 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1m` | measured |
 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | measured |
 | `Qwen3.8-27B-UD-Q8_K_XL` | in progress |
-| `Qwen3.8-Flash-Next-UD-Q4_K_XL` | planned |
-| `Qwen3.8-Flash-Next-UD-IQ4_XS` | planned |
+| `Qwen3.8-Flash-Next-UD-Q4_K_XL` | queued: YaRN 1M, 32k guarded |
+| `Qwen3.8-Flash-Next-UD-IQ4_XS` | queued: YaRN 1M, 32k guarded |
 | `Qwen3.8-Flash-Next-IQ3_M` | planned |
 
 ## 4. Reproducing a run

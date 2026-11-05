@@ -98,8 +98,8 @@
 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1m` | 已测量 |
 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | 已测量 |
 | `Qwen3.8-27B-UD-Q8_K_XL` | 进行中 |
-| `Qwen3.8-Flash-Next-UD-Q4_K_XL` | 计划中 |
-| `Qwen3.8-Flash-Next-UD-IQ4_XS` | 计划中 |
+| `Qwen3.8-Flash-Next-UD-Q4_K_XL` | 队列中：YaRN 1M，32k 带检测器 |
+| `Qwen3.8-Flash-Next-UD-IQ4_XS` | 队列中：YaRN 1M，32k 带检测器 |
 | `Qwen3.8-Flash-Next-IQ3_M` | 计划中 |
 
 ## 4. 复现一次运行

@@ -119,8 +119,8 @@ YaRN, температурой или бюджетом — контекст по
 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1m` | измерена |
 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | измерена |
 | `Qwen3.8-27B-UD-Q8_K_XL` | в процессе |
-| `Qwen3.8-Flash-Next-UD-Q4_K_XL` | запланирована |
-| `Qwen3.8-Flash-Next-UD-IQ4_XS` | запланирована |
+| `Qwen3.8-Flash-Next-UD-Q4_K_XL` | в очереди: YaRN 1M, 32k с детектором |
+| `Qwen3.8-Flash-Next-UD-IQ4_XS` | в очереди: YaRN 1M, 32k с детектором |
 | `Qwen3.8-Flash-Next-IQ3_M` | запланирована |
 
 ## 4. Воспроизведение прогона
