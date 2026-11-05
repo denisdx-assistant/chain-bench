@@ -99,8 +99,11 @@ def main():
     ap.add_argument("--fp", type=float, default=0.3)
     ap.add_argument("--pp", type=float, default=0.3)
     ap.add_argument("--only", default="", help="comma list of program stems")
+    ap.add_argument("--force", action="store_true", help="overwrite an existing result file")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
+    if os.path.exists(a.out) and not a.force:
+        raise SystemExit("refusing to overwrite %s (use --force to replace)" % a.out)
     TEMP_DEFAULT = None if a.temp < 0 else a.temp
 
     meta = fetch_meta(a.model)
