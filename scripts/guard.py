@@ -24,11 +24,15 @@ def _shingles(text, n=8):
 
 def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
                 max_repeat=40, client='openclaw-guard', frequency_penalty=0.0, presence_penalty=0.0):
-    body = json.dumps({"model": model, "max_tokens": max_tokens, "stream": True,
-                       "temperature": temperature,
-                       "frequency_penalty": frequency_penalty,
-                       "presence_penalty": presence_penalty,
-                       "messages": [{"role": "user", "content": prompt}]}).encode()
+    payload = {"model": model, "max_tokens": max_tokens, "stream": True}
+    if temperature is not None:
+        payload["temperature"] = temperature
+    if frequency_penalty:
+        payload["frequency_penalty"] = frequency_penalty
+    if presence_penalty:
+        payload["presence_penalty"] = presence_penalty
+    payload["messages"] = [{"role": "user", "content": prompt}]
+    body = json.dumps(payload).encode()
     req = urllib.request.Request(BASE + '/v1/chat/completions', data=body,
                                  headers={'Content-Type': 'application/json',
                                           'X-Aidir-Client': client})

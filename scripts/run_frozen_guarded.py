@@ -64,6 +64,7 @@ def main():
     ap.add_argument("--only", default="", help="comma list of program stems")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
+    TEMP_DEFAULT = None if a.temp < 0 else a.temp
 
     meta = fetch_meta(a.model)
     files = sorted(glob.glob(os.path.join(a.dir, "*.py")))
@@ -84,7 +85,7 @@ def main():
             print("  %s | нет ожидаемого json, пропуск" % os.path.basename(path), flush=True)
             continue
         out = ask_guarded(code + QUESTION, a.model, max_tokens=a.max_tokens,
-                          timeout=a.timeout, temperature=a.temp,
+                          timeout=a.timeout, temperature=TEMP_DEFAULT,
                           frequency_penalty=a.fp, presence_penalty=a.pp,
                           client='openclaw-frozen-guard')
         got_arr = parse_array(out.get("content"))
