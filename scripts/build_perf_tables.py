@@ -51,15 +51,16 @@ def main():
         rows = d if isinstance(d, list) else (d.get("rows") or [])
         if not rows:
             continue
-        gen_tps, pre_tps, out_tok, prompt_tok, gen_s = [], [], [], [], []
+        gen_tps, pre_tps, out_tok, prompt_tok, gen_s, uncached = [], [], [], [], [], []
         for r in rows:
             st = r.get("server_timings") or {}
             if not isinstance(st, dict):
                 continue
             if st.get("predicted_per_second"):
                 gen_tps.append(st["predicted_per_second"])
-            if st.get("prompt_per_second") and (st.get("prompt_n") or 0) >= 50:
+            if (st.get("cache_n") or 0) == 0 and st.get("prompt_per_second") and (st.get("prompt_n") or 0) >= 50:
                 pre_tps.append(st["prompt_per_second"])
+                uncached.append(1)
             if st.get("predicted_n"):
                 out_tok.append(st["predicted_n"])
             pn = (st.get("prompt_n") or 0) + (st.get("cache_n") or 0)
@@ -78,19 +79,20 @@ def main():
             "ok": ok, "with_timings": len(gen_tps),
             "gen_tps": median(gen_tps), "pre_tps": median(pre_tps),
             "out_tok": median(out_tok), "prompt_tok": median(prompt_tok),
-            "gen_s": median(gen_s),
+            "gen_s": median(gen_s), "uncached": len(uncached),
         })
 
-    head = ("| Run | Variant | n | gen tok/s | prefill tok/s | answer tokens | prompt tokens | gen time |\n"
-            "|---|---|---|---|---|---|---|---|")
+    head = ("| Run | Variant | n | gen tok/s | prefill tok/s | uncached reqs | answer tokens | prompt tokens | gen time |\n"
+            "|---|---|---|---|---|---|---|---|---|")
     lines = [head]
     for r in rows_out:
         def f(v, unit=""):
             return ("%.1f%s" % (v, unit)) if isinstance(v, (int, float)) else "—"
-        lines.append("| %s | %s | %d | %s | %s | %s | %s | %s |" % (
+        lines.append("| %s | %s | %d | %s | %s | %d | %s | %s | %s |" % (
             r["label"], r["variant"], r["n"],
             f(r["gen_tps"]),
-            (f(r["pre_tps"]) if r["pre_tps"] else ("cached" if r["prompt_tok"] else "—")),
+            f(r["pre_tps"]) if r["pre_tps"] else "—",
+            r["uncached"],
             ("%d" % r["out_tok"]) if r["out_tok"] else "—",
             ("%d" % r["prompt_tok"]) if r["prompt_tok"] else "—",
             ("%.0f s" % r["gen_s"]) if r["gen_s"] else "—"))
@@ -100,7 +102,10 @@ def main():
               "Median server-side numbers per run: generation speed, prefill speed, tokens spent on\n"
               "an answer, prompt size (including the cached prefix) and generation time.\n"
               "These come from the `timings` block of the API response, so queueing and wall-clock\n"
-              "noise are excluded. Runs made before the fields were captured show “—”.\n\n")
+              "noise are excluded. **Prefill counts only requests that did not hit the prefix cache**\n"
+              "(`cache_n = 0`); the column `uncached reqs` says how many samples that is. In a run over\n"
+              "one document that is usually one request, since the rest reuse the prefix. Runs made\n"
+              "before the fields were captured show “—”.\n\n")
     os.makedirs("docs", exist_ok=True)
     open("docs/performance.md", "w").write(header + table + "\n")
     print(table)
