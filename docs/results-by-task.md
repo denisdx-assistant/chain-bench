@@ -22,6 +22,9 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-27B-UD-Q6_K_XL · en · 16k · 8tasks | 33s ✓ | 6s ✓ | 5s ✓ | 6s ✓ | 70s ✗ | 63s ✗ | 71s ✗ | 65s ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q6_K_XL · ru · 16k · 8tasks | 44s ✓ | 8s ✓ | 6s ✓ | 5s ✓ | 46s ✗ | 46s ✗ | 70s ✗ | 59s ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q6_K_XL · zh · 16k · 8tasks | 40s ✓ | 11s ✓ | 9s ✓ | 9s ✓ | 37s ✗ | 29s ✗ | 79s ✗ | 394s ✓ | 5/8 |
+| Qwen3.8-27B-UD-Q8_K_XL · en · 16k · 8tasks | 22s ✓ | 7s ✓ | 5s ✓ | 5s ✓ | 76s ✗ | 15s ✗ | 56s ✗ | 72s ✗ | 4/8 |
+| Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · 8tasks | 24s ✓ | 10s ✓ | 6s ✓ | 6s ✓ | 70s ✗ | 49s ✗ | 74s ✗ | 75s ✓ | 5/8 |
+| Qwen3.8-27B-UD-Q8_K_XL · zh · 16k · 8tasks | 39s ✓ | 12s ✓ | 10s ✓ | 7s ✓ | 26s ✗ | 50s ✗ | 84s ✗ | 75s ✗ | 4/8 |
 
 ### Test 2 — 20 frozen programs
 
@@ -30,5 +33,6 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-27B-UD-Q6_K_XL · - · 8k · legacy | 54s ✓ | 46s ✓ | 109s ✓ | 58s ✗ | 202s ✓ | 98s ✓ | 61s ✓ | 57s ✓ | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | 7/28 |
 | Qwen3.8-27B-UD-Q6_K_XL · - · 8k · legacy | 81s ✓ | 63s ✓ | 80s ✓ | 139s ✗ | 202s ✓ | 102s ✓ | 68s ✓ | 96s ✓ | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | 7/28 |
 | Qwen3.8-27B-UD-Q6_K_XL · - · 16k · default | · | · | · | · | · | · | · | · | 292s ✓ | 306s ✗ | 292s ✗ | 288s ✗ | 597s ✓ | 294s ✓ | 304s ✓ | 292s ✓ | 291s ✓ | 595s ✓ | 296s ✗ | 306s ✗ | 298s ✗ | 296s ✗ | 593s ✓ | 292s ✓ | 484s ✗ | 294s ✓ | 597s ✗ | 292s ✓ | 11/28 |
+| Qwen3.8-27B-UD-Q8_K_XL · - · 16k · default | · | · | · | · | · | · | · | · | 310s ✗ | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | 0/28 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · - · 32k · guarded | · | · | · | · | · | · | · | · | 305s ✗ | 122s ✗ | 390s ✓ | 132s ✗ | 123s ✗ | 373s ✗ | 124s ✗ | 112s ✗ | 125s ✗ | 111s ✗ | 206s ✗ | 373s ✓ | 120s ✗ | 382s ✓ | 135s ✗ | 146s ✗ | 116s ✗ | 216s ✗ | 126s ✗ | 111s ✗ | 3/28 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · - · 32k · guarded | · | · | · | · | · | · | · | · | 152s ✗ | 388s ✓ | 389s ✓ | 118s ✗ | 192s ✗ | 150s ✗ | 134s ✗ | 114s ✗ | 99s ✗ | 118s ✗ | 120s ✗ | 124s ✗ | 120s ✗ | 132s ✗ | 153s ✗ | 127s ✗ | 133s ✗ | 118s ✗ | 248s ✗ | 112s ✗ | 2/28 |
