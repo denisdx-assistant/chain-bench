@@ -67,4 +67,4 @@ made before the fields were captured show —.
 | gemma-4-31B-it-UD-Q8_K_XL · chains ru · 16k | 8tasks | 8 | 77.4 | 72.3 | — | 0 | 685 | 18780 | 9 s |
 | gemma-4-31B-it-UD-Q8_K_XL · chains zh · 16k | default | 17 | 64.4 | 58.5 | — | 0 | 1005 | 42057 | 17 s |
 | gemma-4-31B-it-UD-Q8_K_XL · chains zh · 16k | 8tasks | 8 | 67.7 | 62.1 | — | 0 | 712 | 41936 | 12 s |
-| gemma-4-31B-it-UD-Q8_K_XL · programs · 16k · v4_16k | default | 19 | 44.2 | 42.9 | 494.0 | 9 | 6143 | 142712 | 142 s |
+| gemma-4-31B-it-UD-Q8_K_XL · programs · 16k · v4_16k | default | 20 | 44.2 | 42.8 | 494.1 | 10 | 6509 | 142704 | 151 s |
