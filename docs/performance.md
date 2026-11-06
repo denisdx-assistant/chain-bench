@@ -12,7 +12,7 @@ made before the fields were captured show —.
 
 | Run | Variant | n | gen tok/s (best) | gen tok/s (median) | prefill tok/s (best) | uncached reqs | answer tokens | prompt tokens | gen time |
 |---|---|---|---|---|---|---|---|---|---|
-| Qwen3.8-27B-UD-Q4_K_M · chains ru · 16k | default | 12 | — | — | — | 0 | — | — | — |
+| Qwen3.8-27B-UD-Q4_K_M · chains ru · 16k | default | 17 | 23.1 | 22.8 | — | 0 | 15722 | 19259 | 692 s |
 | Qwen3.8-27B-UD-Q6_K_XL · chains en · 16k | 8tasks | 8 | — | — | — | 0 | — | — | — |
 | Qwen3.8-27B-UD-Q6_K_XL · chains ru · 16k | default | 17 | — | — | — | 0 | — | — | — |
 | Qwen3.8-27B-UD-Q6_K_XL · chains ru · 16k | 8tasks | 8 | — | — | — | 0 | — | — | — |
