@@ -12,6 +12,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-27B-UD-Q8_K_XL · en · 16k · default | 70sw ✓ | 78sw ✗ | 7sw ✓ | 7sw ✓ | 7sw ✓ | 11sw ✓ | 75sw ✗ | 13sw ✓ | 77sw ✗ | 12sw ✓ | 79sw ✗ | 75sw ✗ | 70sw ✗ | 76sw ✓ | 73sw ✓ | 80sw ✓ | 72sw ✓ | 11/17 |
 | Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · default | 32sw ✓ | 80sw ✗ | 9sw ✓ | 8sw ✓ | 10sw ✓ | 8sw ✓ | 74sw ✗ | 14sw ✓ | 75sw ✗ | 76sw ✓ | 82sw ✓ | 76sw ✗ | 81sw ✗ | 78sw ✗ | 80sw ✓ | 82sw ✓ | 75sw ✗ | 10/17 |
 | Qwen3.8-27B-UD-Q8_K_XL · zh · 16k · default | 115sw ✓ | 83sw ✓ | 10sw ✓ | 9sw ✓ | 11sw ✓ | 10sw ✓ | 83sw ✗ | 40sw ✓ | 84sw ✗ | 68sw ✓ | 87sw ✗ | 86sw ✓ | 83sw ✗ | 87sw ✗ | 88sw ✓ | 49sw ✓ | 83sw ✗ | 11/17 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · en · 16k · default | 34s ✓ | 103s ✓ | 3s ✓ | 2s ✓ | 3s ✓ | 4s ✓ | 115s ✓ | 6s ✓ | 88s ✗ | 21s ✓ | 79s ✗ | 272s ✗ | 112s ✗ | 98s ✓ | 35s ✓ | 57s ✓ | 307s ✗ | 12/17 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ru · 32k · guarded | 157sw ✓ | 73sw ✗ | 9sw ✓ | 8sw ✓ | 11sw ✓ | 6sw ✓ | 131sw ✗ | 10sw ✓ | 168sw ✗ | 27sw ✓ | 203sw ✓ | 379sw L | 202sw ✗ | 82sw ✗ | 75sw ✓ | 97sw ✓ | 183sw ✗ | 10/17 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ru · 65535 · default | 62sw ✓ | 168sw ✗ | 7sw ✓ | 6sw ✓ | 8sw ✓ | 5sw ✓ | 250sw ✗ | 13sw ✓ | 83sw ✓ | 20sw ✓ | 117sw ✓ | 102sw ✓ | 320sw ✗ | 206sw ✗ | 102sw ✓ | 53sw ✓ | 156sw ✗ | 12/17 |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · en · 16k · default | 57s ✓ | 79s ✓ | 4s ✓ | 4s ✓ | 3s ✓ | 4s ✓ | 219s ✓ | 5s ✓ | 84s ✗ | 8s ✓ | 124s ✗ | 190s ✗ | 184s ✗ | 173s ✓ | 17s ✓ | 41s ✓ | 241s ✗ | 12/17 |
