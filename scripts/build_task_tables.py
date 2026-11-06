@@ -246,7 +246,7 @@ def summary():
                 mark += " (8)"
             return "%s %s" % (human(c["t"]), mark)
         t, ok, n = r["overall"]
-        overall = "%s · %d%% err" % (human(t), round(100 * (n - ok) / n) if n else 0)
+        overall = ("%s · %d%% err" % (human(t), round(100 * (n - ok) / n))) if n else "—"
         lines.append("| %s | %s | %s | %s | %s | %s |" % (
             r["label"], overall, fmt(r["cells"]["t1_en"]), fmt(r["cells"]["t1_ru"]),
             fmt(r["cells"]["t1_zh"]), fmt(r["cells"]["t2"])))

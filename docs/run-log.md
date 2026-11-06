@@ -50,3 +50,16 @@ context and conclusions.
   chains, the 8-task subsets and the 20 programs, with the corrected scoring and the same
   configuration as the other models. Existing Q6 results stay in place until then; runs
   are append-only and will go to new files.
+
+## 2026-11-06 — full series with corrected scoring
+
+| Model | Chains ru / en / zh | Subsets 8 (ru/en/zh) | Programs | Note |
+|---|---|---|---|---|
+| Qwen3.8-27B-UD-Q8_K_XL | 10 / 11 / 11 | 5 / 4 / 4 | 14/20 | chains 16k, programs 32k; no length cuts |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL | 11 / 13 / 14 | 5 / 4 / 6 | 14/20 | YaRN 1M, 32k, temp default, pen 0.2 |
+| Qwen3.8-Flash-Next-UD-IQ4_XS | 11 / 12 / 13 | 5 / 5 / 5 | 14/20 | same stack as Q4_K_XL, faster prefill |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1M | 10 / 12 / 11 | 5 / 5 / 5 | 11/20 | programs re-run after the scoring fix (was 3/20 by the bug) |
+| Qwen3.8-27B-UD-Q4_K_M (host B) | in progress | — | — | 200k context, 32k budget; slow host |
+
+Qwen3.8-27B-UD-Q6_K_XL still has only the Russian full set plus the 8-task
+subsets and programs; a from-scratch run on host A is planned.
