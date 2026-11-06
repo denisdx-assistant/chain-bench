@@ -27,6 +27,7 @@ context and conclusions.
 | 2026-11-05 05:32 | Test 2: v4 × 20 programs | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1M | guarded, 32k, temp 0.3, freq/pres 0.3 | 3/20 (85% errors), loops 0, length 3 | failures are confident and wrong, not loops |
 | 2026-11-05 12:54 | Test 2: v4 × 20 programs | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S | guarded, 32k, temp 0.3, freq/pres 0.3, 262k no YaRN | 2/20 (90% errors), loops 0, length 2 | removing YaRN did not recover accuracy |
 | 2026-11-06 12:15 | Context prefill, 261k / 512k / 1M | Qwen3.8-Flash-Next-UD-Q4_K_XL | full 1M context, one prompt per size | 1850.6 / 1758.2 / 1583.0 tok/s prefill; 141 / 291 / 631 s; generation 152.5 / 127.5 / 74.2 tok/s | prefill falls slowly with size; the model holds a full 1M prompt; word count not reached within 8192 tokens |
+| 2026-11-06 12:46 | Context prefill, 261k / 512k / 1M | Qwen3.8-Flash-Next-UD-IQ4_XS | full 1M context, one prompt per size | 2410.8 / 2295.2 / 1988.9 tok/s prefill; 108 / 223 / 503 s | fastest of the tested models; prefill falls 17% from 261k to 1M |
 
 ## Observations
 
