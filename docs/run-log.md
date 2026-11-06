@@ -43,3 +43,10 @@ context and conclusions.
    penalties and a moderate cap address it.
 6. **A length cut without repetition** is a real under-budget case; it is
    retried at 4× budget and reported separately.
+
+## Planned
+
+- Re-run `Qwen3.8-27B-UD-Q6_K_XL` from scratch on host A (2×V100): full three-language
+  chains, the 8-task subsets and the 20 programs, with the corrected scoring and the same
+  configuration as the other models. Existing Q6 results stay in place until then; runs
+  are append-only and will go to new files.
