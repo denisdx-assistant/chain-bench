@@ -165,3 +165,21 @@ before each request the runner checks the server queue and, if other clients are
 already waiting, sleeps in one-minute steps for up to fifteen minutes. Requests
 also identify themselves as `chain-bench`, so a task list on the server shows who
 sent what. Set `CHAIN_BENCH_POLITE=0` to disable the yielding for an unattended run.
+
+## Pause and resume
+
+A long series can be stopped without losing work. Both runners append each finished
+task to the result file as soon as it lands, and both accept `--resume`, which reads
+the existing file and skips the tasks already there. A task that ended with
+`finish=length`, or with a transport error, is retried rather than skipped.
+
+To stop between tasks, create a file named `PAUSE` in the repository root (or point
+`CHAIN_BENCH_PAUSE_FILE` at another path). The runner finishes the task in flight and
+exits; nothing already recorded is lost. Remove the file and rerun the same command
+with `--resume` to continue.
+
+`--dry-run` lists the tasks that would run, without contacting the model:
+
+```
+python3 scripts/run_frozen_guarded.py --dir datasets/programs/v4 --out results/<model>/programs_v4_16k.json --resume --dry-run
+```

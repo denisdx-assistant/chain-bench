@@ -100,10 +100,23 @@ def main():
     ap.add_argument("--pp", type=float, default=0.3)
     ap.add_argument("--only", default="", help="comma list of program stems")
     ap.add_argument("--force", action="store_true", help="overwrite an existing result file")
+    ap.add_argument("--resume", action="store_true",
+                    help="continue an existing result file: skip programs already done")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="list the programs that would run, then exit")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
-    if os.path.exists(a.out) and not a.force:
-        raise SystemExit("refusing to overwrite %s (use --force to replace)" % a.out)
+    done_rows = []
+    if os.path.exists(a.out) and not a.force and not a.resume:
+        raise SystemExit("refusing to overwrite %s (use --force to replace, or --resume to continue)"
+                         % a.out)
+    if os.path.exists(a.out) and a.resume and not a.force:
+        prev = json.load(open(a.out))
+        done_rows = prev.get("rows") or []
+        # a program cut by the token budget is not done: retry it
+        done = {r.get("file") for r in done_rows if r.get("finish") != "length" and r.get("kind") != "error"}
+    else:
+        done = set()
     TEMP_DEFAULT = None if a.temp < 0 else a.temp
 
     meta = fetch_meta(a.model)
@@ -111,12 +124,24 @@ def main():
     if a.only:
         want = {x.strip() for x in a.only.split(",") if x.strip()}
         files = [f for f in files if os.path.splitext(os.path.basename(f))[0] in want]
+    if done:
+        files = [f for f in files if os.path.basename(f) not in done]
+        print("resume: %d already done, %d to run" % (len(done_rows), len(files)), flush=True)
+    if a.dry_run:
+        for f in files:
+            print("  pending %s" % os.path.basename(f))
+        print("dry run: %d program(s) pending" % len(files))
+        return
     print("resolved: %s / %s" % (meta.get("resolved_provider"), meta.get("resolved_model")), flush=True)
     print("dir: %s | model: %s | programs: %d | max_tokens: %d | timeout: %d s | temp: %.2f"
           % (a.dir, a.model, len(files), a.max_tokens, a.timeout, a.temp), flush=True)
 
-    rows = []
+    rows = list(done_rows)
     for path in files:
+        if os.path.exists(os.environ.get("CHAIN_BENCH_PAUSE_FILE", "PAUSE")):
+            print("\npaused: pause file present, %d program(s) left; rerun with --resume"
+                  % (len(files) - len(rows) + len(done_rows)), flush=True)
+            break
         stem = os.path.splitext(path)[0]
         code = open(path).read()
         try:

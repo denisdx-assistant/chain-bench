@@ -60,6 +60,9 @@ def main():
 
     rows = list(done_rows)
     for t in tasks:
+        if os.path.exists(os.environ.get("CHAIN_BENCH_PAUSE_FILE", "PAUSE")):
+            print("\npaused: pause file present, remaining tasks kept for --resume", flush=True)
+            break
         prompt = d["document"] + "\n\nВопрос: " + t["question"]
         for _attempt in range(3):
             out = ask_guarded(prompt, a.model, max_tokens=a.max_tokens,
