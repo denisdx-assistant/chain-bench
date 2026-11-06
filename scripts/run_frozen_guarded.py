@@ -131,7 +131,7 @@ def main():
             out = ask_guarded(code + QUESTION, a.model, max_tokens=a.max_tokens,
                               timeout=a.timeout, temperature=TEMP_DEFAULT,
                               frequency_penalty=a.fp, presence_penalty=a.pp,
-                              client='openclaw-frozen-guard')
+                              client='chain-bench-frozen')
             if not out.get("stalled"):
                 break
             print("  stall detected, retrying (%d/3)" % (_attempt + 1), flush=True)

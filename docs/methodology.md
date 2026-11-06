@@ -156,3 +156,12 @@ loop needs.
 - Whether the four quantisations in preparation reproduce the Q6 profile or
   degrade differently.
 - How stable the calibrated difficulty is across restarts and cache states.
+
+## Sharing the model with OpenClaw
+
+The benchmark talks to the same single-slot server that OpenClaw agents use, and
+one request at a time is admitted. A chain task holds that slot for minutes, so
+before each request the runner checks the server queue and, if other clients are
+already waiting, sleeps in one-minute steps for up to fifteen minutes. Requests
+also identify themselves as `chain-bench`, so a task list on the server shows who
+sent what. Set `CHAIN_BENCH_POLITE=0` to disable the yielding for an unattended run.

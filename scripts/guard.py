@@ -53,8 +53,36 @@ def _watch_queue(base, model, stop, stall):
         time.sleep(20)
 
 
+def _queue_depth(base, model):
+    try:
+        with urllib.request.urlopen(base + "/v1/models/" + model + "/queue-state", timeout=10) as r:
+            d = json.loads(r.read())
+        return int(d.get("queued_count_total") or 0)
+    except Exception:
+        return 0
+
+
+def wait_for_queue(base, model, max_wait=900, step=60, log=print):
+    """Yield the single model slot to other clients before sending a benchmark request.
+
+    The server admits one request at a time, so a benchmark task holds the GPU for
+    minutes. Waiting until the queue is empty keeps OpenClaw's own calls from
+    timing out behind us. Set CHAIN_BENCH_POLITE=0 to send regardless.
+    """
+    if os.environ.get("CHAIN_BENCH_POLITE", "1") == "0":
+        return 0
+    waited = 0
+    while waited < max_wait:
+        depth = _queue_depth(base, model)
+        if depth == 0:
+            return waited
+        log("  %d other request(s) waiting, yielding %ds to them" % (depth, step))
+        time.sleep(step)
+        waited += step
+    return waited
+
 def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
-                max_repeat=40, client='openclaw-guard', frequency_penalty=0.0, presence_penalty=0.0):
+                max_repeat=40, client='chain-bench', frequency_penalty=0.0, presence_penalty=0.0):
     payload = {"model": model, "max_tokens": max_tokens, "stream": True}
     if temperature is not None:
         payload["temperature"] = temperature
@@ -63,6 +91,7 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
     if presence_penalty:
         payload["presence_penalty"] = presence_penalty
     payload["messages"] = [{"role": "user", "content": prompt}]
+    wait_for_queue(BASE, model)
     body = json.dumps(payload).encode()
     req = urllib.request.Request(BASE + '/v1/chat/completions', data=body,
                                  headers={'Content-Type': 'application/json',
