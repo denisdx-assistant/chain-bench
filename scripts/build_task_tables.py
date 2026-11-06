@@ -12,6 +12,7 @@ import json
 import os
 import sys
 import re
+import statistics
 
 OK, BAD, LEN, LOOP, NA = "✓", "✗", "L", "R", "·"
 
@@ -88,7 +89,8 @@ def load(path):
         if isinstance(st, dict) and isinstance(st.get("predicted_ms"), (int, float)):
             # compute time for this task: prefill + generation, both reported by the server
             gen = round(((st.get("prompt_ms") or 0) + st["predicted_ms"]) / 1000.0)
-        out[str(tid)] = (mark, round(lat) if isinstance(lat, (int, float)) else None, gen)
+        tok = st.get("predicted_n") if isinstance(st, dict) else None
+        out[str(tid)] = (mark, round(lat) if isinstance(lat, (int, float)) else None, gen, tok)
     meta = {} if isinstance(d, list) else d
     return out, meta
 
@@ -146,7 +148,8 @@ def col_label(kind, task):
 def cell(t):
     if not t:
         return NA
-    mark, lat, gen = (t + (None,))[:3] if len(t) == 2 else t
+    t = tuple(t) + (None,) * (4 - len(t))
+    mark, lat, gen = t[0], t[1], t[2]
     secs = gen if gen is not None else lat
     suffix = "" if gen is not None else ("w" if lat is not None else "")
     return "%s%s %s" % (("%ds" % secs) if secs is not None else "—", suffix, mark)
@@ -220,6 +223,11 @@ def summary():
             total_t += t; total_ok += ok; total_n += n
 
         complete_programs = [r for r in g["programs"] if not r.get("partial")]
+        _toks = []
+        for _r in [c for c in g["chains"] if not c.get("partial")] + complete_programs:
+            for _v in _r["tasks"].values():
+                if len(_v) > 3 and isinstance(_v[3], int):
+                    _toks.append(_v[3])
         pr = complete_programs[0] if complete_programs else None
         if pr:
             t = sum(((v[2] if len(v) > 2 and v[2] is not None else v[1]) or 0)
@@ -232,11 +240,18 @@ def summary():
             cells["t2"] = None
 
         budget = g["cfg"].get("budget", g["chains"][0]["budget"] if g["chains"] else g["programs"][0]["budget"])
+        _tok = []
+        for _r in g["chains"] + g["programs"]:
+            if _r.get("partial"):
+                continue
+            for _v in _r["tasks"].values():
+                pass
         rows.append({"label": "%s · %s" % (folder, cfg_label(g["cfg"], budget)),
+                     "median_tokens": round(statistics.median(_toks)) if _toks else None,
                      "cells": cells, "overall": (total_t, total_ok, total_n)})
 
-    head = "| Run | Overall (errors) | Test 1 en (correct) | Test 1 ru (correct) | Test 1 zh (correct) | Test 2 (correct) |"
-    sep = "|---|---|---|---|---|---|"
+    head = "| Run | Overall (errors) | Median tokens/task | Test 1 en (correct) | Test 1 ru (correct) | Test 1 zh (correct) | Test 2 (correct) |"
+    sep = "|---|---|---|---|---|---|---|"
     lines = [head, sep]
     for r in rows:
         def fmt(c):
@@ -248,8 +263,10 @@ def summary():
             return "%s %s" % (human(c["t"]), mark)
         t, ok, n = r["overall"]
         overall = ("%s · %d%% err" % (human(t), round(100 * (n - ok) / n))) if n else "—"
-        lines.append("| %s | %s | %s | %s | %s | %s |" % (
-            r["label"], overall, fmt(r["cells"]["t1_en"]), fmt(r["cells"]["t1_ru"]),
+        lines.append("| %s | %s | %s | %s | %s | %s | %s |" % (
+            r["label"], overall,
+            ("%d" % r["median_tokens"]) if r.get("median_tokens") else "—",
+            fmt(r["cells"]["t1_en"]), fmt(r["cells"]["t1_ru"]),
             fmt(r["cells"]["t1_zh"]), fmt(r["cells"]["t2"])))
     return "\n".join(lines)
 
