@@ -83,6 +83,7 @@
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · ctx 1M · YaRN · T 0.3 · pen 0.3 · guard | 137m55s · 38% err | 4899 | 24m51s 12/17 | 30m21s 10/17 | 31m10s 11/17 | 13m15s 15/24 | 51m33s 11/20 |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · T default · pen 0.2 · guard | 127m31s · 30% err | 5960 | 26m38s 12/17 | 26m24s 11/17 | 26m57s 13/17 | 19m29s 15/24 | 47m32s 14/20 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · T default · pen 0.2 · guard | 162m02s · 27% err | 4958 | 32m51s 13/17 | 29m33s 11/17 | 35m27s 14/17 | 25m52s 15/24 | 64m11s 14/20 |
+| gemma-4-31B-it-UD-Q8_K_XL · ctx 262k · no YaRN · T default · guard | 7m24s · 41% err | 986 | — | 7m24s 10/17 | — | — | — |
 <!-- summary:end -->
 
 **细节。**

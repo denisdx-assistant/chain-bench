@@ -29,6 +29,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · en · 16k · default | 44s ✓ | 195s ✓ | 16s ✓ | 15s ✓ | 16s ✓ | 16s ✓ | 153s ✓ | 17s ✓ | 119s ✗ | 35s ✓ | 99s ✗ | 328s ✗ | 242s ✗ | 168s ✓ | 67s ✓ | 40s ✓ | 401s ✓ | 13/17 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · ru · 16k · default | 65s ✓ | 124s ✗ | 21s ✓ | 11s ✓ | 13s ✓ | 10s ✓ | 134s ✗ | 23s ✓ | 145s ✗ | 24s ✓ | 127s ✓ | 297s ✓ | 210s ✗ | 248s ✗ | 71s ✓ | 55s ✓ | 195s ✗ | 11/17 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · zh · 16k · default | 73s ✓ | 149s ✓ | 22s ✓ | 22s ✓ | 24s ✓ | 23s ✓ | 263s ✓ | 56s ✓ | 84s ✓ | 66s ✓ | 127s ✗ | 284s ✓ | 246s ✗ | 176s ✓ | 82s ✓ | 86s ✓ | 344s ✗ | 14/17 |
+| gemma-4-31B-it-UD-Q8_K_XL · ru · 16k · default | 26s ✓ | 16s ✗ | 6s ✓ | 6s ✓ | 7s ✓ | 8s ✓ | 39s ✗ | 7s ✓ | 19s ✗ | 6s ✓ | 38s ✗ | 113s ✓ | 42s ✗ | 32s ✗ | 15s ✓ | 33s ✓ | 31s ✗ | 10/17 |
 
 ### Test 1 — 8-task subset
 
