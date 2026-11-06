@@ -12,6 +12,7 @@ made before the fields were captured show —.
 
 | Run | Variant | n | gen tok/s (best) | gen tok/s (median) | prefill tok/s (best) | uncached reqs | answer tokens | prompt tokens | gen time |
 |---|---|---|---|---|---|---|---|---|---|
+| Qwen3.8-27B-UD-Q4_K_M · chains ru · 16k | default | 12 | — | — | — | 0 | — | — | — |
 | Qwen3.8-27B-UD-Q6_K_XL · chains en · 16k | 8tasks | 8 | — | — | — | 0 | — | — | — |
 | Qwen3.8-27B-UD-Q6_K_XL · chains ru · 16k | default | 17 | — | — | — | 0 | — | — | — |
 | Qwen3.8-27B-UD-Q6_K_XL · chains ru · 16k | 8tasks | 8 | — | — | — | 0 | — | — | — |
@@ -27,8 +28,13 @@ made before the fields were captured show —.
 | Qwen3.8-27B-UD-Q8_K_XL · chains zh · 16k | 8tasks | 8 | — | — | — | 0 | — | — | — |
 | Qwen3.8-27B-UD-Q8_K_XL · programs · 16k · v4_16k | default | 20 | 44.1 | 40.3 | 722.9 | 2 | 4145 | 142558 | 103 s |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · chains en · 16k | default | 17 | 102.1 | 90.7 | 1510.7 | 16 | 4596 | 14062 | 57 s |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · chains en · 16k | 8tasks | 8 | 107.3 | 94.1 | 1503.2 | 8 | 1059 | 13735 | 11 s |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · chains ru · 16k | 8tasks | 8 | 87.0 | 83.7 | 1655.2 | 1 | 2121 | 19112 | 26 s |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · chains ru · 32k | guarded | 17 | — | — | — | 0 | — | — | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · chains ru · 65535 | default | 17 | — | — | — | 0 | — | — | — |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · chains zh · 16k | default | 17 | 97.4 | 88.9 | — | 0 | 5600 | 38359 | 65 s |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · chains zh · 16k | 8tasks | 8 | 98.5 | 89.4 | 2084.9 | 1 | 1976 | 38141 | 21 s |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · programs · 32k · v4_32k_guarded | guarded | 20 | 99.4 | 97.8 | 2456.1 | 20 | 6688 | 142558 | 70 s |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · chains en · 16k | default | 17 | 102.2 | 89.9 | 1495.4 | 17 | 5469 | 14062 | 57 s |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · chains en · 16k | 8tasks | 8 | 94.5 | 90.0 | 1471.5 | 8 | 1379 | 13735 | 15 s |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · chains ru · 16k | default | 17 | 94.4 | 83.5 | 1602.8 | 2 | 6739 | 19260 | 86 s |
