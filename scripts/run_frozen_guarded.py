@@ -127,10 +127,14 @@ def main():
         if "expected_array" not in exp and "array" not in exp:
             raise SystemExit("schema error in %s: expected_array/array missing; refusing to score"
                              % os.path.basename(stem))
-        out = ask_guarded(code + QUESTION, a.model, max_tokens=a.max_tokens,
-                          timeout=a.timeout, temperature=TEMP_DEFAULT,
-                          frequency_penalty=a.fp, presence_penalty=a.pp,
-                          client='openclaw-frozen-guard')
+        for _attempt in range(3):
+            out = ask_guarded(code + QUESTION, a.model, max_tokens=a.max_tokens,
+                              timeout=a.timeout, temperature=TEMP_DEFAULT,
+                              frequency_penalty=a.fp, presence_penalty=a.pp,
+                              client='openclaw-frozen-guard')
+            if not out.get("stalled"):
+                break
+            print("  stall detected, retrying (%d/3)" % (_attempt + 1), flush=True)
         got_arr = parse_array(out.get("content"))
         got_sum = parse_sum(out.get("content"))
         # a missing answer must never compare equal to a missing expectation

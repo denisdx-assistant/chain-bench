@@ -51,9 +51,13 @@ def main():
     rows = []
     for t in tasks:
         prompt = d["document"] + "\n\nВопрос: " + t["question"]
-        out = ask_guarded(prompt, a.model, max_tokens=a.max_tokens,
-                          timeout=a.timeout, temperature=TEMP_DEFAULT,
-                          frequency_penalty=a.fp, presence_penalty=a.pp)
+        for _attempt in range(3):
+            out = ask_guarded(prompt, a.model, max_tokens=a.max_tokens,
+                              timeout=a.timeout, temperature=TEMP_DEFAULT,
+                              frequency_penalty=a.fp, presence_penalty=a.pp)
+            if not out.get("stalled"):
+                break
+            print("  stall detected, retrying (%d/3)" % (_attempt + 1), flush=True)
         if "answer" not in t:
             raise SystemExit("schema error: task %s has no answer field" % t.get("id"))
         got = parse_int(out.get("content"))

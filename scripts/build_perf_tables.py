@@ -80,18 +80,21 @@ def main():
             "gen_tps": median(gen_tps), "pre_tps": median(pre_tps),
             "out_tok": median(out_tok), "prompt_tok": median(prompt_tok),
             "gen_s": median(gen_s), "uncached": len(uncached),
+            "gen_best": max(gen_tps) if gen_tps else None,
+            "pre_best": max(pre_tps) if pre_tps else None,
         })
 
-    head = ("| Run | Variant | n | gen tok/s | prefill tok/s | uncached reqs | answer tokens | prompt tokens | gen time |\n"
-            "|---|---|---|---|---|---|---|---|---|")
+    head = ("| Run | Variant | n | gen tok/s (best) | gen tok/s (median) | prefill tok/s (best) | uncached reqs | answer tokens | prompt tokens | gen time |\n"
+            "|---|---|---|---|---|---|---|---|---|---|")
     lines = [head]
     for r in rows_out:
         def f(v, unit=""):
             return ("%.1f%s" % (v, unit)) if isinstance(v, (int, float)) else "—"
-        lines.append("| %s | %s | %d | %s | %s | %d | %s | %s | %s |" % (
+        lines.append("| %s | %s | %d | %s | %s | %s | %d | %s | %s | %s |" % (
             r["label"], r["variant"], r["n"],
+            f(r["gen_best"]) if r.get("gen_best") else "—",
             f(r["gen_tps"]),
-            f(r["pre_tps"]) if r["pre_tps"] else "—",
+            f(r["pre_best"]) if r.get("pre_best") else "—",
             r["uncached"],
             ("%d" % r["out_tok"]) if r["out_tok"] else "—",
             ("%d" % r["prompt_tok"]) if r["prompt_tok"] else "—",
@@ -102,7 +105,9 @@ def main():
               "Median server-side numbers per run: generation speed, prefill speed, tokens spent on\n"
               "an answer, prompt size (including the cached prefix) and generation time.\n"
               "These come from the `timings` block of the API response, so queueing and wall-clock\n"
-              "noise are excluded. **Prefill counts only requests that did not hit the prefix cache**\n"
+              "noise are excluded. Two speeds are given: **best** (the fastest task, i.e. a run without
+"
+              "stalls — the figure to quote) and **median** (typical, pulled down by any stall). **Prefill counts only requests that did not hit the prefix cache**\n"
               "(`cache_n = 0`); the column `uncached reqs` says how many samples that is. In a run over\n"
               "one document that is usually one request, since the rest reuse the prefix. Runs made\n"
               "before the fields were captured show “—”.\n\n")

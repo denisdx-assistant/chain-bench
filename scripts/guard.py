@@ -11,9 +11,11 @@ Returns a dict with `loop: True` when aborted, plus partial content.
 import json
 import os
 import re
+import os
 import time
 import urllib.error
 import urllib.request
+import threading
 
 _cfg = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "endpoint")
 BASE = (os.environ.get("CHAIN_BENCH_ENDPOINT")
@@ -24,6 +26,31 @@ BASE = (os.environ.get("CHAIN_BENCH_ENDPOINT")
 def _shingles(text, n=8):
     words = re.findall(r"\w+", text.lower())
     return set(tuple(words[i:i + n]) for i in range(len(words) - n + 1))
+
+
+def _watch_queue(base, model, stop, stall):
+    """Detect a request the server no longer knows about."""
+    import threading
+    url = base + "/v1/models/" + model + "/queue-state"
+    zero = 0
+    while not stop.is_set():
+        try:
+            with urllib.request.urlopen(url, timeout=10) as r:
+                q = json.load(r) or {}
+            active = q.get("active_count")
+            loaded = q.get("model_loaded")
+            if loaded is False:
+                zero = 0          # still loading: an idle counter means nothing yet
+            elif active == 0:
+                zero += 1
+                if zero >= 2:
+                    stall.set()
+                    return
+            else:
+                zero = 0
+        except Exception:
+            pass
+        time.sleep(20)
 
 
 def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
@@ -63,8 +90,37 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
                 time.sleep(15)
                 continue
             return {"error": str(e)[:150], "latency": time.time() - t0}
+    stop = threading.Event()
+    stall = threading.Event()
+    if os.environ.get("CHAIN_BENCH_WATCH") == "1":
+        threading.Thread(target=_watch_queue, args=(BASE, model, stop, stall), daemon=True).start()
     try:
-        for raw in r:
+        _sock = getattr(getattr(getattr(r, "fp", None), "raw", None), "_sock", None)
+        if _sock is not None:
+            _sock.settimeout(30)
+    except Exception:
+        pass
+    try:
+        while True:
+            try:
+                raw = r.readline()
+            except Exception as exc:
+                msg = str(exc).lower()
+                if "timed out" in msg or isinstance(exc, TimeoutError):
+                    if stall.is_set():
+                        stop.set()
+                        try: r.close()
+                        except Exception: pass
+                        return {"content": ''.join(content), "loop": False, "timeout": False,
+                                "stalled": True, "latency": time.time() - t0, "finish": "stalled"}
+                    if time.time() - t0 > timeout:
+                        r.close()
+                        return {"content": ''.join(content), "loop": False, "timeout": True,
+                                "latency": time.time() - t0, "finish": "timeout"}
+                    continue
+                return {"error": str(exc)[:150], "latency": time.time() - t0}
+            if not raw:
+                break
             if time.time() - t0 > timeout:
                 r.close()
                 return {"content": ''.join(content), "loop": False,
