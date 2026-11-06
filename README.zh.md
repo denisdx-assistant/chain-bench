@@ -93,6 +93,8 @@
   [docs/performance.md](docs/performance.md)
 - 长上下文预填充（261k / 512k / 1M token）:
   [docs/context-prefill.md](docs/context-prefill.md)
+- 各主机的硬件与 KV 缓存设置:
+  [docs/hardware.md](docs/hardware.md)
 - 运行与校准的时间顺序日志: [docs/run-log.md](docs/run-log.md)
 
 ## 3. 模型

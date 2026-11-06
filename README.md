@@ -114,6 +114,8 @@ Each cell is one test series: total wall-clock time and score. `(8)` marks the
   spent per task: [docs/performance.md](docs/performance.md)
 - Context-length prefill (261k / 512k / 1M tokens):
   [docs/context-prefill.md](docs/context-prefill.md)
+- Serving hardware and KV-cache settings per host:
+  [docs/hardware.md](docs/hardware.md)
 - Chronological log of runs and calibration:
   [docs/run-log.md](docs/run-log.md)
 

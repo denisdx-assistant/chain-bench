@@ -112,6 +112,8 @@ YaRN, температурой или бюджетом — контекст по
   префилла, расход токенов на задачу: [docs/performance.md](docs/performance.md)
 - Префилл на длинном контексте (261k / 512k / 1M токенов):
   [docs/context-prefill.md](docs/context-prefill.md)
+- Железо и настройки KV-кэша по хостам:
+  [docs/hardware.md](docs/hardware.md)
 - Хронологический журнал прогонов и калибровки:
   [docs/run-log.md](docs/run-log.md)
 
