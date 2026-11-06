@@ -95,12 +95,12 @@ YaRN, температурой или бюджетом — контекст по
 |---|---|---|---|---|---|
 | Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default · budget 16k | 150m36s · 43% err | 5m19s 4/8 (8) | 13m30s 10/17 | 10m08s 5/8 (8) | 121m39s 11/20 |
 | Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default · budget 8 · legacy 8-program set | 11m25s · 12% err | — | — | — | 11m25s 7/8 |
-| Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · budget 16k/32k · guard | 83m41s · 35% err | 14m42s 11/17 | 15m40s 10/17 | 17m56s 11/17 | 35m23s 14/20 |
+| Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · budget 16k/32k · guard | 146m22s · 35% err | 14m42s 11/17 | 15m40s 10/17 | 17m56s 11/17 | 98m04s 14/20 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T 0.3 · pen 0.3 · budget 32k · guard | 30m21s · 41% err | — | 30m21s 10/17 | — | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T default · budget 65535 · provenance inferred | 27m58s · 29% err | — | 27m58s 12/17 | — | — |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · budget 16 | 22m19s · 29% err | 22m19s 12/17 | — | — | — |
-| Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · T default · pen 0.2 · budget 32k · guard | 99m37s · 30% err | 23m57s 12/17 | 25m08s 11/17 | 22m52s 13/17 | 27m40s 14/20 |
-| Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · T default · pen 0.2 · budget 32k · guard | 124m23s · 27% err | 29m20s 13/17 | 26m59s 11/17 | 30m15s 14/17 | 37m49s 14/20 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · budget 16 | 24m51s · 29% err | 24m51s 12/17 | — | — | — |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · T default · pen 0.2 · budget 32k · guard | 127m31s · 30% err | 26m38s 12/17 | 26m24s 11/17 | 26m57s 13/17 | 47m32s 14/20 |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · T default · pen 0.2 · budget 32k · guard | 162m02s · 27% err | 32m51s 13/17 | 29m33s 11/17 | 35m27s 14/17 | 64m11s 14/20 |
 <!-- summary:end -->
 
 **Детали.**

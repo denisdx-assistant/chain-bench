@@ -85,7 +85,8 @@ def load(path):
         gen = None
         st = r.get("server_timings") or {}
         if isinstance(st, dict) and isinstance(st.get("predicted_ms"), (int, float)):
-            gen = round(st["predicted_ms"] / 1000.0)
+            # compute time for this task: prefill + generation, both reported by the server
+            gen = round(((st.get("prompt_ms") or 0) + st["predicted_ms"]) / 1000.0)
         out[str(tid)] = (mark, round(lat) if isinstance(lat, (int, float)) else None, gen)
     meta = {} if isinstance(d, list) else d
     return out, meta
