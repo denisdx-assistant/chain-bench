@@ -4,6 +4,15 @@ Speed in this benchmark depends not only on the weights but on how the serving
 stack stores the KV cache. The table records what each measured configuration
 actually used, so that a difference in tokens per second can be attributed.
 
+## Engines
+
+- **Flash-Next models** run on *strata*, a custom build compiled for **SM_70**
+  (V100 compute capability 7.0). That is why the engine carries a
+  `build-v100-cuda124` suffix: stock builds of the same project target newer
+  architectures and do not run on these cards.
+- **27B models** (Q6, Q8, Q4_K_M) run on a llama.cpp-style server, with the KV
+  cache settings listed below.
+
 ## Qwen3.8-27B-UD-Q4_K_M.gguf
 
 | Host | Context | Parallel | Batch / ubatch | KV K | KV V | Note |
