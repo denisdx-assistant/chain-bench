@@ -93,6 +93,12 @@ def main():
         print("  %2d | expected %5d | got %s | %-7s | %6.1f c%s"
               % (t["id"], t["answer"], ("%5d" % got) if got is not None else "    —",
                  kind, out.get("latency", 0), _sp), flush=True)
+        # save after every task: a crash or a gateway restart must not lose the set
+        _tmp = a.out + ".tmp"
+        json.dump({"dataset": a.dataset, "model": a.model, "max_tokens": a.max_tokens,
+                   "temperature": a.temp, "rows": rows},
+                  open(_tmp, "w"), ensure_ascii=False, indent=1)
+        os.replace(_tmp, a.out)
 
     errors = [r for r in rows if r.get("kind") == "error"]
     if errors:
