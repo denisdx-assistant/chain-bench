@@ -21,15 +21,33 @@ the context limit; only the context size and the K-cache type differ.
 | 192.168.1.111 (2×V100 32 GB) | 262 144 | 1 | 8192 / 2048 | `q8_0` | `q8_0` | `q8_0` | `turbo4` |
 
 Q8 compresses **both** keys and values with `q8_0`, while the Flash-Next models
-use `turbo3` for values (and default or `q8_0` keys). This is one candidate
-explanation for speed differences that the weights alone do not explain: the
-KV format changes memory traffic and dequantisation cost per token.
+run `k8v4` (q8 keys, turbo4 values). This is one candidate explanation for speed
+differences that the weights alone do not explain: the KV format changes memory
+traffic and dequantisation cost per token. Note also that Q8 runs on the
+llama.cpp-style stack while Flash-Next runs on strata, so engine differences are
+mixed in with the format difference.
 
 ## Flash-Next models (IQ3_S, IQ4_XS, Q4_K_XL)
 
-Served with YaRN scaling to a 1M context on 2×V100. KV-cache settings for these
-runs were not recorded at the time and are marked as unknown in the config
-registry; they should be captured before the next series.
+All three are served by the same engine configuration on 2×V100; only the packed
+weights differ. Launch parameters, taken from the sanitised configs in
+`configs/strata/`:
+
+| Parameter | Value | Meaning |
+|---|---|---|
+| `--max-context` | 1 048 576 | 1M tokens |
+| `--kv` | `k8v4` | keys q8, values turbo4 |
+| `--kv-resident` | 49 152 | tokens kept resident in VRAM |
+| `--rope-scaling` / `--rope-scale` / `--yarn-orig-ctx` | yarn / 4 / 262 144 | 262k native context scaled 4× to 1M |
+| `--vram-reserve-mib` | 2 048 | headroom left to the driver |
+| `--spec` / `--mtp-hnorm` | 4 / stream | speculative decoding with MTP |
+| `--pipeline-windows` | 2 | pipeline depth |
+| `--prompt-cache` | 4 | prompt cache slots |
+| `--conversation-cache-mib` / `-slots` | 16 384 / 8 | cross-request KV reuse |
+
+Because the serving configuration is identical, differences between IQ3_S,
+IQ4_XS and Q4_K_XL in this benchmark come from the weights, not from the stack.
+The KV format (`k8v4`) is the same in all three.
 
 ## Where this is stored
 
