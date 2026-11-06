@@ -33,22 +33,32 @@ def main():
     ap.add_argument("--fp", type=float, default=0.3)
     ap.add_argument("--pp", type=float, default=0.3)
     ap.add_argument("--ids", default="")
+    ap.add_argument("--resume", action="store_true", help="continue an existing result file")
     ap.add_argument("--force", action="store_true", help="overwrite an existing result file")
     ap.add_argument("--out", default="chains_guarded.json")
     a = ap.parse_args()
-    if os.path.exists(a.out) and not a.force:
+    if os.path.exists(a.out) and not a.force and not a.resume:
         raise SystemExit("refusing to overwrite %s (use --force to replace)" % a.out)
     TEMP_DEFAULT = None if a.temp < 0 else a.temp
 
+    done_rows = []
+    done_ids = set()
+    if a.resume and os.path.exists(a.out):
+        prev = json.load(open(a.out))
+        done_rows = prev.get("rows") or []
+        # a task that hit the length cap is not done: retry it with the larger budget
+        done_ids = {str(r.get("id")) for r in done_rows if r.get("finish") != "length"}
     d = json.load(open(a.dataset))
     tasks = d["tasks"]
+    if done_ids:
+        tasks = [t for t in tasks if str(t["id"]) not in done_ids]
     if a.ids:
         want = {int(x) for x in a.ids.split(",") if x.strip()}
         tasks = [t for t in tasks if t["id"] in want]
     print("dataset: %s | model: %s | tasks: %d | max_tokens: %d | timeout: %d s | temp: %.2f"
           % (a.dataset, a.model, len(tasks), a.max_tokens, a.timeout, a.temp), flush=True)
 
-    rows = []
+    rows = list(done_rows)
     for t in tasks:
         prompt = d["document"] + "\n\nВопрос: " + t["question"]
         for _attempt in range(3):

@@ -93,6 +93,7 @@ YaRN, температурой или бюджетом — контекст по
 <!-- summary:start -->
 | Run | Overall (errors) | Test 1 en (correct) | Test 1 ru (correct) | Test 1 zh (correct) | Test 2 (correct) |
 |---|---|---|---|---|---|
+| Qwen3.8-27B-UD-Q4_K_M · ctx 200k · no YaRN · T default · budget 16k · guard | 0s · 0% err | — | — | — | — |
 | Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default · budget 16k | 150m36s · 43% err | 5m19s 4/8 (8) | 13m30s 10/17 | 10m08s 5/8 (8) | 121m39s 11/20 |
 | Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default · budget 8 · legacy 8-program set | 11m25s · 12% err | — | — | — | 11m25s 7/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · budget 16k/32k · guard | 146m22s · 35% err | 14m42s 11/17 | 15m40s 10/17 | 17m56s 11/17 | 98m04s 14/20 |
