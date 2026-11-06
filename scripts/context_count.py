@@ -58,8 +58,8 @@ def provider():
         return None, None
 
 
-def ask(prompt, max_tokens, timeout):
-    body = json.dumps({"model": "local-only", "messages": [{"role": "user", "content": prompt}],
+def ask(prompt, max_tokens, timeout, model="local-only"):
+    body = json.dumps({"model": model, "messages": [{"role": "user", "content": prompt}],
                        "max_tokens": max_tokens, "temperature": 0}).encode()
     headers = {"Content-Type": "application/json"}
     tok = token()
@@ -124,6 +124,7 @@ def main():
     ap.add_argument("--max-tokens", type=int, default=8192)
     ap.add_argument("--timeout", type=int, default=7200)
     ap.add_argument("--label", default="")
+    ap.add_argument("--model", default="local-only")
     ap.add_argument("--calibrate", action="store_true")
     a = ap.parse_args()
 
@@ -134,7 +135,7 @@ def main():
 
     prompt, expected = build_prompt(a.words, a.target, a.seed)
     print("слов: %d | символов в промпте: %d | ожидаемый счёт: %d" % (a.words, len(prompt), expected), flush=True)
-    response, wall, err = ask(prompt, a.max_tokens, a.timeout)
+    response, wall, err = ask(prompt, a.max_tokens, a.timeout, a.model)
     if err:
         print("ОШИБКА:", err, flush=True)
         (out / "error.txt").write_text(err)
@@ -150,7 +151,7 @@ def main():
         m["count_status"] = "correct" if reported == expected else "wrong"
     m.update({"resolved_provider": prov, "resolved_model": pmodel,
               "words": a.words, "expected": expected, "reported": reported,
-              "correct": reported == expected, "target": a.target, "model": "local-only",
+              "correct": reported == expected, "target": a.target, "model": a.model,
               "label": tag})
     (out / "report.json").write_text(json.dumps(m, indent=1, ensure_ascii=False))
     print("\n--- РЕЗУЛЬТАТ ---")
