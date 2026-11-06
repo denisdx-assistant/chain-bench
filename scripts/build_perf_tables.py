@@ -105,7 +105,7 @@ def main():
               "Median server-side numbers per run: generation speed, prefill speed, tokens spent on\n"
               "an answer, prompt size (including the cached prefix) and generation time.\n"
               "These come from the `timings` block of the API response, so queueing and wall-clock\n"
-              "noise are excluded. Two speeds are given: **best** (the fastest task, i.e. a run without
+              "noise are excluded. Two speeds are given: **best** (the fastest task, i.e. a run without"
 "
               "stalls — the figure to quote) and **median** (typical, pulled down by any stall). **Prefill counts only requests that did not hit the prefix cache**\n"
               "(`cache_n = 0`); the column `uncached reqs` says how many samples that is. In a run over\n"
