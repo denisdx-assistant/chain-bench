@@ -81,7 +81,7 @@
 | Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · budget 16k/32k · guard | 146m22s · 35% err | 14m42s 11/17 | 15m40s 10/17 | 17m56s 11/17 | 98m04s 14/20 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T 0.3 · pen 0.3 · budget 32k · guard | 30m21s · 41% err | — | 30m21s 10/17 | — | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T default · budget 65535 · provenance inferred | 27m58s · 29% err | — | 27m58s 12/17 | — | — |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · budget 16 | 24m51s · 29% err | 24m51s 12/17 | — | — | — |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · budget 16 | 61m01s · 33% err | 24m51s 12/17 | 5m00s 5/8 (8) | 31m10s 11/17 | — |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · T default · pen 0.2 · budget 32k · guard | 127m31s · 30% err | 26m38s 12/17 | 26m24s 11/17 | 26m57s 13/17 | 47m32s 14/20 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · T default · pen 0.2 · budget 32k · guard | 162m02s · 27% err | 32m51s 13/17 | 29m33s 11/17 | 35m27s 14/17 | 64m11s 14/20 |
 <!-- summary:end -->
