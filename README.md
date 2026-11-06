@@ -96,8 +96,7 @@ Each cell is one test series: total wall-clock time and score. `(8)` marks the
 | Run | Overall (errors) | Median tokens/task | Test 1 en (correct) | Test 1 ru (correct) | Test 1 zh (correct) | Test 2 (correct) |
 |---|---|---|---|---|---|---|
 | Qwen3.8-27B-UD-Q4_K_M · ctx 200k · no YaRN · T default · guard | 93m16s · 35% err | 15722 | — | 93m16s 11/17 | — | — |
-| Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default | 150m36s · 43% err | — | 5m19s 4/8 (8) | 13m30s 10/17 | 10m08s 5/8 (8) | 121m39s 11/20 |
-| Qwen3.8-27B-UD-Q6_K_XL · budget 16 | 30m50s · 26% err | 4099 | 14m06s 13/17 | — | 16m44s 12/17 | — |
+| Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default | 165m59s · 35% err | 4099 | 14m06s 13/17 | 13m30s 10/17 | 16m44s 12/17 | 121m39s 11/20 |
 | Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · guard | 146m22s · 35% err | 4145 | 14m42s 11/17 | 15m40s 10/17 | 17m56s 11/17 | 98m04s 14/20 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T 0.3 · pen 0.3 · guard | 137m55s · 38% err | 4899 | 24m51s 12/17 | 30m21s 10/17 | 31m10s 11/17 | 51m33s 11/20 |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · T default · pen 0.2 · guard | 127m31s · 30% err | 5960 | 26m38s 12/17 | 26m24s 11/17 | 26m57s 13/17 | 47m32s 14/20 |
