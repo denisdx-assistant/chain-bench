@@ -15,8 +15,8 @@ overwritten; the retry is recorded next to it and referenced from the series.
 
 | # | Model | Run | Task | Why | Status |
 |---|---|---|---|---|---|
-| 1 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M` | `chains_ru_20k_32k_guarded.json` | chain 12 | `finish=length` at 32k, 379 s | ✅ done — `chains_ru_20k_task12_retry_131k.json`, answer 100 = expected 100 |
-| 2 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M` | `programs_v4_32k_guarded.json` | `v4_seed313.py` | `finish=length` at 32k, 385 s | ⬜ pending |
+| 1 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `chains_ru_20k_32k_guarded.json` | chain 12 | `finish=length` at 32k, 379 s | ✅ done — `chains_ru_20k_task12_retry_131k.json`, answer 100 = expected 100 |
+| 2 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `programs_v4_32k_guarded.json` | `v4_seed313.py` | `finish=length` at 32k, 385 s | ⬜ pending |
 | 3 | `Qwen3.8-Flash-Next-UD-Q4_K_XL` | `programs_v4_16k.json` | `v4_seed302.py` | `finish=length` at 16k, 395 s | ⬜ pending |
 | 4 | `Qwen3.8-Flash-Next-UD-Q4_K_XL` | `programs_v4_16k.json` | `v4_seed310.py` | `finish=length` at 16k, 475 s | ⬜ pending |
 
@@ -33,7 +33,7 @@ rerun is needed:
 - `Qwen3.8-27B-UD-Q8_K_XL` — both the archived 16k series and the 32k
   reproduction run
 - `Qwen3.8-Flash-Next-UD-IQ4_XS` — chains ru/en/zh, subsets, programs
-- `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M` — chains en/zh, all subsets
+- `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` — chains en/zh, all subsets
 - `Qwen3.8-Flash-Next-UD-Q4_K_XL` — chains ru/en/zh, all subsets
 
 A short or empty-looking `raw` is not by itself a truncation. In program runs a

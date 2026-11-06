@@ -248,6 +248,7 @@ def summary():
         # one subset run per language: prefer the one with server timings, else the first
         # subsets: one averaged cell per language, summed across the three languages
         _sub_parts = []
+        _sub_langs = []
         for _lang in ("ru", "en", "zh"):
             _cand = [r for r in g["chains"] if r.get("subset") and r["lang"] == _lang and not r.get("partial")]
             if not _cand:
@@ -255,11 +256,14 @@ def summary():
             _c = avg_cells([cell_of(r) for r in _cand])
             if _c:
                 _sub_parts.append(_c)
+                _sub_langs.append(_lang)
         if _sub_parts:
             cells["t1_subs"] = {"t": sum(c["t"] for c in _sub_parts),
                                 "ok": sum(c["ok"] for c in _sub_parts),
                                 "n": sum(c["n"] for c in _sub_parts),
-                                "runs": max(c["runs"] for c in _sub_parts)}
+                                "runs": max(c["runs"] for c in _sub_parts),
+                                "langs": len(_sub_parts),
+                                "lang_list": _sub_langs}
         else:
             cells["t1_subs"] = None
         c2 = avg_cells([cell_of(r) for r in complete_programs])
@@ -294,7 +298,9 @@ def summary():
             if not c:
                 return "—"
             m = mark(c["ok"], c["n"])
-            if c.get("subset"):
+            if c.get("langs", 3) < 3:
+                m += " (%s only)" % "/".join(c.get("lang_list") or ["ru", "en", "zh"][:c["langs"]])
+            elif c.get("subset"):
                 m += " (8)"
             return "%s %s" % (human(c["t"]), m)
         t, ok, n = r["overall"]
