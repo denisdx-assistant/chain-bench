@@ -195,32 +195,49 @@ def summary():
         groups.setdefault(sig, {"chains": [], "programs": [], "cfg": cfg})
         groups[sig]["programs" if r["file"].startswith("programs_") else "chains"].append(r)
 
+    def cell_of(r):
+        t = sum(((v[2] if len(v) > 2 and v[2] is not None else v[1]) or 0)
+                for v in r["tasks"].values())
+        ok = sum(1 for v in r["tasks"].values() if v[0] == OK)
+        return {"t": t, "ok": ok, "n": len(r["tasks"])}
+
+    def avg_cells(cells):
+        """Mean over repeated runs of the same configuration: a cell may be fractional."""
+        cells = [c for c in cells if c]
+        if not cells:
+            return None
+        if len(cells) == 1:
+            out = dict(cells[0])
+            out["runs"] = 1
+            return out
+        return {"t": sum(c["t"] for c in cells) / len(cells),
+                "ok": sum(c["ok"] for c in cells) / len(cells),
+                "n": sum(c["n"] for c in cells) / len(cells),
+                "runs": len(cells)}
+
     rows = []
     for (folder, _ctx, _yarn, _temp, _pen, _guard), g in sorted(groups.items(), key=lambda kv: str(kv[0])):
         def pick(lang):
+            """Every valid full run of the language; several runs average into one cell."""
             full = [r for r in g["chains"] if r["lang"] == lang and not r["subset"] and not r.get("partial")]
             if full:
-                full.sort(key=lambda r: (r["variant"] != "guarded", -len(r["tasks"])))
-                return full[0], False
+                return full, False
             sub = [r for r in g["chains"] if r["lang"] == lang and not r.get("partial")]
             if sub:
-                sub.sort(key=lambda r: -len(r["tasks"]))
-                return sub[0], True
-            return None, False
+                return sub, True
+            return [], False
 
         cells = {}
         total_t = total_ok = total_n = 0
         for lang in ("en", "ru", "zh"):
-            r, subset = pick(lang)
-            if r is None:
+            runs, subset = pick(lang)
+            c = avg_cells([cell_of(r) for r in runs])
+            if c is None:
                 cells["t1_" + lang] = None
                 continue
-            t = sum(((v[2] if len(v) > 2 and v[2] is not None else v[1]) or 0)
-                    for v in r["tasks"].values())
-            ok = sum(1 for v in r["tasks"].values() if v[0] == OK)
-            n = len(r["tasks"])
-            cells["t1_" + lang] = {"t": t, "ok": ok, "n": n, "subset": subset}
-            total_t += t; total_ok += ok; total_n += n
+            c["subset"] = subset
+            cells["t1_" + lang] = c
+            total_t += c["t"]; total_ok += c["ok"]; total_n += c["n"]
 
         complete_programs = [r for r in g["programs"] if not r.get("partial")]
         _toks = []
@@ -229,26 +246,26 @@ def summary():
                 if len(_v) > 3 and isinstance(_v[3], int):
                     _toks.append(_v[3])
         # one subset run per language: prefer the one with server timings, else the first
-        subs = []
+        # subsets: one averaged cell per language, summed across the three languages
+        _sub_parts = []
         for _lang in ("ru", "en", "zh"):
             _cand = [r for r in g["chains"] if r.get("subset") and r["lang"] == _lang and not r.get("partial")]
             if not _cand:
                 continue
-            _with = [r for r in _cand if any(len(v) > 3 and isinstance(v[3], int) for v in r["tasks"].values())]
-            subs.append((_with or _cand)[0])
-        _s_t = sum(((v[2] if len(v) > 2 and v[2] is not None else v[1]) or 0)
-                   for r in subs for v in r["tasks"].values())
-        _s_ok = sum(1 for r in subs for v in r["tasks"].values() if v[0] == OK)
-        _s_n = sum(len(r["tasks"]) for r in subs)
-        cells["t1_subs"] = {"t": _s_t, "ok": _s_ok, "n": _s_n} if _s_n else None
-        pr = complete_programs[0] if complete_programs else None
-        if pr:
-            t = sum(((v[2] if len(v) > 2 and v[2] is not None else v[1]) or 0)
-                    for v in pr["tasks"].values())
-            ok = sum(1 for v in pr["tasks"].values() if v[0] == OK)
-            n = len(pr["tasks"])
-            cells["t2"] = {"t": t, "ok": ok, "n": n}
-            total_t += t; total_ok += ok; total_n += n
+            _c = avg_cells([cell_of(r) for r in _cand])
+            if _c:
+                _sub_parts.append(_c)
+        if _sub_parts:
+            cells["t1_subs"] = {"t": sum(c["t"] for c in _sub_parts),
+                                "ok": sum(c["ok"] for c in _sub_parts),
+                                "n": sum(c["n"] for c in _sub_parts),
+                                "runs": max(c["runs"] for c in _sub_parts)}
+        else:
+            cells["t1_subs"] = None
+        c2 = avg_cells([cell_of(r) for r in complete_programs])
+        if c2:
+            cells["t2"] = c2
+            total_t += c2["t"]; total_ok += c2["ok"]; total_n += c2["n"]
         else:
             cells["t2"] = None
 
@@ -268,13 +285,18 @@ def summary():
     sep = "|---|---|---|---|---|---|---|---|"
     lines = [head, sep]
     for r in rows:
+        def mark(ok, n):
+            if abs(ok - round(ok)) < 1e-9:
+                return "%d/%d" % (round(ok), round(n))
+            return "%.1f/%d" % (ok, round(n))
+
         def fmt(c):
             if not c:
                 return "—"
-            mark = "%d/%d" % (c["ok"], c["n"])
+            m = mark(c["ok"], c["n"])
             if c.get("subset"):
-                mark += " (8)"
-            return "%s %s" % (human(c["t"]), mark)
+                m += " (8)"
+            return "%s %s" % (human(c["t"]), m)
         t, ok, n = r["overall"]
         overall = ("%s · %d%% err" % (human(t), round(100 * (n - ok) / n))) if n else "—"
         lines.append("| %s | %s | %s | %s | %s | %s | %s | %s |" % (
