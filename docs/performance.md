@@ -61,3 +61,10 @@ made before the fields were captured show —.
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains zh · 16k | default | 17 | 92.6 | 78.6 | 1537.3 | 2 | 4964 | 38359 | 66 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains zh · 16k | 8tasks | 8 | 85.0 | 78.6 | 1530.4 | 2 | 1923 | 38141 | 23 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · programs · 16k · v4_16k | default | 20 | 101.5 | 84.8 | 1802.7 | 20 | 7434 | 142558 | 87 s |
+| gemma-4-31B-it-UD-Q8_K_XL · chains en · 16k | default | 17 | 80.0 | 70.6 | — | 0 | 1473 | 13909 | 19 s |
+| gemma-4-31B-it-UD-Q8_K_XL · chains en · 16k | 8tasks | 8 | 80.1 | 77.1 | — | 0 | 477 | 13575 | 6 s |
+| gemma-4-31B-it-UD-Q8_K_XL · chains ru · 16k | default | 17 | 77.6 | 69.6 | 1041.1 | 1 | 986 | 19050 | 15 s |
+| gemma-4-31B-it-UD-Q8_K_XL · chains ru · 16k | 8tasks | 8 | 77.4 | 72.3 | — | 0 | 685 | 18780 | 9 s |
+| gemma-4-31B-it-UD-Q8_K_XL · chains zh · 16k | default | 17 | 64.4 | 58.5 | — | 0 | 1005 | 42057 | 17 s |
+| gemma-4-31B-it-UD-Q8_K_XL · chains zh · 16k | 8tasks | 8 | 67.7 | 62.1 | — | 0 | 712 | 41936 | 12 s |
+| gemma-4-31B-it-UD-Q8_K_XL · programs · 16k · v4_16k | default | 19 | 44.2 | 42.9 | 494.0 | 9 | 6143 | 142712 | 142 s |
