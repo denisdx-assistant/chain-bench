@@ -31,6 +31,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · zh · 16k · default | 73s ✓ | 149s ✓ | 22s ✓ | 22s ✓ | 24s ✓ | 23s ✓ | 263s ✓ | 56s ✓ | 84s ✓ | 66s ✓ | 127s ✗ | 284s ✓ | 246s ✗ | 176s ✓ | 82s ✓ | 86s ✓ | 344s ✗ | 14/17 |
 | gemma-4-31B-it-UD-Q8_K_XL · en · 16k · default | 17s ✓ | 25s ✓ | 5s ✓ | 7s ✓ | 6s ✓ | 6s ✓ | 115s ✗ | 7s ✓ | 97s ✗ | 7s ✓ | 33s ✗ | 131s ✗ | 80s ✗ | 86s ✗ | 15s ✓ | 20s ✗ | 43s ✗ | 9/17 |
 | gemma-4-31B-it-UD-Q8_K_XL · ru · 16k · default | 26s ✓ | 16s ✗ | 6s ✓ | 6s ✓ | 7s ✓ | 8s ✓ | 39s ✗ | 7s ✓ | 19s ✗ | 6s ✓ | 38s ✗ | 113s ✓ | 42s ✗ | 32s ✗ | 15s ✓ | 33s ✓ | 31s ✗ | 10/17 |
+| gemma-4-31B-it-UD-Q8_K_XL · zh · 16k · default | 6s ✓ | 18s ✓ | 7s ✓ | 8s ✓ | 9s ✓ | 7s ✓ | 58s ✓ | 9s ✓ | 26s ✗ | 9s ✓ | 34s ✗ | 56s ✗ | 45s ✗ | 46s ✓ | 19s ✗ | 19s ✓ | 126s ✗ | 11/17 |
 
 ### Test 1 — 8-task subset
 
@@ -57,6 +58,8 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · en · 16k · 8tasks | 19s ✓ | 16s ✓ | 15s ✓ | 16s ✓ | 87s ✗ | 28s ✗ | 76s ✗ | 294s ✗ | 4/8 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · ru · 16k · 8tasks | 23s ✓ | 14s ✓ | 12s ✓ | 10s ✓ | 89s ✗ | 62s ✗ | 52s ✗ | 147s ✓ | 5/8 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · zh · 16k · 8tasks | 43s ✓ | 34s ✓ | 23s ✓ | 22s ✓ | 86s ✗ | 45s ✓ | 83s ✗ | 256s ✓ | 6/8 |
+| gemma-4-31B-it-UD-Q8_K_XL · en · 16k · 8tasks | 18s ✓ | 5s ✓ | 6s ✓ | 7s ✓ | 76s ✗ | 7s ✗ | 41s ✗ | 131s ✗ | 4/8 |
+| gemma-4-31B-it-UD-Q8_K_XL · ru · 16k · 8tasks | 24s ✓ | 7s ✓ | 6s ✓ | 7s ✓ | 22s ✗ | 12s ✗ | 29s ✗ | 50s ✓ | 5/8 |
 
 ### Test 2 — 20 frozen programs
 
