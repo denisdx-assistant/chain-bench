@@ -8,8 +8,8 @@ actually used, so that a difference in tokens per second can be attributed.
 
 | Host | Context | Parallel | Batch / ubatch | KV K | KV V | Note |
 |---|---|---|---|---|---|---|
-| 192.168.1.111 (2×V100 32 GB) | 262 144 | 1 | 4096 / 4096 | `q8_0` | `turbo3` | full-size context host |
-| 192.168.1.110 (RTX 3090 24 GB) | 200 000 | 1 | default | default (f16) | `turbo3` | same model, smaller context, otherwise interchangeable |
+| host A — 2×V100 32 GB | 262 144 | 1 | 4096 / 4096 | `q8_0` | `turbo3` | full-size context host |
+| host B — RTX 3090 24 GB | 200 000 | 1 | default | default (f16) | `turbo3` | same model, smaller context, otherwise interchangeable |
 
 The two hosts run the same weights on purpose, so results stay comparable up to
 the context limit; only the context size and the K-cache type differ.
@@ -18,7 +18,7 @@ the context limit; only the context size and the K-cache type differ.
 
 | Host | Context | Parallel | Batch / ubatch | KV K | KV V | Draft K | Draft V |
 |---|---|---|---|---|---|---|---|
-| 192.168.1.111 (2×V100 32 GB) | 262 144 | 1 | 8192 / 2048 | `q8_0` | `q8_0` | `q8_0` | `turbo4` |
+| host A — 2×V100 32 GB | 262 144 | 1 | 8192 / 2048 | `q8_0` | `q8_0` | `q8_0` | `turbo4` |
 
 Q8 compresses **both** keys and values with `q8_0`, while the Flash-Next models
 run `k8v4` (q8 keys, turbo4 values). This is one candidate explanation for speed
