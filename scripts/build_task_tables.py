@@ -228,6 +228,19 @@ def summary():
             for _v in _r["tasks"].values():
                 if len(_v) > 3 and isinstance(_v[3], int):
                     _toks.append(_v[3])
+        # one subset run per language: prefer the one with server timings, else the first
+        subs = []
+        for _lang in ("ru", "en", "zh"):
+            _cand = [r for r in g["chains"] if r.get("subset") and r["lang"] == _lang and not r.get("partial")]
+            if not _cand:
+                continue
+            _with = [r for r in _cand if any(len(v) > 3 and isinstance(v[3], int) for v in r["tasks"].values())]
+            subs.append((_with or _cand)[0])
+        _s_t = sum(((v[2] if len(v) > 2 and v[2] is not None else v[1]) or 0)
+                   for r in subs for v in r["tasks"].values())
+        _s_ok = sum(1 for r in subs for v in r["tasks"].values() if v[0] == OK)
+        _s_n = sum(len(r["tasks"]) for r in subs)
+        cells["t1_subs"] = {"t": _s_t, "ok": _s_ok, "n": _s_n} if _s_n else None
         pr = complete_programs[0] if complete_programs else None
         if pr:
             t = sum(((v[2] if len(v) > 2 and v[2] is not None else v[1]) or 0)
@@ -250,8 +263,9 @@ def summary():
                      "median_tokens": round(statistics.median(_toks)) if _toks else None,
                      "cells": cells, "overall": (total_t, total_ok, total_n)})
 
-    head = "| Run | Overall (errors) | Median tokens/task | Test 1 en (correct) | Test 1 ru (correct) | Test 1 zh (correct) | Test 2 (correct) |"
-    sep = "|---|---|---|---|---|---|---|"
+    head = ("| Run | Overall (errors) | Median tokens/task | Test 1 en (correct) | Test 1 ru (correct) | "
+            "Test 1 zh (correct) | Test 1 subsets 8 (all langs) | Test 2 (correct) |")
+    sep = "|---|---|---|---|---|---|---|---|"
     lines = [head, sep]
     for r in rows:
         def fmt(c):
@@ -263,11 +277,11 @@ def summary():
             return "%s %s" % (human(c["t"]), mark)
         t, ok, n = r["overall"]
         overall = ("%s · %d%% err" % (human(t), round(100 * (n - ok) / n))) if n else "—"
-        lines.append("| %s | %s | %s | %s | %s | %s | %s |" % (
+        lines.append("| %s | %s | %s | %s | %s | %s | %s | %s |" % (
             r["label"], overall,
             ("%d" % r["median_tokens"]) if r.get("median_tokens") else "—",
             fmt(r["cells"]["t1_en"]), fmt(r["cells"]["t1_ru"]),
-            fmt(r["cells"]["t1_zh"]), fmt(r["cells"]["t2"])))
+            fmt(r["cells"]["t1_zh"]), fmt(r["cells"].get("t1_subs")), fmt(r["cells"]["t2"])))
     return "\n".join(lines)
 
 

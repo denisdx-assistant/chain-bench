@@ -93,14 +93,14 @@ Each cell is one test series: total wall-clock time and score. `(8)` marks the
 8-task subset instead of the full set. Regenerated from result files.
 
 <!-- summary:start -->
-| Run | Overall (errors) | Median tokens/task | Test 1 en (correct) | Test 1 ru (correct) | Test 1 zh (correct) | Test 2 (correct) |
-|---|---|---|---|---|---|---|
-| Qwen3.8-27B-UD-Q4_K_M · ctx 200k · no YaRN · T default · guard | 293m25s · 31% err | 7072 | 108m21s 12/17 | 93m16s 11/17 | 91m48s 12/17 | — |
-| Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default | 165m59s · 35% err | 4099 | 14m06s 13/17 | 13m30s 10/17 | 16m44s 12/17 | 121m39s 11/20 |
-| Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · guard | 146m22s · 35% err | 4099 | 14m42s 11/17 | 15m40s 10/17 | 17m56s 11/17 | 98m04s 14/20 |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T 0.3 · pen 0.3 · guard | 137m55s · 38% err | 4899 | 24m51s 12/17 | 30m21s 10/17 | 31m10s 11/17 | 51m33s 11/20 |
-| Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · T default · pen 0.2 · guard | 127m31s · 30% err | 5960 | 26m38s 12/17 | 26m24s 11/17 | 26m57s 13/17 | 47m32s 14/20 |
-| Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · T default · pen 0.2 · guard | 162m02s · 27% err | 4958 | 32m51s 13/17 | 29m33s 11/17 | 35m27s 14/17 | 64m11s 14/20 |
+| Run | Overall (errors) | Median tokens/task | Test 1 en (correct) | Test 1 ru (correct) | Test 1 zh (correct) | Test 1 subsets 8 (all langs) | Test 2 (correct) |
+|---|---|---|---|---|---|---|---|
+| Qwen3.8-27B-UD-Q4_K_M · ctx 200k · no YaRN · T default · guard | 293m25s · 31% err | 7072 | 108m21s 12/17 | 93m16s 11/17 | 91m48s 12/17 | — | — |
+| Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default | 165m59s · 35% err | 4099 | 14m06s 13/17 | 13m30s 10/17 | 16m44s 12/17 | 20m11s 13/24 | 121m39s 11/20 |
+| Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · guard | 146m22s · 35% err | 4099 | 14m42s 11/17 | 15m40s 10/17 | 17m56s 11/17 | 15m45s 13/24 | 98m04s 14/20 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ctx 1M · YaRN · T 0.3 · pen 0.3 · guard | 137m55s · 38% err | 4899 | 24m51s 12/17 | 30m21s 10/17 | 31m10s 11/17 | 13m15s 15/24 | 51m33s 11/20 |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · T default · pen 0.2 · guard | 127m31s · 30% err | 5960 | 26m38s 12/17 | 26m24s 11/17 | 26m57s 13/17 | 19m29s 15/24 | 47m32s 14/20 |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · T default · pen 0.2 · guard | 162m02s · 27% err | 4958 | 32m51s 13/17 | 29m33s 11/17 | 35m27s 14/17 | 25m52s 15/24 | 64m11s 14/20 |
 <!-- summary:end -->
 
 **Details.**
