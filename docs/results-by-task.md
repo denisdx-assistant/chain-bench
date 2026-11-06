@@ -9,6 +9,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Run | T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9 | T10 | T11 | T12 | T13 | T14 | T15 | T16 | T17 | Score |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Qwen3.8-27B-UD-Q4_K_M · ru · 16k · default | 174sw ✓ | 617sw ✗ | 12sw ✓ | 21sw ✓ | 18sw ✓ | 11sw ✓ | 396sw ✗ | 62sw ✓ | 561sw ✗ | 106sw ✓ | 447sw ✓ | 673s ✓ | 724s ✗ | 714s ✗ | 163s ✓ | 173s ✓ | 724s ✗ | 11/17 |
+| Qwen3.8-27B-UD-Q6_K_XL · en · 16k · default | 65s ✓ | 70s ✓ | 6s ✓ | 6s ✓ | 7s ✓ | 5s ✓ | 70s ✓ | 10s ✓ | 67s ✗ | 64s ✓ | 70s ✗ | 66s ✓ | 69s ✗ | 66s ✓ | 68s ✓ | 72s ✓ | 65s ✗ | 13/17 |
 | Qwen3.8-27B-UD-Q6_K_XL · ru · 16k · default | 23sw ✓ | 78sw ✗ | 10sw ✓ | 8sw ✓ | 9sw ✓ | 7sw ✓ | 73sw ✗ | 9sw ✓ | 68sw ✗ | 51sw ✓ | 73sw ✓ | 70sw ✓ | 62sw ✗ | 73sw ✗ | 61sw ✗ | 74sw ✓ | 61sw ✗ | 10/17 |
 | Qwen3.8-27B-UD-Q8_K_XL · en · 16k · default | 70sw ✓ | 78sw ✗ | 7sw ✓ | 7sw ✓ | 7sw ✓ | 11sw ✓ | 75sw ✗ | 13sw ✓ | 77sw ✗ | 12sw ✓ | 79sw ✗ | 75sw ✗ | 70sw ✗ | 76sw ✓ | 73sw ✓ | 80sw ✓ | 72sw ✓ | 11/17 |
 | Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · default | 32sw ✓ | 80sw ✗ | 9sw ✓ | 8sw ✓ | 10sw ✓ | 8sw ✓ | 74sw ✗ | 14sw ✓ | 75sw ✗ | 76sw ✓ | 82sw ✓ | 76sw ✗ | 81sw ✗ | 78sw ✗ | 80sw ✓ | 82sw ✓ | 75sw ✗ | 10/17 |
