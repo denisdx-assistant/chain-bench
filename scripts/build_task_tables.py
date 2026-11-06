@@ -34,7 +34,8 @@ def cfg_label(cfg, budget):
     pen = cfg.get("penalty", "-")
     if pen and pen != "-":
         parts.append("pen %s" % pen)
-    parts.append("budget %s" % budget)
+    # budget is a cap, not a comparison parameter: recorded in results/run-configs.json
+
     if cfg.get("guard"):
         parts.append("guard")
     if cfg.get("note"):
@@ -187,12 +188,12 @@ def summary():
     for r in chains + programs:
         cfg = cfg_for(r["folder"], r["file"])
         sig = (r["folder"], cfg.get("ctx"), cfg.get("yarn"), cfg.get("temp"),
-               cfg.get("penalty"), cfg.get("budget", r["budget"]), bool(cfg.get("guard")))
+               cfg.get("penalty"), bool(cfg.get("guard")))
         groups.setdefault(sig, {"chains": [], "programs": [], "cfg": cfg})
         groups[sig]["programs" if r["file"].startswith("programs_") else "chains"].append(r)
 
     rows = []
-    for (folder, _ctx, _yarn, _temp, _pen, _budget, _guard), g in sorted(groups.items(), key=lambda kv: str(kv[0])):
+    for (folder, _ctx, _yarn, _temp, _pen, _guard), g in sorted(groups.items(), key=lambda kv: str(kv[0])):
         def pick(lang):
             full = [r for r in g["chains"] if r["lang"] == lang and not r["subset"] and not r.get("partial")]
             if full:
