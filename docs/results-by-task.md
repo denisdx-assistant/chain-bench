@@ -8,6 +8,7 @@ cap, R aborted by the loop guard, · task not in this set.
 
 | Run | T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9 | T10 | T11 | T12 | T13 | T14 | T15 | T16 | T17 | Score |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Qwen3.8-27B-UD-Q4_K_M · en · 16k · default | 112s ✓ | 659s ✓ | 14s ✓ | 14s ✓ | 19s ✓ | 17s ✓ | 874s ✓ | 30s ✓ | 421s ✗ | 224s ✓ | 549s ✗ | 800s ✗ | 703s ✗ | 700s ✗ | 534s ✓ | 147s ✓ | 684s ✓ | 12/17 |
 | Qwen3.8-27B-UD-Q4_K_M · ru · 16k · default | 174sw ✓ | 617sw ✗ | 12sw ✓ | 21sw ✓ | 18sw ✓ | 11sw ✓ | 396sw ✗ | 62sw ✓ | 561sw ✗ | 106sw ✓ | 447sw ✓ | 673s ✓ | 724s ✗ | 714s ✗ | 163s ✓ | 173s ✓ | 724s ✗ | 11/17 |
 | Qwen3.8-27B-UD-Q6_K_XL · en · 16k · default | 65s ✓ | 70s ✓ | 6s ✓ | 6s ✓ | 7s ✓ | 5s ✓ | 70s ✓ | 10s ✓ | 67s ✗ | 64s ✓ | 70s ✗ | 66s ✓ | 69s ✗ | 66s ✓ | 68s ✓ | 72s ✓ | 65s ✗ | 13/17 |
 | Qwen3.8-27B-UD-Q6_K_XL · ru · 16k · default | 23sw ✓ | 78sw ✗ | 10sw ✓ | 8sw ✓ | 9sw ✓ | 7sw ✓ | 73sw ✗ | 9sw ✓ | 68sw ✗ | 51sw ✓ | 73sw ✓ | 70sw ✓ | 62sw ✗ | 73sw ✗ | 61sw ✗ | 74sw ✓ | 61sw ✗ | 10/17 |
@@ -17,6 +18,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · default | 32sw ✓ | 80sw ✗ | 9sw ✓ | 8sw ✓ | 10sw ✓ | 8sw ✓ | 74sw ✗ | 14sw ✓ | 75sw ✗ | 76sw ✓ | 82sw ✓ | 76sw ✗ | 81sw ✗ | 78sw ✗ | 80sw ✓ | 82sw ✓ | 75sw ✗ | 10/17 |
 | Qwen3.8-27B-UD-Q8_K_XL · ru · 32k · rerun | 59s ✓ | 76s ✗ | 8s ✓ | 8s ✓ | 7s ✓ | 6s ✓ | 75s ✗ | 14s ✓ | 73s ✗ | 9s ✓ | 73s ✓ | 72s ✗ | 75s ✗ | 74s ✗ | 74s ✓ | 59s ✓ | 68s ✗ | 10/17 |
 | Qwen3.8-27B-UD-Q8_K_XL · zh · 16k · default | 115sw ✓ | 83sw ✓ | 10sw ✓ | 9sw ✓ | 11sw ✓ | 10sw ✓ | 83sw ✗ | 40sw ✓ | 84sw ✗ | 68sw ✓ | 87sw ✗ | 86sw ✓ | 83sw ✗ | 87sw ✗ | 88sw ✓ | 49sw ✓ | 83sw ✗ | 11/17 |
+| Qwen3.8-27B-UD-Q8_K_XL · zh · 32k · rerun | 112s ✓ | 84s ✓ | 9s ✓ | 8s ✓ | 8s ✓ | 8s ✓ | 84s ✗ | 45s ✓ | 79s ✗ | 48s ✓ | 83s ✗ | 81s ✓ | 82s ✗ | 79s ✓ | 78s ✓ | 86s ✓ | 76s ✗ | 12/17 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · en · 32k · guarded | 43s ✓ | 112s ✓ | 12s ✓ | 12s ✓ | 13s ✓ | 13s ✓ | 125s ✓ | 16s ✓ | 97s ✗ | 30s ✓ | 88s ✗ | 283s ✗ | 121s ✗ | 98s ✓ | 45s ✓ | 66s ✓ | 317s ✗ | 12/17 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ru · 32k · guarded | 157sw ✓ | 73sw ✗ | 9sw ✓ | 8sw ✓ | 11sw ✓ | 6sw ✓ | 131sw ✗ | 10sw ✓ | 168sw ✗ | 27sw ✓ | 203sw ✓ | 379sw L | 202sw ✗ | 82sw ✗ | 75sw ✓ | 97sw ✓ | 183sw ✗ | 10/17 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · zh · 32k · guarded | 30s ✓ | 72s ✓ | 11s ✓ | 8s ✓ | 10s ✓ | 10s ✓ | 300s ✗ | 16s ✓ | 70s ✗ | 24s ✓ | 62s ✗ | 185s ✗ | 299s ✗ | 128s ✓ | 146s ✓ | 120s ✓ | 379s ✗ | 11/17 |
@@ -35,8 +37,11 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-27B-UD-Q6_K_XL · ru · 16k · 8tasks | 44sw ✓ | 8sw ✓ | 6sw ✓ | 5sw ✓ | 46sw ✗ | 46sw ✗ | 70sw ✗ | 59sw ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q6_K_XL · zh · 16k · 8tasks | 40sw ✓ | 11sw ✓ | 9sw ✓ | 9sw ✓ | 37sw ✗ | 29sw ✗ | 79sw ✗ | 394sw ✓ | 5/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · en · 16k · 8tasks | 22sw ✓ | 7sw ✓ | 5sw ✓ | 5sw ✓ | 76sw ✗ | 15sw ✗ | 56sw ✗ | 72sw ✗ | 4/8 |
+| Qwen3.8-27B-UD-Q8_K_XL · en · 32k · rerun_8tasks | 40s ✓ | 10s ✓ | 6s ✓ | 6s ✓ | 77s ✗ | 20s ✗ | 75s ✗ | 71s ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · 8tasks | 24sw ✓ | 10sw ✓ | 6sw ✓ | 6sw ✓ | 70sw ✗ | 49sw ✗ | 74sw ✗ | 75sw ✓ | 5/8 |
+| Qwen3.8-27B-UD-Q8_K_XL · ru · 32k · rerun_8tasks | 37s ✓ | 8s ✓ | 7s ✓ | 8s ✓ | 74s ✗ | 42s ✗ | 73s ✗ | 63s ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · zh · 16k · 8tasks | 39sw ✓ | 12sw ✓ | 10sw ✓ | 7sw ✓ | 26sw ✗ | 50sw ✗ | 84sw ✗ | 75sw ✗ | 4/8 |
+| Qwen3.8-27B-UD-Q8_K_XL · zh · 32k · rerun_8tasks | 67s ✓ | 10s ✓ | 8s ✓ | 8s ✓ | 43s ✗ | 30s ✗ | 83s ✗ | 79s ✓ | 5/8 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · en · 32k · guarded_8tasks | 21s ✓ | 12s ✓ | 11s ✓ | 12s ✓ | 30s ✗ | 19s ✓ | 45s ✗ | 71s ✗ | 5/8 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · ru · 32k · guarded_8tasks | 26s ✓ | 10s ✓ | 7s ✓ | 8s ✓ | 41s ✗ | 52s ✗ | 47s ✗ | 109s ✓ | 5/8 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · zh · 32k · guarded_8tasks | 31s ✓ | 13s ✓ | 9s ✓ | 8s ✓ | 56s ✗ | 35s ✗ | 43s ✗ | 79s ✓ | 5/8 |
