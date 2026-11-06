@@ -102,15 +102,15 @@ def main():
     table = "\n".join(lines)
 
     header = ("# Performance\n\n"
-              "Median server-side numbers per run: generation speed, prefill speed, tokens spent on\n"
-              "an answer, prompt size (including the cached prefix) and generation time.\n"
+              "Server-side numbers per run: generation speed, prefill speed, tokens spent on an\n"
+              "answer, prompt size (including the cached prefix) and generation time.\n"
               "These come from the `timings` block of the API response, so queueing and wall-clock\n"
-              "noise are excluded. Two speeds are given: **best** (the fastest task, i.e. a run without"
-"
-              "stalls — the figure to quote) and **median** (typical, pulled down by any stall). **Prefill counts only requests that did not hit the prefix cache**\n"
-              "(`cache_n = 0`); the column `uncached reqs` says how many samples that is. In a run over\n"
-              "one document that is usually one request, since the rest reuse the prefix. Runs made\n"
-              "before the fields were captured show “—”.\n\n")
+              "noise are excluded. Two speeds are given: **best** (the fastest task, i.e. a run\n"
+              "without stalls — the figure to quote) and **median** (typical, pulled down by any\n"
+              "stall). **Prefill counts only requests that did not hit the prefix cache**\n"
+              "(`cache_n = 0`); the column `uncached reqs` says how many samples that is. In a run\n"
+              "over one document that is usually one request, since the rest reuse the prefix. Runs\n"
+              "made before the fields were captured show \u2014.\n\n")
     os.makedirs("docs", exist_ok=True)
     open("docs/performance.md", "w").write(header + table + "\n")
     print(table)
