@@ -91,6 +91,8 @@
 - 逐次运行表格，含推理规模与长度截断: [results/README.md](results/README.md)
 - 每次运行的性能（来自服务器计时）：生成与预填充速度、单题 token 消耗:
   [docs/performance.md](docs/performance.md)
+- 长上下文预填充（261k / 512k / 1M token）:
+  [docs/context-prefill.md](docs/context-prefill.md)
 - 运行与校准的时间顺序日志: [docs/run-log.md](docs/run-log.md)
 
 ## 3. 模型
