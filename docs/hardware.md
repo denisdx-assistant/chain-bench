@@ -30,7 +30,7 @@ the context limit; only the context size and the K-cache type differ.
 | host A — 2×V100 32 GB | 262 144 | 1 | 8192 / 2048 | `q8_0` | `q8_0` | `q8_0` | `turbo4` |
 
 Q8 compresses **both** keys and values with `q8_0`, while the Flash-Next models
-run `k8v4` (q8 keys, turbo4 values). This is one candidate explanation for speed
+run `k8v4` (8-bit keys, 4-bit values). This is one candidate explanation for speed
 differences that the weights alone do not explain: the KV format changes memory
 traffic and dequantisation cost per token. Note also that Q8 runs on the
 llama.cpp-style stack while Flash-Next runs on strata, so engine differences are
@@ -45,7 +45,7 @@ weights differ. Launch parameters, taken from the sanitised configs in
 | Parameter | Value | Meaning |
 |---|---|---|
 | `--max-context` | 1 048 576 | 1M tokens |
-| `--kv` | `k8v4` | keys q8, values turbo4 |
+| `--kv` | `k8v4` | keys 8-bit, values 4-bit (strata spec, not a llama.cpp turbo format) |
 | `--kv-resident` | 49 152 | tokens kept resident in VRAM |
 | `--rope-scaling` / `--rope-scale` / `--yarn-orig-ctx` | yarn / 4 / 262 144 | 262k native context scaled 4× to 1M |
 | `--vram-reserve-mib` | 2 048 | headroom left to the driver |
@@ -56,7 +56,7 @@ weights differ. Launch parameters, taken from the sanitised configs in
 
 Because the serving configuration is identical, differences between IQ3_S,
 IQ4_XS and Q4_K_XL in this benchmark come from the weights, not from the stack.
-The KV format (`k8v4`) is the same in all three.
+The KV format (`k8v4`) is the same in all three. Note that `k8v4` is the strata cache spec — 8-bit keys and 4-bit values — and should not be read as llama.cpp's "turbo" cache types.
 
 ## Where this is stored
 
