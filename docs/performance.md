@@ -26,6 +26,13 @@ before the fields were captured show “—”.
 | Qwen3.8-27B-UD-Q8_K_XL · programs · 16k · v4_16k | default | 20 | 40.3 | 722.1 | 2 | 4145 | 142558 | 103 s |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · chains ru · 32k | guarded | 17 | — | — | 0 | — | — | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S+YaRN-1M · chains ru · 65535 | default | 17 | — | — | 0 | — | — | — |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · chains en · 16k | default | 17 | 89.9 | 1487.4 | 17 | 5469 | 14062 | 57 s |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · chains en · 16k | 8tasks | 8 | 90.0 | 1468.8 | 8 | 1379 | 13735 | 15 s |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · chains ru · 16k | default | 17 | 83.5 | 1599.5 | 2 | 6739 | 19260 | 86 s |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · chains ru · 16k | 8tasks | 8 | 81.7 | 1592.7 | 1 | 1985 | 19112 | 25 s |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · chains zh · 16k | default | 17 | 87.1 | 2028.7 | 4 | 6016 | 38359 | 69 s |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · chains zh · 16k | 8tasks | 8 | 90.1 | 2031.8 | 2 | 1601 | 38141 | 18 s |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · programs · 16k · v4_16k | default | 20 | 95.7 | 2395.2 | 20 | 6905 | 142558 | 72 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains en · 16k | default | 17 | 78.0 | 1135.9 | 17 | 4112 | 14062 | 54 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains en · 16k | 8tasks | 8 | 81.6 | 1117.0 | 8 | 920 | 13735 | 11 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains ru · 16k | default | 17 | 73.6 | 1166.7 | 4 | 4605 | 19260 | 64 s |
