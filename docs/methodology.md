@@ -218,3 +218,14 @@ How to read them in the tables: chain 11 and chain 12 are provoked tasks. A low
 English or Chinese score on these two is expected and is not evidence of a broken
 harness or a loop; a budget cut on chain 12 is not evidence of a repetition loop
 either. They are kept for comparability with the runs that already exist.
+
+## Context arithmetic differs by tokenizer
+
+The same 600 KB program file costs a different number of prompt tokens per model:
+142 558 on the Qwen hosts and 162 764 on the Ripple host. So a 175k context leaves
+only ~12.2k of output for Ripple, not the 32k the budget asked for, and the server
+stops with `finish=length` well below `max_tokens`. Two consequences:
+
+- a length stop at a number far below the budget means the window ended, not the
+  budget: check `prompt_n + predicted_n` against the declared context first;
+- to give Ripple 32k of reasoning on programs it needs ~195k of context, not 175k.
