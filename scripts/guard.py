@@ -28,6 +28,23 @@ def _shingles(text, n=8):
     return set(tuple(words[i:i + n]) for i in range(len(words) - n + 1))
 
 
+def _loop_repeats(text, n=8, window=8000):
+    """How often the most repeated 8-word phrase occurs inside the recent tail.
+
+    Counting over the whole stream is wrong: a long reasoning trace reuses stock
+    phrases naturally and eventually crosses any fixed threshold. A loop shows up
+    as dense repetition *inside a short window*.
+    """
+    words = re.findall(r"\w+", text[-window:].lower())
+    if len(words) < n * 4:
+        return 0
+    counts = {}
+    for i in range(len(words) - n + 1):
+        sh = tuple(words[i:i + n])
+        counts[sh] = counts.get(sh, 0) + 1
+    return max(counts.values()) if counts else 0
+
+
 def _watch_queue(base, model, stop, stall):
     """Detect a request the server no longer knows about."""
     import threading
@@ -82,7 +99,7 @@ def wait_for_queue(base, model, max_wait=900, step=60, log=print):
     return waited
 
 def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
-                max_repeat=40, client='chain-bench', frequency_penalty=0.0, presence_penalty=0.0):
+                max_repeat=12, threshold_n=8, client='chain-bench', frequency_penalty=0.0, presence_penalty=0.0):
     payload = {"model": model, "max_tokens": max_tokens, "stream": True}
     if temperature is not None:
         payload["temperature"] = temperature
@@ -180,9 +197,7 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
             joined = ''.join(content) + ''.join(reasoning)
             if len(joined) - checked_at > 4000:
                 checked_at = len(joined)
-                for sh in _shingles(joined):
-                    counts[sh] = counts.get(sh, 0) + 1
-                if counts and max(counts.values()) > max_repeat:
+                if _loop_repeats(joined, threshold_n) >= max_repeat:
                     r.close()
                     return {"content": ''.join(content), "loop": True, "timeout": False,
                             "latency": time.time() - t0, "finish": "loop",
