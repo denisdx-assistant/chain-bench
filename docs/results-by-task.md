@@ -65,7 +65,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · ru · 16k · 8tasks | 23s ✓ | 14s ✓ | 12s ✓ | 10s ✓ | 89s ✗ | 62s ✗ | 52s ✗ | 147s ✓ | 5/8 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · ru · 32k · rerun_8tasks | 30s ✓ | 15s ✓ | 11s ✓ | 11s ✓ | 83s ✗ | 47s ✗ | 118s ✗ | 127s ✓ | 5/8 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · zh · 16k · 8tasks | 43s ✓ | 34s ✓ | 23s ✓ | 22s ✓ | 86s ✗ | 45s ✓ | 83s ✗ | 256s ✓ | 6/8 |
-| Qwen3.8-Flash-Next-UD-Q4_K_XL · zh · 32k · rerun_8tasks | 32s ✓ | 14s ✓ | 13s ✓ | 12s ✓ | · | · | · | · | 4/4 (partial 4/8) |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · zh · 32k · rerun_8tasks | 32s ✓ | 14s ✓ | 13s ✓ | 12s ✓ | 75s ✗ | 51s ✓ | 28s ✗ | 96s ✓ | 6/8 |
 | gemma-4-31B-it-UD-Q8_K_XL · en · 16k · 8tasks | 18s ✓ | 5s ✓ | 6s ✓ | 7s ✓ | 76s ✗ | 7s ✗ | 41s ✗ | 131s ✗ | 4/8 |
 | gemma-4-31B-it-UD-Q8_K_XL · ru · 16k · 8tasks | 24s ✓ | 7s ✓ | 6s ✓ | 7s ✓ | 22s ✗ | 12s ✗ | 29s ✗ | 50s ✓ | 5/8 |
 | gemma-4-31B-it-UD-Q8_K_XL · zh · 16k · 8tasks | 55s ✓ | 10s ✓ | 6s ✓ | 6s ✓ | 35s ✗ | 15s ✗ | 26s ✗ | 76s ✓ | 5/8 |
@@ -81,6 +81,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · - · 32k · guarded | 182s ✓ | 120s ✗ | 206s ✓ | 324s ✗ | 127s ✓ | 107s ✗ | 129s ✓ | 114s ✓ | 133s ✗ | 107s ✗ | 135s ✗ | 134s ✗ | 117s ✓ | 384s L | 148s ✓ | 119s ✗ | 127s ✓ | 128s ✓ | 139s ✓ | 113s ✓ | 11/20 |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · - · 16k · default | 185s ✓ | 139s ✗ | 127s ✗ | 121s ✓ | 155s ✓ | 167s ✓ | 165s ✓ | 112s ✓ | 132s ✗ | 180s ✓ | 130s ✓ | 131s ✗ | 111s ✗ | 126s ✓ | 123s ✓ | 143s ✗ | 121s ✓ | 110s ✓ | 199s ✓ | 175s ✓ | 14/20 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · - · 16k · default | 240s ✓ | 128s ✗ | 562s ✗ | 186s ✓ | 170s ✓ | 229s ✓ | 139s ✓ | 155s ✓ | 136s ✗ | 149s ✓ | 145s ✓ | 159s ✗ | 162s ✓ | 130s ✗ | 170s ✓ | 176s ✓ | 133s ✓ | 134s ✓ | 192s ✓ | 216s ✓ | 15/20 |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · - · 32k · default | 143sw R | 238sw R | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | 0/2 (partial 2/20) |
 | Ripple-65B-Preview-Q6_K · - · 16k · default | 716sw R | 899s L | 1339s L | 936s L | 720sw R | 1359s L | 1340s L | · | · | · | · | · | · | · | · | · | · | · | · | · | 0/7 (partial 7/20) |
 | deepseek-v4.1-flash · - · 16k · default | 16sw ✗ | 21sw ✓ | 64sw ✓ | 17sw ✓ | 14sw ✓ | 30sw ✗ | 40sw ✗ | 20sw ✓ | 76sw ✓ | 14sw ✓ | 32sw ✓ | 20sw ✗ | 19sw ✓ | 45sw ✓ | 30sw ✗ | 15sw ✓ | 24sw ✓ | 14sw ✓ | 21sw ✓ | 52sw ✗ | 14/20 |
 | gemma-4-31B-it-UD-Q8_K_XL · - · 16k · default | 406s ✗ | 407s ✗ | 460s ✗ | 537s ✗ | 518s ✗ | 416s ✗ | 428s ✗ | 503s ✗ | 423s ✗ | 375s ✗ | 518s ✗ | 427s ✗ | 162s ✗ | 239s ✗ | 480s ✗ | 467s ✗ | 424s ✗ | 402s ✗ | 431s ✗ | 455s ✗ | 0/20 |
