@@ -16,7 +16,7 @@ overwritten; the retry is recorded next to it and referenced from the series.
 | # | Model | Run | Task | Why | Status |
 |---|---|---|---|---|---|
 | 1 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `chains_ru_20k_32k_guarded.json` | chain 12 | `finish=length` at 32k, 379 s | ✅ done — `chains_ru_20k_task12_retry_131k.json`, answer 100 = expected 100 |
-| 2 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `programs_v4_32k_guarded.json` | `v4_seed313.py` | `finish=length` at 32k, 385 s | ⬜ pending |
+| 2 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `programs_v4_32k_guarded.json` | `v4_seed313.py` | `finish=length` at 32k, 385 s | ✅ done — 131k finished in 170 s (10 358 tokens, `finish=stop`), answer wrong: `[10, 27, 12, 46, …]` vs expected `[22, 64, 31, 88, …]`. The zero was earned, not a truncation artefact |
 | 3 | `Qwen3.8-Flash-Next-UD-Q4_K_XL` | `programs_v4_16k.json` | `v4_seed302.py` | `finish=length` at 16k, 395 s | ⬜ pending |
 | 4 | `Qwen3.8-Flash-Next-UD-Q4_K_XL` | `programs_v4_16k.json` | `v4_seed310.py` | `finish=length` at 16k, 475 s | ⬜ pending |
 
