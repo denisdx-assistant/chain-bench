@@ -190,3 +190,22 @@ python3 scripts/run_frozen_guarded.py --dir datasets/programs/v4 --out results/<
 for a 3090. That is why its series takes 442 minutes while Q8, running on two
 cards, finishes the same sets in 147. The label in the summary table carries the
 same note, so the comparison is not read as a property of the quantisation.
+
+## Tasks that reference entities missing from the document
+
+Two tasks ask about entities the document never lists: chain 11 (ship-15 vs
+ship-18) and chain 12 (heron-09, цапля-09). This is deliberate — both are
+determined by rules, not by records:
+
+- ships: capacity comes from divisibility rules (by five `+10 t`, by three
+  `-4 t`, by seven `-4 t`; when two rules match, only the rule of five applies),
+  so 15 → base+10 and 18 → base−4, a difference of 14;
+- herons: "all jays are 30 g heavier than all crows" and "all crows are 20 g
+  heavier than all herons" give 150 → 120 → 100.
+
+The check is whether a model applies the rules instead of searching the text for
+a record. The outcome splits sharply by language: Russian runs solve chain 11 in
+5 of 5 cases and chain 12 in 6 of 7, while English runs solve 11 in 0 of 7 and 12
+in 1 of 7. So the task is solvable and is a clean discriminator, not a defect.
+A run that stops at "the entity is not in the document" and then re-reads the
+text until the budget ends is a genuine capability failure.
