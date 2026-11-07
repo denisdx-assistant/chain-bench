@@ -58,7 +58,7 @@ and only these three tasks will be re-run:
 
 | # | Model | Run | Task | Why | Status |
 |---|---|---|---|---|---|
-| 5 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 7 | `finish=length` at 16 384 tokens, 814 s | ⬜ pending — needs the 175k build |
+| 5 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 7 | `finish=length` at 16 384 tokens, 814 s | ✅ done — at 32k it looped in reasoning (297 s) until `frequency_penalty`/`presence_penalty` 0.3 were applied: then 1 180 s, 23 167 tokens, answer 5 = correct |
 | 6 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 9 | `finish=length` at 16 384 tokens, 814 s | ⬜ pending — needs the 175k build |
 | 7 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 12 | `finish=length` at 16 384 tokens, 815 s | ⬜ pending — needs the 175k build |
 | 8 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 13 | `finish=length` at 16 384 tokens, 816 s | ⬜ pending — needs the 175k build |
