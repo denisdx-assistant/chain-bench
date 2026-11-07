@@ -202,7 +202,8 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
                     return {"content": ''.join(content), "loop": True, "timeout": False,
                             "latency": time.time() - t0, "finish": "loop",
                             "timings": timings, "usage": usage,
-                            "reasoning_chars": len(''.join(reasoning))}
+                            "reasoning_chars": len(''.join(reasoning)),
+                            "reasoning_tail": ''.join(reasoning)[-2000:]}
     except urllib.error.HTTPError as e:
         return {"error": "HTTP %s" % e.code, "latency": time.time() - t0}
     except Exception as e:
