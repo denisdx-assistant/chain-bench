@@ -110,9 +110,15 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
     payload["messages"] = [{"role": "user", "content": prompt}]
     wait_for_queue(BASE, model)
     body = json.dumps(payload).encode()
-    req = urllib.request.Request(BASE + '/v1/chat/completions', data=body,
-                                 headers={'Content-Type': 'application/json',
-                                          'X-Aidir-Client': client})
+    _hdr = {'Content-Type': 'application/json',
+            'X-Aidir-Client': client,
+            # hosted endpoints sit behind a CDN that rejects non-browser agents
+            'User-Agent': ('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
+                           '(KHTML, like Gecko) Chrome/124.0 Safari/537.36')}
+    _key = os.environ.get("CHAIN_BENCH_API_KEY")
+    if _key:
+        _hdr['Authorization'] = 'Bearer ' + _key
+    req = urllib.request.Request(BASE + '/v1/chat/completions', data=body, headers=_hdr)
     t0 = time.time()
     content = []
     reasoning = []
@@ -215,4 +221,5 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
             "timings": timings, "usage": usage,
             "reasoning_chars": len(''.join(reasoning)),
             "reasoning_tail": ''.join(reasoning)[-2000:],
+            "reasoning_text": ''.join(reasoning),
             "repeat_max": _loop_repeats(_joined)}

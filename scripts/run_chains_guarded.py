@@ -18,6 +18,18 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from guard import ask_guarded
 
 
+def _dump_raw(out_path, tid, content, reasoning):
+    """Keep the whole answer and the whole reasoning trace; the JSON keeps only a tail."""
+    import os
+    d = os.path.join(os.path.dirname(os.path.abspath(out_path)), "_raw")
+    os.makedirs(d, exist_ok=True)
+    stem = str(tid).replace("/", "_")
+    if content:
+        open(os.path.join(d, "%s.answer.txt" % stem), "w").write(content)
+    if reasoning:
+        open(os.path.join(d, "%s.reasoning.txt" % stem), "w").write(reasoning)
+
+
 def parse_int(text):
     m = re.search(r"-?\d+", (text or "").replace("−", "-"))
     return int(m.group(0)) if m else None
@@ -86,8 +98,8 @@ def main():
                      "reasoning_chars": out.get("reasoning_chars"),
                      "reasoning_tail": out.get("reasoning_tail"),
                      "repeat_max": out.get("repeat_max"),
-                     "repeat_max": out.get("repeat_max"),
                      "server_timings": out.get("timings")})
+        _dump_raw(a.out, t["id"], out.get("content") or "", out.get("reasoning_text") or "")
         _st = out.get("timings") or {}
         _sp = ""
         if isinstance(_st, dict) and _st.get("predicted_per_second"):

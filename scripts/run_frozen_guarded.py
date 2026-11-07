@@ -30,6 +30,18 @@ QUESTION = ("\n\nQuestion: name the final array arr after running this program a
             "Answer strictly as:\nARRAY: [numbers, comma separated]\nSUM: number")
 
 
+def _dump_raw(out_path, tid, content, reasoning):
+    """Keep the whole answer and the whole reasoning trace; the JSON keeps only a tail."""
+    import os
+    d = os.path.join(os.path.dirname(os.path.abspath(out_path)), "_raw")
+    os.makedirs(d, exist_ok=True)
+    stem = str(tid).replace("/", "_")
+    if content:
+        open(os.path.join(d, "%s.answer.txt" % stem), "w").write(content)
+    if reasoning:
+        open(os.path.join(d, "%s.reasoning.txt" % stem), "w").write(reasoning)
+
+
 def fetch_meta(model):
     """Provenance: which concrete model/provider the router resolved."""
     try:
@@ -185,6 +197,7 @@ def main():
                      "expected_array": exp.get("expected_array", exp.get("array")),
                      "expected_sum": exp.get("expected_sum", exp.get("sum")),
                      "error": out.get("error")})
+        _dump_raw(a.out, os.path.basename(path), out.get("content") or "", out.get("reasoning_text") or "")
         st = out.get("timings") or {}
         speed = ""
         if isinstance(st, dict) and st.get("predicted_per_second"):
