@@ -102,7 +102,7 @@ YaRN, температурой или бюджетом — контекст по
 | Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · T default · pen 0.2 · guard | 127m31s · 30% err | 5960 | 26m38s 12/17 | 26m24s 11/17 | 26m57s 13/17 | 19m29s 15/24 | 47m32s 14/20 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · T default · pen 0.2 · guard | 159m42s · 25% err | 4958 | 32m51s 13/17 | 29m33s 11/17 | 35m27s 14/17 | 25m52s 15/24 | 61m51s 15/20 |
 | Ripple-65B-Preview-Q6_K · ctx 175k · no YaRN · T default · pen mixed (0 / 0.3) · guard · chains: 12 tasks at 16k pen 0, 5 at 32k pen 0.3; programs all at 32k pen 0.3 | 120m57s · 29% err | 4684 | 120m57s 12/17 | — | — | — | — |
-| deepseek-v4.1-flash · budget 16 | 19m38s · 46% err | — | 7m04s 12/17 | — | — | — | 12m34s 8/20 |
+| deepseek-v4.1-flash · ctx 1M · no YaRN · T default | 16m48s · 30% err | — | 7m04s 12/17 | — | — | — | 9m44s 14/20 |
 | gemma-4-31B-it-UD-Q8_K_XL · ctx 262k · no YaRN · T default · guard | 168m44s · 58% err | 1601 | 11m40s 9/17 | 7m24s 10/17 | 8m22s 11/17 | 11m17s 14/24 | 141m18s 0/20 |
 <!-- summary:end -->
 

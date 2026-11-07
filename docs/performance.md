@@ -62,7 +62,9 @@ made before the fields were captured show —.
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains zh · 16k | 8tasks | 8 | 85.0 | 78.6 | 1530.4 | 2 | 1923 | 38141 | 23 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · programs · 16k · v4_16k | default | 20 | 88.8 | 84.2 | 1802.7 | 19 | 6961 | 142558 | 81 s |
 | Ripple-65B-Preview-Q6_K · chains en · 16k | default | 17 | 20.6 | 20.5 | 482.4 | 1 | 4684 | 12913 | 230 s |
-| Ripple-65B-Preview-Q6_K · programs · 16k · v4_16k | default | 1 | — | — | — | 0 | — | — | — |
+| Ripple-65B-Preview-Q6_K · programs · 16k · v4_16k | default | 5 | 13.7 | 13.7 | 371.5 | 1 | 12340 | 162764 | 901 s |
+| deepseek-v4.1-flash · chains en · 16k | default | 17 | — | — | — | 0 | — | — | — |
+| deepseek-v4.1-flash · programs · 16k · v4_16k | default | 20 | — | — | — | 0 | — | — | — |
 | gemma-4-31B-it-UD-Q8_K_XL · chains en · 16k | default | 17 | 80.0 | 70.6 | — | 0 | 1473 | 13909 | 19 s |
 | gemma-4-31B-it-UD-Q8_K_XL · chains en · 16k | 8tasks | 8 | 80.1 | 77.1 | — | 0 | 477 | 13575 | 6 s |
 | gemma-4-31B-it-UD-Q8_K_XL · chains ru · 16k | default | 17 | 77.6 | 69.6 | 1041.1 | 1 | 986 | 19050 | 15 s |
