@@ -48,3 +48,19 @@ with `finish=stop`. Neither is a budget artefact.
 2. Keep both numbers visible: the measured run stays as it was, and the retry is
    cited in `results/run-configs.json` under the same model.
 3. Do not blend a retry into a different run's totals.
+
+## Ripple (65B Q6), English set
+
+Three chain tasks hit the 16k output budget with no repetition inside the cut
+reasoning — the budget, not a loop, ended them. Context on that host is 160k and
+the prompt is ~14k, so the host will be raised to a 175k window (32k for reasoning)
+and only these three tasks will be re-run:
+
+| # | Model | Run | Task | Why | Status |
+|---|---|---|---|---|---|
+| 5 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 7 | `finish=length` at 16 384 tokens, 814 s | ⬜ pending — needs the 175k build |
+| 6 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 9 | `finish=length` at 16 384 tokens, 814 s | ⬜ pending — needs the 175k build |
+| 7 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 12 | `finish=length` at 16 384 tokens, 815 s | ⬜ pending — needs the 175k build |
+| 8 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 13 | `finish=length` at 16 384 tokens, 816 s | ⬜ pending — needs the 175k build |
+
+The remaining 14 tasks in that set finished with `stop`.
