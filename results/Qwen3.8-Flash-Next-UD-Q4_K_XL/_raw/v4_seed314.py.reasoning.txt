@@ -1,0 +1,468 @@
+We need answer user's request: execute program mentally, name final array and sum. Need parse huge Python code. Need be careful. We can simulate. The code has many dummy variables and comments, traps, manual? Need identify actual executed statements affecting arr.
+
+We need output strict format:
+ARRAY: [numbers, comma separated]
+SUM: number
+
+Need compute final arr after running program. Let's analyze code.
+
+Initial:
+import re
+functions acc, bump, bump_all, mix, apply_twice.
+MANUAL string not executed? It's just string. TRAP variables strings not executed. Many assignments to tmp/copy/note/code/label using arr values but no arr mutation except initial arr and later actual statements.
+
+Initial arr = [7, 15, 4, 6, 1, 21, 21, 10, 8, 13]
+
+Then many lines:
+code_0 = re.sub... etc no arr mutation.
+Then actual executable statements among comments:
+arr[0], arr[4] = arr[4], arr[0]
+# comments...
+arr2 = arr
+# comments...
+arr2[2] += 5
+# comments...
+arr[9] = len(re.findall(r'\d', s131)) % 50
+# comments...
+arr[0], arr[2] = arr[2], arr[0]
+# comments...
+arr[4] += 3
+# comments...
+arr[2], arr[5] = arr[5], arr[2]
+# comments...
+arr[5], arr[5] = arr[5], arr[5]
+# comments...
+arr[0] *= 2
+# comments...
+arr[0], arr[6] = arr[6], arr[0]
+# comments...
+arr[5] += 1
+# comments...
+arr2 = arr
+# comments...
+arr2[8] += 4
+# comments...
+arr[4], arr[2] = arr[2], arr[4]
+# comments...
+s240 = ''.join(str(x) for x in arr)
+# comments...
+arr[6] = len(re.findall(r'\d', s240)) % 50
+# comments...
+arr[2] += 2
+# comments...
+s858 = ''.join(str(x) for x in arr)
+# comments...
+arr[9] = len(re.findall(r'\d', s858)) % 50
+# comments...
+s44 = ''.join(str(x) for x in arr)
+# comments...
+arr[5] = len(re.findall(r'\d', s44)) % 50
+# comments...
+arr[2], arr[3] = arr[3], arr[2]
+# comments...
+s13 = ''.join(str(x) for x in arr)
+# comments...
+arr[7] = len(re.findall(r'\d', s13)) % 50
+# comments...
+arr[3] = acc(arr, 7) % 100
+# comments...
+apply_twice(arr, 4, 5)
+# comments...
+if __name__ == "__main__": print arr sum.
+
+Need ensure no other executable statements hidden? There are many variable assignments using arr but no mutation. Need check lines like `arr[0], arr[4] = arr[4], arr[0]` etc. Comments with `# ... — не выполняется` are not executed. The MANUAL string not executed. TRAP strings not executed.
+
+Need simulate exact sequence. Important: arr2 = arr alias; arr2 mutations affect arr. Also s131 etc computed at certain times. Need compute digit counts modulo 50. Need be careful with negative? no.
+
+Let's step through.
+
+Initial A0 = [7,15,4,6,1,21,21,10,8,13]
+
+Line: arr[0], arr[4] = arr[4], arr[0]
+Swap indices 0 and 4: values 7 and 1 -> [1,15,4,6,7,21,21,10,8,13]
+
+Then many no-op.
+arr2 = arr (alias)
+arr2[2] += 5 => arr[2] = 4+5=9. A=[1,15,9,6,7,21,21,10,8,13]
+
+Then s131 = ''.join(str(x) for x in arr) before arr[9] assignment? Need locate: after many comments: `s131 = ''.join(str(x) for x in arr)` then later `arr[9] = len(re.findall(r'\d', s131)) % 50`. Need compute s131 at that point. Let's verify sequence around s131.
+
+After arr2[2]+=5, many comments, then:
+s131 = ''.join(str(x) for x in arr)
+# comments...
+arr[9] = len(re.findall(r'\d', s131)) % 50
+
+So s131 string of current arr [1,15,9,6,7,21,21,10,8,13] concatenated: "115967212110813"? Let's join: 1 + 15 = "115", +9="1159", +6="11596", +7="115967", +21="11596721", +21="1159672121", +10="115967212110", +8="1159672121108", +13="115967212110813". Count digits: each number digits: 1(1), 15(2), 9(1),6(1),7(1),21(2),21(2),10(2),8(1),13(2) total 1+2+1+1+1+2+2+2+1+2=15. len findall digits = 15. 15 % 50 = 15. arr[9]=15. A=[1,15,9,6,7,21,21,10,8,15]
+
+Then arr[0], arr[2] = arr[2], arr[0]
+Swap 0 and 2: [9,15,1,6,7,21,21,10,8,15]
+
+Then arr[4] += 3 => index4 7+3=10. A=[9,15,1,6,10,21,21,10,8,15]
+
+Then arr[2], arr[5] = arr[5], arr[2]
+Swap idx2=1 and idx5=21 => [9,15,21,6,10,1,21,10,8,15]
+
+Then arr[5], arr[5] = arr[5], arr[5] no change.
+
+Then arr[0] *= 2 => 9*2=18. A=[18,15,21,6,10,1,21,10,8,15]
+
+Then arr[0], arr[6] = arr[6], arr[0]
+Swap idx0=18 and idx6=21 => [21,15,21,6,10,1,18,10,8,15]
+
+Then arr[5] += 1 => 2. A=[21,15,21,6,10,2,18,10,8,15]
+
+Then arr2 = arr (alias again)
+arr2[8] += 4 => idx8 8+4=12. A=[21,15,21,6,10,2,18,10,12,15]
+
+Then arr[4], arr[2] = arr[2], arr[4]
+Swap idx4=10 and idx2=21 => [21,15,10,6,21,2,18,10,12,15]
+
+Then s240 = ''.join(str(x) for x in arr)
+Need compute before arr[6] assignment. Current A: [21,15,10,6,21,2,18,10,12,15]
+String: "211510621218101215"? Let's concatenate carefully:
+21 -> "21"
++15 -> "2115"
++10 -> "211510"
++6 -> "2115106"
++21 -> "211510621"
++2 -> "2115106212"
++18 -> "211510621218"
++10 -> "21151062121810"
++12 -> "2115106212181012"
++15 -> "211510621218101215"
+Count digits: 2+2+2+1+2+1+2+2+2+2 = 18? Let's sum: 21(2),15(2)=4,10(2)=6,6(1)=7,21(2)=9,2(1)=10,18(2)=12,10(2)=14,12(2)=16,15(2)=18. Yes 18. arr[6] = 18 % 50 = 18. A=[21,15,10,6,21,2,18,10,12,15] (idx6 already 18? It was 18 before? Wait before assignment idx6=18. So unchanged.)
+
+Then arr[2] += 2 => idx2 10+2=12. A=[21,15,12,6,21,2,18,10,12,15]
+
+Then s858 = ''.join(str(x) for x in arr)
+Current: [21,15,12,6,21,2,18,10,12,15]
+String: 21 15 12 6 21 2 18 10 12 15 => "211512621218101215"? Let's concatenate:
+"21"+"15"="2115"
++"12"="211512"
++"6"="2115126"
++"21"="211512621"
++"2"="2115126212"
++"18"="211512621218"
++"10"="21151262121810"
++"12"="2115126212181012"
++"15"="211512621218101215"
+Count digits: 2+2+2+1+2+1+2+2+2+2 = 18. arr[9] = 18 % 50 = 18. A=[21,15,12,6,21,2,18,10,12,18]
+
+Then s44 = ''.join(str(x) for x in arr)
+Current: [21,15,12,6,21,2,18,10,12,18]
+String: "211512621218101218"? Let's do: 21 15 12 6 21 2 18 10 12 18 => "21"+"15"="2115"; +"12"="211512"; +"6"="2115126"; +"21"="211512621"; +"2"="2115126212"; +"18"="211512621218"; +"10"="21151262121810"; +"12"="2115126212181012"; +"18"="211512621218101218". Count digits: 2+2+2+1+2+1+2+2+2+2=18. arr[5] = 18 % 50 = 18. A=[21,15,12,6,21,18,18,10,12,18]
+
+Then arr[2], arr[3] = arr[3], arr[2]
+Swap idx2=12 and idx3=6 => [21,15,6,12,21,18,18,10,12,18]
+
+Then s13 = ''.join(str(x) for x in arr)
+Current: [21,15,6,12,21,18,18,10,12,18]
+String: 21 15 6 12 21 18 18 10 12 18 => "21"+"15"="2115"; +"6"="21156"; +"12"="2115612"; +"21"="211561221"; +"18"="21156122118"; +"18"="2115612211818"; +"10"="211561221181810"; +"12"="21156122118181012"; +"18"="2115612211818101218". Count digits: 2+2+1+2+2+2+2+2+2+2 = 19? Let's sum: 21=2, 15=4, 6=5, 12=7, 21=9, 18=11, 18=13, 10=15, 12=17, 18=19. Yes. arr[7] = 19 % 50 = 19. A=[21,15,6,12,21,18,18,19,12,18]
+
+Then arr[3] = acc(arr, 7) % 100
+Need compute acc(a,n) recursively sum first n elements? acc(a,n): if n<=0 return 0; return a[n-1]+acc(a,n-1). So sum of arr[0:7] (indices 0..6). Current before assignment: [21,15,6,12,21,18,18,19,12,18]. Sum first 7 = 21+15+6+12+21+18+18 = let's compute: 21+15=36; +6=42; +12=54; +21=75; +18=93; +18=111. 111 % 100 = 11. arr[3]=11. A=[21,15,6,11,21,18,18,19,12,18]
+
+Then apply_twice(arr,4,5): bump(a,i,v) twice: arr[4] +=5 twice => +10. arr[4]=21+10=31. A=[21,15,6,11,31,18,18,19,12,18]
+
+Then final print sum. Sum = 21+15+6+11+31+18+18+19+12+18. Compute: 21+15=36; +6=42; +11=53; +31=84; +18=102; +18=120; +19=139; +12=151; +18=169. Sum 169.
+
+Need verify no other executable statements: There are functions definitions, MANUAL string, TRAP variables, many assignments. Need check if any line like `arr[0], arr[4] = arr[4], arr[0]` before initial? yes. Need check if any `arr2 = arr` before first swap? It appears after many comments. Need ensure order of actual statements exactly as in code. Let's scan from top after initial arr and dummy assignments.
+
+The code after dummy assignments:
+```
+arr[0], arr[4] = arr[4], arr[0]
+# comments...
+arr2 = arr
+# comments...
+arr2[2] += 5
+# comments...
+s131 = ''.join(str(x) for x in arr)
+# comments...
+arr[9] = len(re.findall(r'\d', s131)) % 50
+# comments...
+arr[0], arr[2] = arr[2], arr[0]
+# comments...
+arr[4] += 3
+# comments...
+arr[2], arr[5] = arr[5], arr[2]
+# comments...
+arr[5], arr[5] = arr[5], arr[5]
+# comments...
+arr[0] *= 2
+# comments...
+arr[0], arr[6] = arr[6], arr[0]
+# comments...
+arr[5] += 1
+# comments...
+arr2 = arr
+# comments...
+arr2[8] += 4
+# comments...
+arr[4], arr[2] = arr[2], arr[4]
+# comments...
+s240 = ''.join(str(x) for x in arr)
+# comments...
+arr[6] = len(re.findall(r'\d', s240)) % 50
+# comments...
+arr[2] += 2
+# comments...
+s858 = ''.join(str(x) for x in arr)
+# comments...
+arr[9] = len(re.findall(r'\d', s858)) % 50
+# comments...
+s44 = ''.join(str(x) for x in arr)
+# comments...
+arr[5] = len(re.findall(r'\d', s44)) % 50
+# comments...
+arr[2], arr[3] = arr[3], arr[2]
+# comments...
+s13 = ''.join(str(x) for x in arr)
+# comments...
+arr[7] = len(re.findall(r'\d', s13)) % 50
+# comments...
+arr[3] = acc(arr, 7) % 100
+# comments...
+apply_twice(arr, 4, 5)
+# comments...
+if __name__ == "__main__": ...
+```
+
+Need check if there are any executable statements in the huge dummy section that mutate arr? Lines like `code_0 = re.sub...` no. `tmp_1 = arr[9] + 11` no. `copy_7 = arr[3]` no. `note_8 = str(arr[3]) + str(arr[2])` no. `label_11 = ...` no. No assignments to arr elements except actual ones.
+
+Need check if any line in comments could be mistaken? Comments start with #, not executed. The MANUAL string includes lines but not executed. TRAP variables strings not executed.
+
+Potential issue: `arr2 = arr` alias; after first arr2[2]+=5, then later `arr2 = arr` again no effect. But if arr2 was assigned earlier? Only after first swap. Good.
+
+Potential issue: `s131 = ''.join(str(x) for x in arr)` occurs after many comments but before arr[9] assignment. We computed current arr. Need ensure no hidden executable line between arr2[2]+=5 and s131? The code has many comments only. Let's inspect around s131: after `arr2[2] += 5` there are many comment lines, then `s131 = ''.join(str(x) for x in arr)`, then comments, then `arr[9] = ...`. Yes.
+
+Potential issue: digit count of concatenated string includes digits from negative? no.
+
+Potential issue: `len(re.findall(r'\d', s131))` counts digits in string. We counted total decimal digits of each integer. Since all positive, yes. Need verify s131 current arr after arr2[2]+=5: initial after swap [1,15,4,6,7,21,21,10,8,13], arr2[2]+=5 => [1,15,9,6,7,21,21,10,8,13]. Digits: 1 (1), 15 (2), 9 (1), 6 (1), 7 (1), 21 (2), 21 (2), 10 (2), 8 (1), 13 (2) = 15. arr[9]=15. Good.
+
+Then swap arr[0], arr[2]: [9,15,1,6,7,21,21,10,8,15]. Good.
+
+arr[4]+=3: [9,15,1,6,10,21,21,10,8,15]. Good.
+
+arr[2], arr[5] = arr[5], arr[2]: [9,15,21,6,10,1,21,10,8,15]. Good.
+
+arr[5], arr[5] no change.
+
+arr[0]*=2: [18,15,21,6,10,1,21,10,8,15]. Good.
+
+arr[0], arr[6] swap: [21,15,21,6,10,1,18,10,8,15]. Good.
+
+arr[5]+=1: [21,15,21,6,10,2,18,10,8,15]. Good.
+
+arr2=arr; arr2[8]+=4: [21,15,21,6,10,2,18,10,12,15]. Good.
+
+arr[4], arr[2] swap: [21,15,10,6,21,2,18,10,12,15]. Good.
+
+s240 digits: [21(2),15(2)=4,10(2)=6,6(1)=7,21(2)=9,2(1)=10,18(2)=12,10(2)=14,12(2)=16,15(2)=18]. arr[6]=18. It was 18 already. Good.
+
+arr[2]+=2: [21,15,12,6,21,2,18,10,12,15]. Good.
+
+s858 digits: 21 2, 15 2=4, 12 2=6, 6 1=7, 21 2=9, 2 1=10, 18 2=12, 10 2=14, 12 2=16, 15 2=18. arr[9]=18. Good.
+
+s44 digits: [21,15,12,6,21,2,18,10,12,18] digits: 2+2+2+1+2+1+2+2+2+2=18. arr[5]=18. Good.
+
+arr[2], arr[3] swap: [21,15,6,12,21,18,18,10,12,18]. Good.
+
+s13 digits: 21(2),15(2)=4,6(1)=5,12(2)=7,21(2)=9,18(2)=11,18(2)=13,10(2)=15,12(2)=17,18(2)=19. arr[7]=19. Good.
+
+acc(arr,7) before arr[3] assignment: arr = [21,15,6,12,21,18,18,19,12,18]. Sum first 7 indices 0-6: 21+15+6+12+21+18+18=111. %100=11. arr[3]=11. Good.
+
+apply_twice(arr,4,5): bump twice: arr[4] +=5 twice. arr[4] was 21 -> 31. Good.
+
+Final sum: [21,15,6,11,31,18,18,19,12,18]. Sum recalc: 21+15=36; +6=42; +11=53; +31=84; +18=102; +18=120; +19=139; +12=151; +18=169. Yes.
+
+Need consider Python recursion acc with n=7 fine. apply_twice uses bump function modifies list. Good.
+
+Need output exactly:
+ARRAY: [21, 15, 6, 11, 31, 18, 18, 19, 12, 18]
+SUM: 169
+
+User says answer strictly as:
+ARRAY: [numbers, comma separated]
+SUM: number
+
+Need maybe no extra spaces? They show with spaces after comma? "numbers, comma separated" likely okay. Use exactly format. Could include spaces after commas. Need final only. Ensure no analysis in final.
+
+Double-check if any actual statement `arr[0], arr[4] = arr[4], arr[0]` appears twice? There is one before comments. In comments there are many `# ... arr[0], arr[4] = arr[4], arr[0] — не выполняется` not executed. Good.
+
+Potential hidden: The code includes `MANUAL = """ ... """` with lines like arr[6] += 57 etc. Not executed. TRAP variables not executed. Good.
+
+Potential hidden: There are variable names `copy_7 = arr[3]` etc. No mutation.
+
+Potential hidden: `arr2 = arr` before `arr2[2] += 5`; after that, if later `arr2 = arr` again, no issue. But what about `arr2[8] += 4` after second alias; yes affects arr.
+
+Potential hidden: The line `arr[9] = len(re.findall(r'\d', s131)) % 50` uses s131 computed before arr[9] assignment. Good.
+
+Potential hidden: `s240`, `s858`, `s44`, `s13` names not necessarily line numbers; computed at points. Good.
+
+Let's maybe simulate with a small script mentally? Could use Python? But can reason. Need maybe verify digit counts by constructing strings:
+s131: "115967212110813" length? Let's count characters: 1 1 5 9 6 7 2 1 2 1 1 0 8 1 3 = 15. Yes.
+s240: "211510621218101215" length? Count: 2(1)1(2)5(3)1(4)0(5)6(6)2(7)1(8)2(9)1(10)8(11)1(12)0(13)1(14)2(15)1(16)5(17)? Wait I may have string wrong. Let's write s240 carefully: arr [21,15,10,6,21,2,18,10,12,15]
+Concatenate:
+21 -> "21"
+15 -> "2115"
+10 -> "211510"
+6 -> "2115106"
+21 -> "211510621"
+2 -> "2115106212"
+18 -> "211510621218"
+10 -> "21151062121810"
+12 -> "2115106212181012"
+15 -> "211510621218101215"
+Now count characters: "2 1 1 5 1 0 6 2 1 2 1 8 1 0 1 2 1 5"? Let's index:
+1 '2'
+2 '1'
+3 '1'
+4 '5'
+5 '1'
+6 '0'
+7 '6'
+8 '2'
+9 '1'
+10 '2'
+11 '1'
+12 '8'
+13 '1'
+14 '0'
+15 '1'
+16 '2'
+17 '1'
+18 '5'. Yes 18. Good.
+
+s858: [21,15,12,6,21,2,18,10,12,15]
+"21"+"15"="2115"
++"12"="211512"
++"6"="2115126"
++"21"="211512621"
++"2"="2115126212"
++"18"="211512621218"
++"10"="21151262121810"
++"12"="2115126212181012"
++"15"="211512621218101215"
+Count: 2 1 1 5 1 2 6 2 1 2 1 8 1 0 1 2 1 5 = 18. Good.
+
+s44: [21,15,12,6,21,2,18,10,12,18]
+"21"+"15"="2115"
++"12"="211512"
++"6"="2115126"
++"21"="211512621"
++"2"="2115126212"
++"18"="211512621218"
++"10"="21151262121810"
++"12"="2115126212181012"
++"18"="211512621218101218"
+Count: 2 1 1 5 1 2 6 2 1 2 1 8 1 0 1 2 1 8 = 18. Good.
+
+s13: [21,15,6,12,21,18,18,10,12,18]
+"21"+"15"="2115"
++"6"="21156"
++"12"="2115612"
++"21"="211561221"
++"18"="21156122118"
++"18"="2115612211818"
++"10"="211561221181810"
++"12"="21156122118181012"
++"18"="2115612211818101218"
+Count: let's count: 2(1),1(2),5(3),6(4),1(5),2(6),2(7),1(8),1(9),8(10),1(11),8(12),1(13),0(14),1(15),2(16),1(17),8(18)? Wait I got 18? Need recalc. String "2115612211818101218". Let's count characters: 
+2 1 1 5 6 1 2 2 1 1 8 1 8 1 0 1 2 1 8? Hmm maybe length 19. Let's write with grouping:
+21 | 15 | 6 | 12 | 21 | 18 | 18 | 10 | 12 | 18
+Digits per group:
+21: positions 1-2: '2','1'
+15: pos3-4: '1','5'
+6: pos5: '6'
+12: pos6-7: '1','2'
+21: pos8-9: '2','1'
+18: pos10-11: '1','8'
+18: pos12-13: '1','8'
+10: pos14-15: '1','0'
+12: pos16-17: '1','2'
+18: pos18-19: '1','8'
+Total 19. My concatenated string should be "21" + "15" = "2115" (4), +"6"="21156" (5), +"12"="2115612" (7), +"21"="211561221" (9), +"18"="21156122118" (11), +"18"="2115612211818" (13), +"10"="211561221181810" (15), +"12"="21156122118181012" (17), +"18"="2115612211818101218" (19). Yes length 19. Good.
+
+Potential issue: `arr[3] = acc(arr, 7) % 100` after arr[7] assignment. We used arr[7]=19 but acc first 7 excludes index7, so no effect. Good.
+
+Potential issue: apply_twice after arr[3] assignment; uses arr[4]=21? Wait after arr[3] assignment, arr[4] still 21? Let's check before apply: [21,15,6,11,21,18,18,19,12,18]. Yes.
+
+Potential issue: Did `arr[4], arr[2] = arr[2], arr[4]` after arr2[8]+=4 use current arr[4]=10? Let's recalc from earlier: before that A=[21,15,21,6,10,2,18,10,12,15]. Swap idx4 and idx2 -> [21,15,10,6,21,2,18,10,12,15]. Yes.
+
+Potential issue: Did `arr[6] = len(...s240...) % 50` set idx6 to 18; it was already 18. Good.
+
+Potential issue: Did `arr[9] = len(...s858...) % 50` set idx9 to 18; it was 15 before? Wait before s858 A=[21,15,12,6,21,2,18,10,12,15], idx9=15. Then arr[9]=18. Good.
+
+Potential issue: Did `arr[5] = len(...s44...) % 50` set idx5 to 18; before s44 A=[21,15,12,6,21,2,18,10,12,18], idx5=2. Then arr[5]=18. Good.
+
+Potential issue: Did `arr[7] = len(...s13...) % 50` set idx7 to 19; before s13 A=[21,15,6,12,21,18,18,10,12,18], idx7=10. Then arr[7]=19. Good.
+
+Potential issue: Did `arr[3] = acc(arr, 7) % 100` set idx3 to 11; before A=[21,15,6,12,21,18,18,19,12,18], idx3=12. Good.
+
+Potential issue: Did `apply_twice(arr,4,5)` add 10 to idx4; before idx4=21 ->31. Good.
+
+Need maybe consider Python's `re.findall(r'\d', s)` returns list of strings; len counts digits. Good.
+
+Could there be any effect from `mix` or `bump_all`? Not called. `acc` called once. `apply_twice` called once.
+
+Need final answer only. But ensure strict: "ARRAY: [numbers, comma separated]" maybe no spaces after colon? Use exactly as examples. I'll output:
+ARRAY: [21, 15, 6, 11, 31, 18, 18, 19, 12, 18]
+SUM: 169
+
+Double-check if final array should be named `arr` and sum. Yes.
+
+Let's think if there is any trap with `arr2 = arr` and later `arr2[8] += 4`: Since arr2 alias, yes. But what about after `arr2 = arr`, then many comments, then `arr2[8] += 4`. Good.
+
+Potential hidden executable line: In the huge dummy section, there are lines like `code_0 = re.sub(r'[0-9]', '#', str(arr[4]))` etc. They don't mutate arr. But note `re.sub` returns string; no side effects. Good.
+
+Potential hidden: `label_11 = "запись 11 не применялась"` no.
+
+Potential hidden: The `MANUAL` string includes `arr[6] += 57` etc but not executed. Good.
+
+Potential hidden: The TRAP variables are strings, not executed. Good.
+
+Potential hidden: Comments with `# временная запись: arr2[7] = 75 — не выполняется` not executed. Good.
+
+Potential hidden: There is line `arr[5], arr[5] = arr[5], arr[5]` no change. Good.
+
+Potential hidden: There is line `arr[0], arr[6] = arr[6], arr[0]` after arr[0]*=2. We did. Good.
+
+Let's maybe create a table to ensure no missed actual statement between s131 and arr[9]. The code after s131 has many comments then `arr[9] = ...`. No other actual. Good.
+
+Potential issue: The variable `s131` is assigned before `arr[9] = ...`, but there are many comments that mention `запись 131 обработана` etc. No effect.
+
+Potential issue: The variable names `s240`, `s858`, `s44`, `s13` maybe correspond to line numbers but not relevant.
+
+Potential issue: The final sum maybe should be sum of arr after all mutations, not including arr2? arr2 alias same. Good.
+
+Let's consider if `acc(arr, 7)` uses current arr after arr[7] assignment? It passes list object; recursive reads a[n-1] for n=7 down to 1, indices 6..0. It does not read index7. So arr[7]=19 irrelevant. Good.
+
+Potential issue: `apply_twice(arr, 4, 5)` calls bump twice. bump does `a[i] += v`. For ints, modifies list element. Good.
+
+Potential issue: If `arr` contains large numbers? no.
+
+Let's maybe recalc from scratch using a concise sequence to catch arithmetic errors:
+Start [7,15,4,6,1,21,21,10,8,13]
+1 swap0,4 -> [1,15,4,6,7,21,21,10,8,13]
+2 arr2[2]+=5 -> [1,15,9,6,7,21,21,10,8,13]
+3 s131 digits 15 -> arr9=15 -> [1,15,9,6,7,21,21,10,8,15]
+4 swap0,2 -> [9,15,1,6,7,21,21,10,8,15]
+5 arr4+=3 -> [9,15,1,6,10,21,21,10,8,15]
+6 swap2,5 -> [9,15,21,6,10,1,21,10,8,15]
+7 arr5,arr5 no -> same
+8 arr0*=2 -> [18,15,21,6,10,1,21,10,8,15]
+9 swap0,6 -> [21,15,21,6,10,1,18,10,8,15]
+10 arr5+=1 -> [21,15,21,6,10,2,18,10,8,15]
+11 arr2[8]+=4 -> [21,15,21,6,10,2,18,10,12,15]
+12 swap4,2 -> [21,15,10,6,21,2,18,10,12,15]
+13 s240 digits 18 -> arr6=18 -> same (idx6 18)
+14 arr2+=2 -> [21,15,12,6,21,2,18,10,12,15]
+15 s858 digits 18 -> arr9=18 -> [21,15,12,6,21,2,18,10,12,18]
+16 s44 digits 18 -> arr5=18 -> [21,15,12,6,21,18,18,10,12,18]
+17 swap2,3 -> [21,15,6,12,21,18,18,10,12,18]
+18 s13 digits 19 -> arr7=19 -> [21,15,6,12,21,18,18,19,12,18]
+19 arr3=sum first7 %100 = (21+15+6+12+21+18+18)=111%100=11 -> [21,15,6,11,21,18,18,19,12,18]
+20 apply_twice idx4 +5 twice -> [21,15,6,11,31,18,18,19,12,18]
+Sum: 21+15=36; +6=42; +11=53; +31=84; +18=102; +18=120; +19=139; +12=151; +18=169. Good.
+
+Need final. Ensure no extra text. final with two lines.

@@ -1,0 +1,303 @@
+We need answer user's request: execute program mentally? Need final array and sum. We need parse huge Python code. Need simulate only effective statements. There are many comments/traps. Need identify actual executed code affecting arr. Program defines functions, MANUAL string, TRAP variables (not used), arr initial [6,5,13,12,12,26,17,9,6,14]. Then many tmp/copy/note/code assignments reading arr but not modifying. Then arr.reverse(). Then many comments. Actual executable statements among comments:
+- arr[6] += 4
+- arr[3] *= 2
+- arr[4] = acc(arr, 8) % 100
+- arr[7] *= 2
+- arr[7] = acc(arr, 5) % 100
+- arr[6] -= 8
+- arr2 = arr
+- arr2[2] += 7
+- arr[5] -= 6
+- apply_twice(arr, 4, 2)
+- arr[7] = int(t280) % 97 (t280 defined earlier? Need check t280 = str(arr[2]) + str(arr[3]) before this? Yes after apply_twice? Let's trace order carefully.)
+- arr[6] *= 2
+- arr[6] += 2
+- apply_twice(arr, 6, 3)
+- arr[1] = acc(arr, 8) % 100
+- arr[0], arr[8] = arr[8], arr[0]
+- arr[0] = acc(arr, 5) % 100
+- t132 = str(arr[4]) + str(arr[6])
+- arr[7] = int(t132) % 97
+- arr[0], arr[6] = arr[6], arr[0]
+- s457 = ''.join(str(x) for x in arr)
+- arr[9] = len(re.findall(r'\d', s457)) % 50
+Then print.
+Need ensure no other executable lines hidden? There are many label/copy/tmp assignments before reverse. They don't modify arr. Need check if any functions called earlier? No. Need check MANUAL not executed. TRAP variables not used. Comments with # ignored. Need consider arr2 = arr alias: arr2[2] += 7 modifies arr[2]. Need order of actual statements exactly as in code after reverse. Let's extract all non-comment executable lines after arr.reverse() until end. Need be careful: There are lines like "arr[6] += 4" etc. Also t280 = str(arr[2]) + str(arr[3]) before arr[7] = int(t280) % 97? Let's locate in code:
+After arr.reverse():
+... comments ...
+arr[6] += 4
+... comments ...
+arr[3] *= 2
+... comments ...
+arr[4] = acc(arr, 8) % 100
+... comments ...
+arr[7] *= 2
+... comments ...
+arr[7] = acc(arr, 5) % 100
+... comments ...
+arr[6] -= 8
+... comments ...
+arr2 = arr
+... comments ...
+arr2[2] += 7
+... comments ...
+arr[5] -= 6
+... comments ...
+apply_twice(arr, 4, 2)
+... comments ...
+t280 = str(arr[2]) + str(arr[3])
+... comments ...
+arr[7] = int(t280) % 97
+... comments ...
+arr[6] *= 2
+... comments ...
+arr[6] += 2
+... comments ...
+apply_twice(arr, 6, 3)
+... comments ...
+arr[1] = acc(arr, 8) % 100
+... comments ...
+arr[0], arr[8] = arr[8], arr[0]
+... comments ...
+arr[0] = acc(arr, 5) % 100
+... comments ...
+t132 = str(arr[4]) + str(arr[6])
+... comments ...
+arr[7] = int(t132) % 97
+... comments ...
+arr[0], arr[6] = arr[6], arr[0]
+... comments ...
+s457 = ''.join(str(x) for x in arr)
+... comments ...
+arr[9] = len(re.findall(r'\d', s457)) % 50
+... comments ...
+if __name__...
+
+Need verify there are no executable lines like "arr[6] += 4" before reverse? The initial tmp/copy assignments don't modify. There is arr.reverse() after them. Need maybe some code_ variables use re.sub but no effect. Need maybe label strings not used.
+
+Let's simulate carefully.
+
+Initial arr = [6,5,13,12,12,26,17,9,6,14]
+Before reverse many reads only. Then arr.reverse(): arr becomes [14,6,9,17,26,12,12,13,5,6]? Let's reverse original: indices 0..9 original: 0=6,1=5,2=13,3=12,4=12,5=26,6=17,7=9,8=6,9=14. Reversed: [14,6,9,17,26,12,12,13,5,6]. Yes.
+
+Now apply statements in order. Need define acc(a,n): sum first n elements recursively (a[0]+...+a[n-1]) if n>0 else 0. bump adds v to a[i]. apply_twice calls bump twice => +2v.
+
+Let's maintain arr list length 10.
+Start S0: [14,6,9,17,26,12,12,13,5,6]
+
+1) arr[6] += 4 => index6 12+4=16.
+S1: [14,6,9,17,26,12,16,13,5,6]
+
+2) arr[3] *= 2 => index3 17*2=34.
+S2: [14,6,9,34,26,12,16,13,5,6]
+
+3) arr[4] = acc(arr,8) % 100. acc sum first 8 indices 0..7: 14+6+9+34+26+12+16+13 = let's sum:14+6=20, +9=29, +34=63, +26=89, +12=101, +16=117, +13=130. 130%100=30. arr[4]=30.
+S3: [14,6,9,34,30,12,16,13,5,6]
+
+4) arr[7] *= 2 => 13*2=26.
+S4: [14,6,9,34,30,12,16,26,5,6]
+
+5) arr[7] = acc(arr,5) % 100. sum first 5 indices 0..4: 14+6+9+34+30 = 93. %100=93. arr[7]=93.
+S5: [14,6,9,34,30,12,16,93,5,6]
+
+6) arr[6] -= 8 => 16-8=8.
+S6: [14,6,9,34,30,12,8,93,5,6]
+
+7) arr2 = arr (alias)
+
+8) arr2[2] += 7 => arr[2] 9+7=16.
+S8: [14,6,16,34,30,12,8,93,5,6]
+
+9) arr[5] -= 6 => 12-6=6.
+S9: [14,6,16,34,30,6,8,93,5,6]
+
+10) apply_twice(arr,4,2): bump index4 +2 twice => +4. arr[4]=30+4=34.
+S10: [14,6,16,34,34,6,8,93,5,6]
+
+11) t280 = str(arr[2]) + str(arr[3]) = '16'+'34' = '1634'.
+
+12) arr[7] = int(t280) % 97 = 1634 % 97. Compute 97*16=1552, remainder 82. 97*16=1552; 1634-1552=82. arr[7]=82.
+S12: [14,6,16,34,34,6,8,82,5,6]
+
+13) arr[6] *= 2 => 8*2=16.
+S13: [14,6,16,34,34,6,16,82,5,6]
+
+14) arr[6] += 2 => 18.
+S14: [14,6,16,34,34,6,18,82,5,6]
+
+15) apply_twice(arr,6,3): index6 +3 twice => +6. 18+6=24.
+S15: [14,6,16,34,34,6,24,82,5,6]
+
+16) arr[1] = acc(arr,8) % 100. sum first 8 indices 0..7: 14+6+16+34+34+6+24+82. Sum:14+6=20, +16=36, +34=70, +34=104, +6=110, +24=134, +82=216. 216%100=16. arr[1]=16.
+S16: [14,16,16,34,34,6,24,82,5,6]
+
+17) arr[0], arr[8] = arr[8], arr[0]. Swap values: arr0=5, arr8=14.
+S17: [5,16,16,34,34,6,24,82,14,6]
+
+18) arr[0] = acc(arr,5) % 100. sum first 5 indices 0..4: 5+16+16+34+34 = 105. %100=5. arr[0]=5 (unchanged).
+S18: [5,16,16,34,34,6,24,82,14,6]
+
+19) t132 = str(arr[4]) + str(arr[6]) = '34'+'24' = '3424'.
+
+20) arr[7] = int(t132) % 97. 3424 /97: 97*35=3395, remainder 29. (97*35=3395; +29). arr[7]=29.
+S20: [5,16,16,34,34,6,24,29,14,6]
+
+21) arr[0], arr[6] = arr[6], arr[0]. Swap: arr0=24, arr6=5.
+S21: [24,16,16,34,34,6,5,29,14,6]
+
+22) s457 = ''.join(str(x) for x in arr). Need concatenate decimal representations of all elements. arr values: 24,16,16,34,34,6,5,29,14,6. String: '24'+'16'+'16'+'34'+'34'+'6'+'5'+'29'+'14'+'6' = let's form: 24161634346529146? Check: 24 16 -> 2416; +16 -> 241616; +34 -> 24161634; +34 -> 2416163434; +6 -> 24161634346; +5 -> 241616343465; +29 -> 24161634346529; +14 -> 2416163434652914; +6 -> 24161634346529146. Yes length? digits: 2+2+2+2+2+1+1+2+2+1 = 17. All digits, no negatives. len(re.findall(r'\d', s457)) = 17. 17 % 50 = 17. arr[9]=17.
+Final: [24,16,16,34,34,6,5,29,14,17]
+
+Sum: 24+16=40; +16=56; +34=90; +34=124; +6=130; +5=135; +29=164; +14=178; +17=195.
+
+Need ensure no overlooked executable statements: There are many lines like "arr[6] += 4" etc. Need maybe there is "arr[6] += 4" after comments, yes. Need check if any line "arr[3] *= 2" etc. Need maybe there are assignments to arr inside code_ variables? No, code_ = re.sub returns string, no arr modification. There are copy_ = arr[...] no mutation. tmp_ = arr[...] + ... no mutation. note_ strings. label strings.
+
+Need check if any trap variables used? No.
+
+Need consider Python tuple assignment arr[6], arr[6] = arr[6], arr[6] in MANUAL not executed. Comments with "не выполняется" ignored.
+
+Need ensure order of t280 relative to apply_twice(arr,4,2). In code: after arr[5]-=6, apply_twice(arr,4,2), then many comments, then t280 = str(arr[2]) + str(arr[3]), then arr[7] = int(t280) % 97. Yes.
+
+Need ensure arr[6] *= 2 and arr[6] += 2 order: after arr[7]=int(t280)%97, comments, arr[6] *= 2, comments, arr[6] += 2, comments, apply_twice(arr,6,3). Yes.
+
+Need ensure arr[1] = acc(arr,8) after apply_twice(arr,6,3). Yes.
+
+Need ensure swap arr[0],arr[8] before arr[0]=acc(arr,5). Yes.
+
+Need ensure t132 after arr[0]=acc(arr,5). Yes.
+
+Need ensure final swap arr[0],arr[6] before s457. Yes.
+
+Potential issue: acc uses recursion and list values at time. We computed. Need double-check all arithmetic.
+
+Let's maybe simulate with a small mental or write table. But can manually verify.
+
+Initial after reverse: [14,6,9,17,26,12,12,13,5,6]
+arr[6]+=4 -> [14,6,9,17,26,12,16,13,5,6]
+arr[3]*=2 -> [14,6,9,34,26,12,16,13,5,6]
+acc8: 14+6+9+34+26+12+16+13 = 130 -> arr4=30. [14,6,9,34,30,12,16,13,5,6]
+arr7*=2 -> 26. [14,6,9,34,30,12,16,26,5,6]
+acc5: 14+6+9+34+30=93 -> arr7=93. [14,6,9,34,30,12,16,93,5,6]
+arr6-=8 -> 8. [14,6,9,34,30,12,8,93,5,6]
+arr2[2]+=7 -> arr2=16. [14,6,16,34,30,12,8,93,5,6]
+arr5-=6 -> 6. [14,6,16,34,30,6,8,93,5,6]
+apply_twice arr4 +4 -> 34. [14,6,16,34,34,6,8,93,5,6]
+t280 = '16'+'34' = '1634'. 1634 mod 97: 97*16=1552 rem82. arr7=82. [14,6,16,34,34,6,8,82,5,6]
+arr6*=2 ->16. [14,6,16,34,34,6,16,82,5,6]
+arr6+=2 ->18. [14,6,16,34,34,6,18,82,5,6]
+apply_twice arr6 +6 ->24. [14,6,16,34,34,6,24,82,5,6]
+acc8: 14+6+16+34+34+6+24+82 = 216 -> arr1=16. [14,16,16,34,34,6,24,82,5,6]
+swap 0,8: [5,16,16,34,34,6,24,82,14,6]
+acc5: 5+16+16+34+34=105 -> arr0=5. [5,16,16,34,34,6,24,82,14,6]
+t132 = '34'+'24' = '3424'. 97*35=3395 rem29. arr7=29. [5,16,16,34,34,6,24,29,14,6]
+swap 0,6: [24,16,16,34,34,6,5,29,14,6]
+s digits length: values digits count: 24(2),16(2)=4,16=6,34=8,34=10,6=11,5=12,29=14,14=16,6=17. arr9=17. [24,16,16,34,34,6,5,29,14,17]
+sum: 24+16+16+34+34+6+5+29+14+17 = let's recalc: 24+16=40; +16=56; +34=90; +34=124; +6=130; +5=135; +29=164; +14=178; +17=195. Yes.
+
+Need consider if arr[9] = len(re.findall(r'\d', s457)) % 50: re.findall returns list of digit characters. If any numbers negative? no. If arr values maybe multi-digit, all digits. length 17. Good.
+
+Need answer strictly format:
+ARRAY: [numbers, comma separated]
+SUM: number
+
+Need maybe include spaces after commas? User says numbers, comma separated. Example likely "ARRAY: [24, 16, 16, 34, 34, 6, 5, 29, 14, 17]". Strictly as. We can output only two lines.
+
+Double-check no hidden executable line "arr[6] += 4" maybe appears twice? Search in code: after many comments there is "arr[6] += 4" once. Later comments mention arr[6] += 4 not executed. Good.
+
+Need ensure no line "arr[3] *= 2" maybe only once. Good.
+
+Potential issue: The code includes many assignments before arr.reverse() that use arr values but don't modify. However, some variables like copy_2 = arr[2] are references? For ints immutable, no effect. code_ strings no effect.
+
+Potential issue: There is "arr[6], arr[6] = arr[6], arr[6]" in MANUAL string not executed. Good.
+
+Potential issue: There is "arr2 = arr" then later comments with arr2 assignments not executed except arr2[2] += 7. Good.
+
+Potential issue: apply_twice uses bump(a,i,v) which mutates list. We applied +4 and +6. Good.
+
+Potential issue: acc(a,n) if n <=0 return 0; n=8,5. Good.
+
+Need maybe final array after print includes arr mutated by s457? s457 computed before arr[9] assignment, so arr[9] old 6 not included in digit count. We used old arr for s457. Yes. If arr[9] assignment after s457, final arr[9]=17. Good.
+
+Let's consider if t132 = str(arr[4]) + str(arr[6]) after arr[0]=acc... but before swap 0,6. At that time arr4=34, arr6=24. Yes. If there was any comment line "arr[6] += 2" before? We included. Good.
+
+Need maybe there is line "arr[7] = int(t280) % 97" after t280 but before arr[6]*=2. Yes.
+
+Could there be executable line "arr[6] += 4" before arr.reverse()? No, after reverse. Good.
+
+Let's maybe scan entire code for lines not starting with # or variable assignment? The huge block after reverse includes many comments and actual lines. Need ensure no actual line like "arr[6] += 4" appears in comments? Comments start with #. Actual lines are unindented no #. We listed. Need maybe there is "arr[6] += 4" after a comment line but yes.
+
+Let's search mentally for all non-comment lines after arr.reverse():
+- arr[6] += 4
+- arr[3] *= 2
+- arr[4] = acc(arr, 8) % 100
+- arr[7] *= 2
+- arr[7] = acc(arr, 5) % 100
+- arr[6] -= 8
+- arr2 = arr
+- arr2[2] += 7
+- arr[5] -= 6
+- apply_twice(arr, 4, 2)
+- t280 = str(arr[2]) + str(arr[3])
+- arr[7] = int(t280) % 97
+- arr[6] *= 2
+- arr[6] += 2
+- apply_twice(arr, 6, 3)
+- arr[1] = acc(arr, 8) % 100
+- arr[0], arr[8] = arr[8], arr[0]
+- arr[0] = acc(arr, 5) % 100
+- t132 = str(arr[4]) + str(arr[6])
+- arr[7] = int(t132) % 97
+- arr[0], arr[6] = arr[6], arr[0]
+- s457 = ''.join(str(x) for x in arr)
+- arr[9] = len(re.findall(r'\d', s457)) % 50
+- if __name__...
+
+Need check if there is line "arr[6] += 4" maybe after comments but before "arr[3] *= 2". Yes.
+
+Could there be line "arr[6] += 4" in a comment without #? No.
+
+Need maybe initial assignments before reverse include "arr.reverse()" only mutation. Good.
+
+Let's think about Python evaluation of tuple swap arr[0], arr[8] = arr[8], arr[0]. RHS evaluated first, then assignments left-to-right. We did swap. Good.
+
+Potential issue: acc(arr,8) after arr[1] assignment? It uses current arr including arr[1]=16? Wait step 16: arr[1] = acc(arr,8) % 100. The RHS acc(arr,8) is evaluated before assignment to arr[1]. At that time arr[1] was 6 (from S15). We summed with arr[1]=6: 14+6+16+34+34+6+24+82 = 216. If someone mistakenly uses new arr[1], no. We did correct. Then arr[1]=16. Good.
+
+Step 18: arr[0] = acc(arr,5) % 100. RHS evaluated before assignment; arr[0] currently 5 after swap. Sum includes 5. We did 105 -> 5. If assignment changed before? no.
+
+Step 3: arr[4] = acc(arr,8) %100. RHS before assignment; arr[4] currently 26. Sum first 8 includes old arr4=26, not new. We did 130. Good.
+
+Step 5: arr[7] = acc(arr,5)%100. RHS before assignment; arr[7] currently 26? Wait after step4 arr[7]=26. Sum first 5 doesn't include arr7, so no issue. We did 93.
+
+Step 12: arr[7] = int(t280)%97. t280 computed before, no issue.
+
+Step 20: arr[7] = int(t132)%97. t132 computed before, no issue.
+
+Need maybe re.findall(r'\d', s457) counts digits in string of arr values. If arr values include negative? no. If arr values include 0? no. Good.
+
+Let's consider if any actual line "arr[6] += 4" could be affected by arr2 alias? No.
+
+Need final answer only. But ensure no extra explanation due strict format. Final:
+ARRAY: [24, 16, 16, 34, 34, 6, 5, 29, 14, 17]
+SUM: 195
+
+Double-check sum with final values: 24+16+16=56; +34+34=124; +6=130; +5=135; +29=164; +14=178; +17=195. Yes.
+
+Need maybe if arr[9] = len(re.findall(...)) % 50, len is 17, but if s457 includes spaces? ''.join(str(x) for x in arr) no spaces. Good.
+
+Let's maybe verify digit count string: arr before final assignment: [24,16,16,34,34,6,5,29,14,6]. Concatenate: '24' '16' '16' '34' '34' '6' '5' '29' '14' '6'. Count: 2+2+2+2+2+1+1+2+2+1=17. String length 17. Good.
+
+Potential hidden mutation: code_ variables use re.sub(r'[0-9]', '#', str(arr[...])) but re.sub returns string, no mutation. tmp/copy/note/label no mutation.
+
+Potential hidden mutation: functions defined but not called except apply_twice and acc. bump_all not called. mix not called. Good.
+
+Potential hidden mutation: MANUAL string not executed. TRAP variables strings not executed. Good.
+
+Need maybe there is line "arr[6] += 4" after many comments but before "arr[3] *= 2". Yes.
+
+Let's consider if initial arr.reverse() occurs after all tmp assignments, but some tmp assignments might have side effects? No.
+
+Could there be integer overflow? Python no.
+
+Need maybe final array should be named "arr"? User asks name the final array and sum. Answer format includes ARRAY. Good.
+
+Now final concise. Ensure no markdown code block? Strictly as lines. Could include exactly two lines. final.
