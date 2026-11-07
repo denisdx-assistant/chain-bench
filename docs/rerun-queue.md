@@ -17,8 +17,8 @@ overwritten; the retry is recorded next to it and referenced from the series.
 |---|---|---|---|---|---|
 | 1 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `chains_ru_20k_32k_guarded.json` | chain 12 | `finish=length` at 32k, 379 s | ✅ done — `chains_ru_20k_task12_retry_131k.json`, answer 100 = expected 100 |
 | 2 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `programs_v4_32k_guarded.json` | `v4_seed313.py` | `finish=length` at 32k, 385 s | ✅ done — 131k finished in 170 s (10 358 tokens, `finish=stop`), answer wrong: `[10, 27, 12, 46, …]` vs expected `[22, 64, 31, 88, …]`. The zero was earned, not a truncation artefact |
-| 3 | `Qwen3.8-Flash-Next-UD-Q4_K_XL` | `programs_v4_16k.json` | `v4_seed302.py` | `finish=length` at 16k, 395 s | ⬜ pending |
-| 4 | `Qwen3.8-Flash-Next-UD-Q4_K_XL` | `programs_v4_16k.json` | `v4_seed310.py` | `finish=length` at 16k, 475 s | ⬜ pending |
+| 3 | `Qwen3.8-Flash-Next-UD-Q4_K_XL` | `programs_v4_16k.json` | `v4_seed302.py` | `finish=length` at 16k, 395 s | ✅ done — 131k: one attempt answered correctly but was cut by a loop-guard bug (now fixed); the clean re-run finished in 564 s with `finish=stop` and answered wrong (`[12, 36, …]` vs `[32, 36, …]`). Scored as wrong; the task is unstable |
+| 4 | `Qwen3.8-Flash-Next-UD-Q4_K_XL` | `programs_v4_16k.json` | `v4_seed310.py` | `finish=length` at 16k, 475 s | ✅ done — 131k finished in 146 s (5 391 tokens), answer correct. The length cut was hiding a right answer |
 
 Pending items need the model to be loaded on a host; they are run together the
 next time it is up.

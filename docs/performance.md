@@ -47,6 +47,7 @@ made before the fields were captured show —.
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · chains zh · 32k | guarded | 17 | 97.4 | 88.9 | — | 0 | 5600 | 38359 | 65 s |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · chains zh · 32k | guarded_8tasks | 8 | 98.5 | 89.4 | 2084.9 | 1 | 1976 | 38141 | 21 s |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · programs · 32k · v4_32k_guarded | guarded | 20 | 99.4 | 97.8 | 2456.1 | 20 | 6688 | 142558 | 70 s |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · programs · 313 · v4_task313_retry_131k | default | 1 | 92.9 | 92.9 | 2450.1 | 1 | 10358 | 143035 | 112 s |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · chains en · 16k | default | 17 | 102.2 | 89.9 | 1495.4 | 17 | 5469 | 14062 | 57 s |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · chains en · 16k | 8tasks | 8 | 94.5 | 90.0 | 1471.5 | 8 | 1379 | 13735 | 15 s |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · chains ru · 16k | default | 17 | 94.4 | 83.5 | 1602.8 | 2 | 6739 | 19260 | 86 s |
@@ -60,7 +61,9 @@ made before the fields were captured show —.
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains ru · 16k | 8tasks | 8 | 83.2 | 74.0 | 1162.8 | 1 | 1922 | 19112 | 26 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains zh · 16k | default | 17 | 92.6 | 78.6 | 1537.3 | 2 | 4964 | 38359 | 66 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains zh · 16k | 8tasks | 8 | 85.0 | 78.6 | 1530.4 | 2 | 1923 | 38141 | 23 s |
-| Qwen3.8-Flash-Next-UD-Q4_K_XL · programs · 16k · v4_16k | default | 20 | 101.5 | 84.8 | 1802.7 | 20 | 7434 | 142558 | 87 s |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · programs · 16k · v4_16k | default | 20 | 88.8 | 84.2 | 1802.7 | 19 | 6961 | 142558 | 81 s |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · programs · 302 · v4_task302_rerun_fixed | default | 1 | 82.0 | 82.0 | — | 0 | 45977 | 142525 | 561 s |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · programs · 131k · v4_task_retry_131k | default | 2 | 82.1 | 82.1 | 1794.5 | 1 | 5391 | 142603 | 66 s |
 | gemma-4-31B-it-UD-Q8_K_XL · chains en · 16k | default | 17 | 80.0 | 70.6 | — | 0 | 1473 | 13909 | 19 s |
 | gemma-4-31B-it-UD-Q8_K_XL · chains en · 16k | 8tasks | 8 | 80.1 | 77.1 | — | 0 | 477 | 13575 | 6 s |
 | gemma-4-31B-it-UD-Q8_K_XL · chains ru · 16k | default | 17 | 77.6 | 69.6 | 1041.1 | 1 | 986 | 19050 | 15 s |
