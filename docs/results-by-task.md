@@ -27,7 +27,9 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-Flash-Next-UD-IQ4_XS · ru · 16k · default | 34s ✓ | 85s ✗ | 9s ✓ | 8s ✓ | 7s ✓ | 6s ✓ | 170s ✗ | 13s ✓ | 150s ✗ | 39s ✓ | 102s ✓ | 234s ✓ | 262s ✗ | 163s ✗ | 90s ✓ | 106s ✓ | 106s ✗ | 11/17 |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · zh · 16k · default | 45s ✓ | 91s ✓ | 19s ✓ | 24s ✓ | 19s ✓ | 17s ✓ | 239s ✓ | 29s ✓ | 82s ✓ | 37s ✓ | 80s ✗ | 133s ✗ | 171s ✗ | 144s ✓ | 117s ✓ | 141s ✓ | 229s ✗ | 13/17 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · en · 16k · default | 44s ✓ | 195s ✓ | 16s ✓ | 15s ✓ | 16s ✓ | 16s ✓ | 153s ✓ | 17s ✓ | 119s ✗ | 35s ✓ | 99s ✗ | 328s ✗ | 242s ✗ | 168s ✓ | 67s ✓ | 40s ✓ | 401s ✓ | 13/17 |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · en · 32k · rerun | 42s ✓ | 151s ✓ | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | 2/2 (partial 2/17) |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · ru · 16k · default | 65s ✓ | 124s ✗ | 21s ✓ | 11s ✓ | 13s ✓ | 10s ✓ | 134s ✗ | 23s ✓ | 145s ✗ | 24s ✓ | 127s ✓ | 297s ✓ | 210s ✗ | 248s ✗ | 71s ✓ | 55s ✓ | 195s ✗ | 11/17 |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · ru · 32k · rerun | 38s ✓ | 159s ✗ | 11s ✓ | 11s ✓ | 13s ✓ | 11s ✓ | 144s ✗ | 27s ✓ | 134s ✗ | 20s ✓ | 92s ✓ | 358s ✓ | 188s ✗ | 162s ✗ | 87s ✓ | 69s ✓ | 105s ✗ | 11/17 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · zh · 16k · default | 73s ✓ | 149s ✓ | 22s ✓ | 22s ✓ | 24s ✓ | 23s ✓ | 263s ✓ | 56s ✓ | 84s ✓ | 66s ✓ | 127s ✗ | 284s ✓ | 246s ✗ | 176s ✓ | 82s ✓ | 86s ✓ | 344s ✗ | 14/17 |
 | Ripple-65B-Preview-Q6_K · en · 16k · default | 174s ✓ | 514s ✓ | 8s ✓ | 14s ✓ | 11s ✓ | 11s ✓ | 1180s ✓ | 18s ✓ | 247s ✗ | 38s ✓ | 370s ✗ | 1692s L | 1017s ✗ | 586s ✓ | 215s ✓ | 757s ✓ | 405sw R | 12/17 |
 | deepseek-v4.1-flash · en · 16k · default | 4sw ✓ | 36sw ✗ | 1sw ✓ | 1sw ✓ | 2sw ✓ | 1sw ✓ | 72sw ✓ | 2sw ✓ | 16sw ✗ | 3sw ✓ | 50sw ✗ | 57sw ✗ | 48sw ✗ | 67sw ✓ | 5sw ✓ | 12sw ✓ | 47sw ✓ | 12/17 |
