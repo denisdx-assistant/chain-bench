@@ -99,7 +99,12 @@ def wait_for_queue(base, model, max_wait=900, step=60, log=print):
     return waited
 
 def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
-                max_repeat=12, threshold_n=8, client='chain-bench', frequency_penalty=0.0, presence_penalty=0.0):
+                max_repeat=None, threshold_n=8, client='chain-bench', frequency_penalty=0.0, presence_penalty=0.0):
+    if max_repeat is None:
+        # a hosted model cannot hang a GPU, and max_tokens already bounds the bill,
+        # so by default only the local endpoints abort on repetition
+        hosted = "127.0.0.1" not in BASE and "192.168." not in BASE
+        max_repeat = 10 ** 9 if (hosted or os.environ.get("CHAIN_BENCH_NO_LOOP_ABORT") == "1") else 12
     payload = {"model": model, "max_tokens": max_tokens, "stream": True}
     if temperature is not None:
         payload["temperature"] = temperature
@@ -209,7 +214,9 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
                             "latency": time.time() - t0, "finish": "loop",
                             "timings": timings, "usage": usage,
                             "reasoning_chars": len(''.join(reasoning)),
-                            "reasoning_tail": ''.join(reasoning)[-2000:]}
+                            "reasoning_tail": ''.join(reasoning)[-2000:],
+                            "reasoning_text": ''.join(reasoning),
+                            "repeat_max": _loop_repeats(''.join(content) + ''.join(reasoning))}
     except urllib.error.HTTPError as e:
         return {"error": "HTTP %s" % e.code, "latency": time.time() - t0}
     except Exception as e:
