@@ -160,3 +160,8 @@ scripts/             生成器、运行器、循环检测、表格构建
 ## 许可
 
 代码 — MIT。文本与数据集 — CC BY 4.0。
+
+**挑衅性题目。** 第 11 题（ship-15 与 ship-18）和第 12 题（heron-09）问的是文档中并不存在的实体，
+两者都靠规则而非记录得出。它们被有意保留在题集中——见
+[docs/methodology.md](docs/methodology.md#provocative-tasks-frozen-in-the-dataset)。
+第 12 题因预算被截断并不表示出现循环，英语或中文得分低也不表示测试环境坏了。

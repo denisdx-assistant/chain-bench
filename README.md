@@ -196,3 +196,10 @@ server; no credentials, keys or private corpora are included.
 ## License
 
 Code — MIT. Texts and datasets — CC BY 4.0.
+
+**Provocative tasks.** Chain 11 (ship-15 vs ship-18) and chain 12 (heron-09)
+ask about entities the document never lists; both are decided by rules, not by
+records. They are frozen in the set on purpose — see
+[docs/methodology.md](docs/methodology.md#provocative-tasks-frozen-in-the-dataset).
+A budget cut on chain 12 is not a repetition loop, and a low English or Chinese
+score there is not a broken harness.

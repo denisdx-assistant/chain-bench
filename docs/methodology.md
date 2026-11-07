@@ -191,7 +191,13 @@ for a 3090. That is why its series takes 442 minutes while Q8, running on two
 cards, finishes the same sets in 147. The label in the summary table carries the
 same note, so the comparison is not read as a property of the quantisation.
 
-## Tasks that reference entities missing from the document
+## Provocative tasks (frozen in the dataset)
+
+> These tasks stay in the set as they are. The dataset is frozen: too many runs
+> already reference it to change a question now. Read them as deliberate traps,
+> not as defects.
+
+The two tasks below ask about entities the document never lists.
 
 Two tasks ask about entities the document never lists: chain 11 (ship-15 vs
 ship-18) and chain 12 (heron-09, цапля-09). This is deliberate — both are
@@ -209,3 +215,8 @@ a record. The outcome splits sharply by language: Russian runs solve chain 11 in
 in 1 of 7. So the task is solvable and is a clean discriminator, not a defect.
 A run that stops at "the entity is not in the document" and then re-reads the
 text until the budget ends is a genuine capability failure.
+
+How to read them in the tables: chain 11 and chain 12 are provoked tasks. A low
+English or Chinese score on these two is expected and is not evidence of a broken
+harness or a loop; a budget cut on chain 12 is not evidence of a repetition loop
+either. They are kept for comparability with the runs that already exist.
