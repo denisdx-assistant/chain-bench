@@ -183,3 +183,10 @@ with `--resume` to continue.
 ```
 python3 scripts/run_frozen_guarded.py --dir datasets/programs/v4 --out results/<model>/programs_v4_16k.json --resume --dry-run
 ```
+
+## Hardware note on the 27B Q4_K_M row
+
+`Qwen3.8-27B-UD-Q4_K_M` was served on a **single** GPU with a configuration tuned
+for a 3090. That is why its series takes 442 minutes while Q8, running on two
+cards, finishes the same sets in 147. The label in the summary table carries the
+same note, so the comparison is not read as a property of the quantisation.
