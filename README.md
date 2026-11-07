@@ -103,7 +103,7 @@ run more than once shows the mean over its valid runs, so a cell can be fraction
 | Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · guard | 146m44s · 33% err | 4100 | 14m14s 11/17 | 14m45s 10/17 | 17m43s 11.5/17 | 15m10s 13/24 | 100m03s 15/20 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · ctx 1M · YaRN · T 0.3 · pen 0.3 · guard | 137m55s · 38% err | 4899 | 24m51s 12/17 | 30m21s 10/17 | 31m10s 11/17 | 13m15s 15/24 | 51m33s 11/20 |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · T default · pen 0.2 · guard | 127m31s · 30% err | 5960 | 26m38s 12/17 | 26m24s 11/17 | 26m57s 13/17 | 19m29s 15/24 | 47m32s 14/20 |
-| Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · T default · pen 0.2 · guard | 159m58s · 26% err | 4964 | 34m18s 12.5/17 | 28m21s 11/17 | 35m27s 14/17 | 25m52s 15/24 | 61m51s 15/20 |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · T default · pen 0.2 · guard | 158m12s · 27% err | 4974 | 34m18s 12.5/17 | 28m21s 11/17 | 33m41s 13.5/17 | 25m52s 15/24 | 61m51s 15/20 |
 | Ripple-65B-Preview-Q6_K · ctx 175k · no YaRN · T default · pen 0.3 · guard · stopped at 7 of 20: 162.8k prompt tokens leave only ~12.2k of output inside a 175k window | — | — | — | — | — | — | 121m49s 0/7 of 20 run |
 | Ripple-65B-Preview-Q6_K · ctx 175k · no YaRN · T default · pen mixed (0 / 0.3) · guard · chains: 12 tasks at 16k pen 0, 5 at 32k pen 0.3; programs all at 32k pen 0.3 | 120m57s · 29% err | 4684 | 120m57s 12/17 | — | — | — | — |
 | deepseek-v4.1-flash · ctx 1M · no YaRN · T default | 16m48s · 30% err | — | 7m04s 12/17 | — | — | — | 9m44s 14/20 |
