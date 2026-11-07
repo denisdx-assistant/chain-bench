@@ -56,13 +56,20 @@ made before the fields were captured show —.
 | Qwen3.8-Flash-Next-UD-IQ4_XS · programs · 16k · v4_16k | default | 20 | 98.2 | 95.7 | 2405.4 | 20 | 6905 | 142558 | 72 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains en · 16k | default | 17 | 88.9 | 78.0 | 1140.0 | 17 | 4112 | 14062 | 54 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains en · 16k | 8tasks | 8 | 87.6 | 81.6 | 1121.3 | 8 | 920 | 13735 | 11 s |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · chains en · 32k | rerun | 17 | 90.5 | 79.5 | 1136.6 | 16 | 5425 | 14062 | 74 s |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · chains en · 32k | rerun_8tasks | 8 | 84.7 | 81.5 | 1119.7 | 8 | 1228 | 13735 | 15 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains ru · 16k | default | 17 | 82.2 | 73.6 | 1168.8 | 4 | 4605 | 19260 | 64 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains ru · 16k | 8tasks | 8 | 83.2 | 74.0 | 1162.8 | 1 | 1922 | 19112 | 26 s |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · chains ru · 32k | rerun | 17 | 84.1 | 75.2 | 1153.4 | 1 | 5892 | 19260 | 80 s |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · chains ru · 32k | rerun_8tasks | 8 | 79.5 | 75.3 | 1150.5 | 1 | 2063 | 19112 | 27 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains zh · 16k | default | 17 | 92.6 | 78.6 | 1537.3 | 2 | 4964 | 38359 | 66 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains zh · 16k | 8tasks | 8 | 85.0 | 78.6 | 1530.4 | 2 | 1923 | 38141 | 23 s |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · chains zh · 32k | rerun | 17 | 85.3 | 77.9 | 1524.1 | 1 | 6501 | 38359 | 82 s |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · chains zh · 32k | rerun_8tasks | 8 | 87.0 | 81.3 | 1528.9 | 1 | 1061 | 38141 | 13 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · programs · 16k · v4_16k | default | 20 | 88.8 | 84.2 | 1802.7 | 19 | 6961 | 142558 | 81 s |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · programs · 32k · v4_32k_rerun | default | 20 | 91.2 | 83.3 | 1800.8 | 18 | 6795 | 142531 | 83 s |
 | Ripple-65B-Preview-Q6_K · chains en · 16k | default | 17 | 20.6 | 20.5 | 482.4 | 1 | 4684 | 12913 | 230 s |
-| Ripple-65B-Preview-Q6_K · programs · 16k · v4_16k | default | 5 | 13.7 | 13.7 | 371.5 | 1 | 12340 | 162764 | 901 s |
+| Ripple-65B-Preview-Q6_K · programs · 16k · v4_16k | default | 7 | 13.7 | 13.7 | 371.9 | 3 | 12358 | 162746 | 902 s |
 | deepseek-v4.1-flash · chains en · 16k | default | 17 | — | — | — | 0 | — | — | — |
 | deepseek-v4.1-flash · programs · 16k · v4_16k | default | 20 | — | — | — | 0 | — | — | — |
 | gemma-4-31B-it-UD-Q8_K_XL · chains en · 16k | default | 17 | 80.0 | 70.6 | — | 0 | 1473 | 13909 | 19 s |
