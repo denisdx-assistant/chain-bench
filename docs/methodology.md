@@ -229,3 +229,11 @@ stops with `finish=length` well below `max_tokens`. Two consequences:
 - a length stop at a number far below the budget means the window ended, not the
   budget: check `prompt_n + predicted_n` against the declared context first;
 - to give Ripple 32k of reasoning on programs it needs ~195k of context, not 175k.
+
+### Ripple program set: stopped at 7 of 20
+
+The set was stopped on purpose. Its prompt costs 162.8k tokens against a 175k
+window, so every task could only produce ~12.2k of reasoning before the window
+ended; five of the seven recorded tasks stopped exactly at that edge and two fell
+into a repetition loop. A 32k reasoning budget needs about 195k of context on this
+model. The summary reports what actually ran: `0/7 of 20 run`.

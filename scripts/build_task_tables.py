@@ -271,7 +271,19 @@ def summary():
             cells["t2"] = c2
             total_t += c2["t"]; total_ok += c2["ok"]; total_n += c2["n"]
         else:
-            cells["t2"] = None
+            # a set that was stopped early still reports what it actually ran
+            partial_programs = [r for r in g["programs"] if r.get("partial")]
+            if partial_programs:
+                seen = {}
+                for _r in partial_programs:
+                    seen.update(_r["tasks"])
+                ok_n = sum(1 for v in seen.values() if v[0] == OK)
+                t_n = sum(((v[2] if len(v) > 2 and v[2] is not None else v[1]) or 0)
+                          for v in seen.values())
+                cells["t2"] = {"t": t_n, "ok": ok_n, "n": len(seen),
+                               "partial_of": partial_programs[0]["expected"]}
+            else:
+                cells["t2"] = None
 
         budget = g["cfg"].get("budget", g["chains"][0]["budget"] if g["chains"] else g["programs"][0]["budget"])
         _tok = []
@@ -302,6 +314,8 @@ def summary():
                 m += " (%s only)" % "/".join(c.get("lang_list") or ["ru", "en", "zh"][:c["langs"]])
             elif c.get("subset"):
                 m += " (8)"
+            if c.get("partial_of"):
+                m += " of %d run" % c["partial_of"]
             return "%s %s" % (human(c["t"]), m)
         t, ok, n = r["overall"]
         overall = ("%s · %d%% err" % (human(t), round(100 * (n - ok) / n))) if n else "—"
