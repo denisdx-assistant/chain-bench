@@ -79,7 +79,7 @@ def _queue_depth(base, model):
         return 0
 
 
-def wait_for_queue(base, model, max_wait=900, step=60, log=print):
+def wait_for_queue(base, model, max_wait=None, step=None, log=print):
     """Yield the single model slot to other clients before sending a benchmark request.
 
     The server admits one request at a time, so a benchmark task holds the GPU for
@@ -88,6 +88,10 @@ def wait_for_queue(base, model, max_wait=900, step=60, log=print):
     """
     if os.environ.get("CHAIN_BENCH_POLITE", "1") == "0":
         return 0
+    if max_wait is None:
+        max_wait = int(os.environ.get("CHAIN_BENCH_POLITE_MAX", "900"))
+    if step is None:
+        step = int(os.environ.get("CHAIN_BENCH_POLITE_STEP", "60"))
     waited = 0
     while waited < max_wait:
         depth = _queue_depth(base, model)
