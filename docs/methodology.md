@@ -197,8 +197,6 @@ same note, so the comparison is not read as a property of the quantisation.
 > already reference it to change a question now. Read them as deliberate traps,
 > not as defects.
 
-The two tasks below ask about entities the document never lists.
-
 Two tasks ask about entities the document never lists: chain 11 (ship-15 vs
 ship-18) and chain 12 (heron-09, цапля-09). This is deliberate — both are
 determined by rules, not by records:
