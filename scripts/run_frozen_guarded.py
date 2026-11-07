@@ -176,6 +176,8 @@ def main():
                      "finish": out.get("finish"),
                      "reasoning_chars": out.get("reasoning_chars"),
                      "reasoning_tail": out.get("reasoning_tail"),
+                     "repeat_max": out.get("repeat_max"),
+                     "repeat_max": out.get("repeat_max"),
                      "raw": (out.get("content") or "")[:20000],
                      "raw_tail": (out.get("content") or "")[-800:],
                      "server_timings": out.get("timings"),

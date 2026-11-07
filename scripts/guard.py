@@ -209,7 +209,10 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
     except Exception as e:
         return {"error": str(e)[:150], "latency": time.time() - t0}
 
+    _joined = ''.join(content) + ''.join(reasoning)
     return {"content": ''.join(content), "loop": False, "timeout": False,
             "latency": time.time() - t0, "finish": finish,
             "timings": timings, "usage": usage,
-            "reasoning_chars": len(''.join(reasoning))}
+            "reasoning_chars": len(''.join(reasoning)),
+            "reasoning_tail": ''.join(reasoning)[-2000:],
+            "repeat_max": _loop_repeats(_joined)}

@@ -85,6 +85,8 @@ def main():
                      "raw_tail": (out.get("content") or "")[-400:],
                      "reasoning_chars": out.get("reasoning_chars"),
                      "reasoning_tail": out.get("reasoning_tail"),
+                     "repeat_max": out.get("repeat_max"),
+                     "repeat_max": out.get("repeat_max"),
                      "server_timings": out.get("timings")})
         _st = out.get("timings") or {}
         _sp = ""
