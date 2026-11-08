@@ -80,7 +80,7 @@
 | Qwen3.8-27B-UD-Q4_K_M · ctx 200k · no YaRN · T default · guard · 1 GPU · tuned for 3090 | 442m14s · 30% err | 4144 | 108m21s 12/17 | 93m16s 11/17 | 91m48s 12/17 | 22m14s 12/24 | 148m49s 15/20 |
 | Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default | 165m59s · 35% err | 4099 | 14m06s 13/17 | 13m30s 10/17 | 16m44s 12/17 | 20m11s 13/24 | 121m39s 11/20 |
 | Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · guard | 146m44s · 33% err | 4100 | 14m14s 11/17 | 14m45s 10/17 | 17m43s 11.5/17 | 15m10s 13/24 | 100m03s 15/20 |
-| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · budget 64 | 137m29s · 33% err | 6967 | 43m39s 12/17 | 56m48s 11/17 | 37m02s 11/17 | 22m50s 15/24 | 134m59s 0/11 of 20 run |
+| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · budget 64 | 137m29s · 33% err | 6967 | 43m39s 12/17 | 56m48s 11/17 | 37m02s 11/17 | 22m50s 15/24 | 157m32s 0/14 of 20 run |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · ctx 1M · YaRN · T 0.3 · pen 0.3 · guard | 131m36s · 37% err | 4899 | 24m51s 12/17 | 27m36s 11/17 | 31m10s 11/17 | 13m15s 15/24 | 47m59s 11/20 |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · T default · pen 0.2 · guard | 138m21s · 28% err | 5511 | 31m20s 11.5/17 | 27m22s 11/17 | 24m52s 12.5/17 | 18m21s 15.5/24 | 54m47s 16/20 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · T default · pen 0.2 · guard · 2 runs averaged | 155m06s · 27% err | 5211 | 34m18s 12.5/17 | 28m21s 11/17 | 33m41s 13.5/17 | 24m28s 15.5/24 | 58m46s 15/20 |
