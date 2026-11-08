@@ -28,7 +28,7 @@ def _shingles(text, n=8):
     return set(tuple(words[i:i + n]) for i in range(len(words) - n + 1))
 
 
-def _loop_repeats(text, n=8, window=8000):
+def _loop_repeats(text, n=8, window=8000, exclude=None):
     """How often the most repeated 8-word phrase occurs inside the recent tail.
 
     Counting over the whole stream is wrong: a long reasoning trace reuses stock
@@ -41,6 +41,9 @@ def _loop_repeats(text, n=8, window=8000):
     counts = {}
     for i in range(len(words) - n + 1):
         sh = tuple(words[i:i + n])
+        if exclude and sh in exclude:
+            # quoting the task text is not a loop: ignore sequences that come from the prompt
+            continue
         counts[sh] = counts.get(sh, 0) + 1
     return max(counts.values()) if counts else 0
 
@@ -104,6 +107,7 @@ def wait_for_queue(base, model, max_wait=None, step=None, log=print):
 
 def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
                 max_repeat=None, threshold_n=8, client='chain-bench', frequency_penalty=0.0, presence_penalty=0.0):
+    _prompt_sh = _shingles(prompt)
     if max_repeat is None:
         # a hosted model cannot hang a GPU, and max_tokens already bounds the bill,
         # so by default only the local endpoints abort on repetition
@@ -212,7 +216,7 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
             joined = ''.join(content) + ''.join(reasoning)
             if len(joined) - checked_at > 4000:
                 checked_at = len(joined)
-                if _loop_repeats(joined, threshold_n) >= max_repeat:
+                if _loop_repeats(joined, threshold_n, exclude=_prompt_sh) >= max_repeat:
                     r.close()
                     return {"content": ''.join(content), "loop": True, "timeout": False,
                             "latency": time.time() - t0, "finish": "loop",
@@ -220,7 +224,7 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
                             "reasoning_chars": len(''.join(reasoning)),
                             "reasoning_tail": ''.join(reasoning)[-2000:],
                             "reasoning_text": ''.join(reasoning),
-                            "repeat_max": _loop_repeats(''.join(content) + ''.join(reasoning))}
+                            "repeat_max": _loop_repeats(''.join(content) + ''.join(reasoning), exclude=_prompt_sh)}
     except urllib.error.HTTPError as e:
         return {"error": "HTTP %s" % e.code, "latency": time.time() - t0}
     except Exception as e:

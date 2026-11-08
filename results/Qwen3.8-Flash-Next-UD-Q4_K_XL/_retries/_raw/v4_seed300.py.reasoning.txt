@@ -1,0 +1,404 @@
+We need answer user's request: execute program mentally? Need final array and sum. We have huge code with many comments/traps. Need parse actual executable statements only. Need be careful. User asks in Russian: "Тест 2 v4: исполнить программу, назвать массив и сумму." They provide Python code. Need output strictly:
+ARRAY: [numbers, comma separated]
+SUM: number
+
+We need simulate program. It's long but many comments. Need identify actual statements affecting arr. Let's extract executable lines ignoring comments and strings? Code includes definitions, MANUAL string, TRAP variables (assignments to strings) not affecting arr. Then arr initial. Then many note/tmp/copy/code/label assignments reading arr but not modifying except maybe re.sub no effect. Then arr2 = arr alias. Then many comments. Actual executable statements after arr2 = arr? Need list all non-comment lines that modify arr or call functions. Also before arr2? There are assignments like note_0 = str(arr[7]) + str(arr[8]) etc no modification. tmp/copy/code/label no modification. Then arr2 = arr. Then comments. Then actual line: arr2[8] += 2 (since arr2 alias arr, modifies arr[8]). Then many comments. Then actual: arr[1], arr[8] = arr[8], arr[1]. Then comments. Then actual: arr2[6] += 1. Then comments. Then actual: arr.reverse(). Then comments. Then actual: arr[1] = int(t681) % 97, where t681 assigned earlier? Need track t681 = str(arr[2]) + str(arr[9]) at some point after first reverse? Let's locate. There is line t681 = str(arr[2]) + str(arr[9]) after arr.reverse() and many comments. Then later arr[1] = int(t681) % 97. Need compute based on arr state at t681 assignment, not later? t681 string fixed. Then actual: arr[9] += 2. Then actual: arr[1], arr[1] = arr[1], arr[1] (no effect). Then actual: arr[0] += 2. Then actual: apply_twice(arr, 0, 2) -> bump twice => arr[0]+=4. Then actual: t494 = str(arr[2]) + str(arr[6]) after apply_twice? Need locate: line t494 = str(arr[2]) + str(arr[6]) appears after apply_twice and many comments. Then actual: arr[8] = int(t494) % 97. Then actual: arr[4] = acc(arr, 6) % 100. Then actual: arr[9] = acc(arr, 7) % 100. Then actual: arr[1] += 6. Then actual: arr[0:3] = sorted(arr[0:3]). Then actual: arr[8] -= 3. Then actual: arr.reverse(). Then actual: arr[5] -= 3. Then actual: arr[2] += 5. Then actual: t168 = str(arr[8]) + str(arr[8]) after second reverse? Need locate: t168 = str(arr[8]) + str(arr[8]) appears after arr[2] += 5? Let's check sequence near end:
+...
+arr.reverse()
+# comments
+arr[5] -= 3
+# comments
+arr[2] += 5
+# comments
+t168 = str(arr[8]) + str(arr[8])
+# comments
+arr[5] = int(t168) % 97
+...
+Then final print.
+
+Need also consider functions acc, bump, bump_all, mix, apply_twice defined but only apply_twice called? Maybe no other calls. Need ensure no hidden executable lines in strings? MANUAL and TRAP are just variables. Comments start with #. Need ignore all lines starting with #. But there are actual assignments like note_0 = ... not comments. They don't modify arr. Need track arr modifications only.
+
+Let's reconstruct initial arr: [20, 12, 12, 1, 16, 12, 17, 27, 29, 14]
+Indices 0..9.
+
+Before arr2 = arr, no modifications? There are many tmp/copy/code reading arr but no assignments to arr. Need check if any line like arr[?] =? before arr2? I see none except definitions and initial arr. The MANUAL string not executed. TRAP variables strings. So arr unchanged until after arr2 = arr.
+
+Let's list actual executable statements in order after initial definitions and arr creation, excluding comments and non-modifying assignments? Need include t681, t494, t168 assignments because they capture values. Also apply_twice call.
+
+I'll scan code from top after arr = ...:
+- note_0 = str(arr[7]) + str(arr[8]) (no mod)
+... many no mod.
+- arr2 = arr
+- # comments...
+- arr2[8] += 2   (mod)
+- # comments...
+- arr[1], arr[8] = arr[8], arr[1] (mod)
+- # comments...
+- arr2[6] += 1 (mod)
+- # comments...
+- arr.reverse() (mod)
+- # comments...
+- t681 = str(arr[2]) + str(arr[9]) (capture)
+- # comments...
+- arr[1] = int(t681) % 97 (mod)
+- # comments...
+- arr[9] += 2 (mod)
+- # comments...
+- arr[1], arr[1] = arr[1], arr[1] (no effect but assignment)
+- # comments...
+- arr[0] += 2 (mod)
+- # comments...
+- apply_twice(arr, 0, 2) (mod +4 to arr[0])
+- # comments...
+- t494 = str(arr[2]) + str(arr[6]) (capture)
+- # comments...
+- arr[8] = int(t494) % 97 (mod)
+- # comments...
+- arr[4] = acc(arr, 6) % 100 (mod)
+- # comments...
+- arr[9] = acc(arr, 7) % 100 (mod)
+- # comments...
+- arr[1] += 6 (mod)
+- # comments...
+- arr[0:3] = sorted(arr[0:3]) (mod)
+- # comments...
+- arr[8] -= 3 (mod)
+- # comments...
+- arr.reverse() (mod)
+- # comments...
+- arr[5] -= 3 (mod)
+- # comments...
+- arr[2] += 5 (mod)
+- # comments...
+- t168 = str(arr[8]) + str(arr[8]) (capture)
+- # comments...
+- arr[5] = int(t168) % 97 (mod)
+- # comments...
+- final print.
+
+Need verify no other actual statements like bump_all? No calls. mix? no. Need check if any line not comment but maybe `#` after code? All comments start with #. There are lines like `# отладка: запись 944 обработана, изменений нет` etc. Ignore.
+
+Need simulate carefully.
+
+Let's do step by step with indices.
+
+Initial A = [20,12,12,1,16,12,17,27,29,14]
+
+Step 1: arr2[8] += 2. arr2 alias arr. A[8]=31.
+A = [20,12,12,1,16,12,17,27,31,14]
+
+Step 2: arr[1], arr[8] = arr[8], arr[1]. Python evaluates RHS first: (A[8]=31, A[1]=12), then assign A[1]=31, A[8]=12.
+A = [20,31,12,1,16,12,17,27,12,14]
+
+Step 3: arr2[6] += 1. A[6]=18.
+A = [20,31,12,1,16,12,18,27,12,14]
+
+Step 4: arr.reverse(). Reverse list in place. Original indices 0..9 become reversed: [14,12,27,18,12,16,1,12,31,20]? Let's compute: before reverse: index0 20,1 31,2 12,3 1,4 16,5 12,6 18,7 27,8 12,9 14. Reverse -> [14,12,27,18,12,16,1,12,31,20]. Yes.
+A = [14,12,27,18,12,16,1,12,31,20]
+
+Step 5: t681 = str(arr[2]) + str(arr[9]). A[2]=27, A[9]=20 => "2720". int=2720. %97? Need compute later. 97*28=2716, remainder 4. So arr[1] = 4.
+Step 6: arr[1] = int(t681) % 97 = 4.
+A = [14,4,27,18,12,16,1,12,31,20]
+
+Step 7: arr[9] += 2 => A[9]=22.
+A = [14,4,27,18,12,16,1,12,31,22]
+
+Step 8: arr[1], arr[1] = arr[1], arr[1] no effect.
+
+Step 9: arr[0] += 2 => A[0]=16.
+A = [16,4,27,18,12,16,1,12,31,22]
+
+Step 10: apply_twice(arr,0,2): bump twice => arr[0]+=4 => A[0]=20.
+A = [20,4,27,18,12,16,1,12,31,22]
+
+Step 11: t494 = str(arr[2]) + str(arr[6]). A[2]=27, A[6]=1 => "271". int=271. %97: 97*2=194, remainder 77. (97*3=291 too high). So arr[8]=77.
+Step 12: arr[8] = 77.
+A = [20,4,27,18,12,16,1,12,77,22]
+
+Step 13: arr[4] = acc(arr,6) % 100. acc(a,n) returns sum of first n elements? It recursively a[n-1]+acc(a,n-1), n<=0 0. So sum indices 0..5. Current A[0:6] = [20,4,27,18,12,16]. Sum = 20+4=24, +27=51, +18=69, +12=81, +16=97. %100 = 97. A[4]=97.
+A = [20,4,27,18,97,16,1,12,77,22]
+
+Step 14: arr[9] = acc(arr,7) % 100. Sum first 7 indices 0..6: [20,4,27,18,97,16,1]. Sum: 20+4=24, +27=51, +18=69, +97=166, +16=182, +1=183. %100 = 83. A[9]=83.
+A = [20,4,27,18,97,16,1,12,77,83]
+
+Step 15: arr[1] += 6 => A[1]=10.
+A = [20,10,27,18,97,16,1,12,77,83]
+
+Step 16: arr[0:3] = sorted(arr[0:3]). Slice first three [20,10,27] sorted [10,20,27]. Assign to indices 0..2.
+A = [10,20,27,18,97,16,1,12,77,83]
+
+Step 17: arr[8] -= 3 => A[8]=74.
+A = [10,20,27,18,97,16,1,12,74,83]
+
+Step 18: arr.reverse(). Reverse current: [83,74,12,1,16,97,18,27,20,10]? Let's compute: before indices 0 10,1 20,2 27,3 18,4 97,5 16,6 1,7 12,8 74,9 83. Reverse -> [83,74,12,1,16,97,18,27,20,10]. Yes.
+A = [83,74,12,1,16,97,18,27,20,10]
+
+Step 19: arr[5] -= 3 => A[5]=94.
+A = [83,74,12,1,16,94,18,27,20,10]
+
+Step 20: arr[2] += 5 => A[2]=17.
+A = [83,74,17,1,16,94,18,27,20,10]
+
+Step 21: t168 = str(arr[8]) + str(arr[8]). A[8]=20 => "2020". int=2020. %97? 97*20=1940, remainder 80. (97*21=2037 too high). So arr[5] = 80.
+Step 22: arr[5] = int(t168) % 97 = 80.
+A = [83,74,17,1,16,80,18,27,20,10]
+
+Final sum: 83+74=157; +17=174; +1=175; +16=191; +80=271; +18=289; +27=316; +20=336; +10=346. Sum 346.
+
+Need ensure no other actual statements hidden: There are lines like `arr[1], arr[8] = arr[8], arr[1]` yes. `arr2[8] += 2`, `arr2[6] += 1`. What about `arr2 = arr` after some modifications? It's alias. Later there is another `arr2 = arr` in comments? I saw line `arr2 = arr` near middle after many comments? Let's search mentally: In code after many comments: `# архив: arr[2] *= 36 — не выполняется
+arr2 = arr
+# ревизия...` There is an actual line `arr2 = arr` again. It doesn't modify. But could it be after some modifications? It just rebinds arr2 to same list. No effect. Need ensure no actual statements like `arr[1], arr[8] = arr[8], arr[1]` only once? There are many commented versions with `#`. Need distinguish actual lines not starting with #. In the huge text, actual lines are not indented? They appear at column 0. Comments start with #. We need scan for any non-comment line we missed. Let's systematically parse from initial arr to end.
+
+The code after initial arr:
+```
+arr = [20, 12, 12, 1, 16, 12, 17, 27, 29, 14]
+
+note_0 = str(arr[7]) + str(arr[8])
+...
+tmp_799 = arr[6] + 8
+
+arr2 = arr
+# отладка...
+...
+# пометка: arr2[1] = 19 — не выполняется
+arr2[8] += 2
+# временная запись...
+...
+# замечание: arr[1] += 93 — не выполняется
+arr[1], arr[8] = arr[8], arr[1]
+# проверено...
+...
+# черновик: arr[7] *= 4 — не выполняется
+arr2[6] += 1
+# временная запись...
+...
+# архив: arr[2] *= 36 — не выполняется
+arr2 = arr
+# ревизия...
+...
+# проверено: arr[9] *= 78 — не выполняется
+arr.reverse()
+# пометка...
+...
+# примечание: запись 932 обработана, изменений нет
+t681 = str(arr[2]) + str(arr[9])
+# архив...
+...
+# замечание: arr[1] += 94 — не выполняется
+arr[1] = int(t681) % 97
+# черновик...
+...
+# проверено: запись 742 обработана, изменений нет
+arr[9] += 2
+# справка...
+...
+# примечание: arr[1] += 2 — не выполняется
+arr[1], arr[1] = arr[1], arr[1]
+# проверено...
+...
+# временная запись: запись 40 обработана, изменений нет
+arr[0] += 2
+# проверено...
+...
+# примечание: запись 389 обработана, изменений нет
+apply_twice(arr, 0, 2)
+# отладка...
+...
+# замечание: запись 571 обработана, изменений нет
+t494 = str(arr[2]) + str(arr[6])
+# справка...
+...
+# архив: arr[8] *= 21 — не выполняется
+arr[8] = int(t494) % 97
+# черновик...
+...
+# ревизия: arr[4] = 74 — не выполняется
+arr[4] = acc(arr, 6) % 100
+# временная...
+...
+# черновик: arr[2] += 15 — не выполняется
+arr[9] = acc(arr, 7) % 100
+# ревизия...
+...
+# проверено: arr[2] += 48 — не выполняется
+arr[1] += 6
+# отладка...
+...
+# черновик: запись 998 обработана, изменений нет
+arr[0:3] = sorted(arr[0:3])
+# ревизия...
+...
+# примечание: arr[5] += 48 — не выполняется
+arr[8] -= 3
+# замечание...
+...
+# черновик: запись 914 обработана, изменений нет
+arr.reverse()
+# пометка...
+...
+# проверено: arr[7] *= 36 — не выполняется
+arr[5] -= 3
+# отладка...
+...
+# примечание: arr[2] += 52 — не выполняется
+arr[2] += 5
+# замечание...
+...
+# временная запись: запись 983 обработана, изменений нет
+t168 = str(arr[8]) + str(arr[8])
+# пометка...
+...
+# проверено: arr[2] += 39 — не выполняется
+arr[5] = int(t168) % 97
+# архив...
+...
+# временная запись: запись 983 обработана, изменений нет
+
+if __name__ == "__main__":
+    print("ARRAY:", arr)
+    print("SUM:", sum(arr))
+```
+
+Need check if there are actual assignments before arr2 = arr that modify arr? The many `note_0 = str(arr[7]) + str(arr[8])` etc no. But there are `copy_10 = arr[3]`, `tmp_11 = arr[5] + 49`, `code_12 = re.sub...` no. No `arr[...] =`. Good.
+
+Need consider Python tuple assignment `arr[1], arr[8] = arr[8], arr[1]` after arr2[8]+=2. We did.
+
+Need consider `arr2 = arr` after first reverse? Actually line `arr2 = arr` appears before first reverse? Let's locate: It appears after `# архив: arr[2] *= 36 — не выполняется` and before many comments, then later `arr.reverse()`. It is after `arr2[6] += 1` and before first `arr.reverse()`. It doesn't change. But note: arr2 already alias; reassign no effect.
+
+Need consider if any actual line `arr[1], arr[8] = arr[8], arr[1]` maybe appears after second `arr2 = arr`? We placed before arr2[6]+=1? Let's verify order from text:
+After first block comments:
+```
+# пометка: arr2[1] = 19 — не выполняется
+arr2[8] += 2
+# временная запись...
+...
+# замечание: arr[1] += 93 — не выполняется
+arr[1], arr[8] = arr[8], arr[1]
+# проверено...
+...
+# черновик: arr[7] *= 4 — не выполняется
+arr2[6] += 1
+# временная запись...
+...
+# архив: arr[2] *= 36 — не выполняется
+arr2 = arr
+# ревизия...
+...
+# проверено: arr[9] *= 78 — не выполняется
+arr.reverse()
+```
+Yes.
+
+Need ensure `arr2[6] += 1` after swap uses arr2 alias same list. We did.
+
+Now verify arithmetic and modulo.
+
+Let's recalc with possible alternative: t681 = str(arr[2]) + str(arr[9]) after first reverse. At that point A after reverse [14,12,27,18,12,16,1,12,31,20]. arr[2]=27 arr[9]=20 -> 2720. 2720 mod 97: 97*28=2716 rem4. Good.
+
+Then arr[1]=4. Then arr[9]+=2 -> 22. Then arr[0]+=2 -> from 14 to 16? Wait after reverse A[0]=14. Then arr[1]=4, arr[9]=22, arr[0]+=2 => 16. apply_twice +4 => 20. Good.
+
+t494 = str(arr[2]) + str(arr[6]) after apply_twice. At that point A: [20,4,27,18,12,16,1,12,31? Wait arr[8] before t494? Let's recalc from start carefully with all values including arr[8]. After step 2 swap: A[8]=12. Step 3 arr2[6]+=1: A[6]=18. Reverse: [14,12,27,18,12,16,1,12,31,20]? Wait reverse of [20,31,12,1,16,12,18,27,12,14] is [14,12,27,18,12,16,1,12,31,20]. Yes A[8]=31 (old index 1). Then arr[1]=4 -> [14,4,27,18,12,16,1,12,31,20]. arr[9]+=2 -> 22. arr[0]+=2 -> 16. apply_twice -> 20. So before t494: [20,4,27,18,12,16,1,12,31,22]. Wait earlier I had arr[8]=31 before setting to 77. Yes. t494 uses arr[2]=27 arr[6]=1 -> 271. arr[8]=77. Good.
+
+Then acc(arr,6) after arr[8]=77: first six [20,4,27,18,12,16] sum 97. A[4]=97. Then acc(arr,7) after A[4]=97: first seven [20,4,27,18,97,16,1] sum 183 -> 83. Good.
+
+Then arr[1]+=6 -> 10. sorted first three [20,10,27] -> [10,20,27]. A[8]-=3: A[8] currently 77? Wait after arr[8]=77, no changes to index8 except reverse later. Before reverse: [10,20,27,18,97,16,1,12,74? Let's recalc: after arr[9]=83: [20,4? Wait after arr[1]+=6: [20,10,27,18,97,16,1,12,77,83]. sorted -> [10,20,27,18,97,16,1,12,77,83]. arr[8]-=3 -> 74. Yes. Reverse -> [83,74,12,1,16,97,18,27,20,10]. Good.
+
+Then arr[5]-=3: index5=97 -> 94. arr[2]+=5: index2=12 -> 17. t168 uses arr[8]=20 -> 2020 mod97=80. arr[5]=80. Final [83,74,17,1,16,80,18,27,20,10]. Sum 346.
+
+Need check if `arr[5] -= 3` after reverse maybe index5 is 97? Yes. Then later arr[5] overwritten by 80. So the -3 had no final effect except maybe if t168? t168 uses arr[8], not arr[5]. So final arr[5]=80. Good.
+
+Need check if `arr[2] += 5` after reverse: index2=12 -> 17. Good.
+
+Potential hidden actual line: `arr[1], arr[8] = arr[8], arr[1]` maybe there are multiple? Search text: I see one actual line exactly `arr[1], arr[8] = arr[8], arr[1]` after many comments. There are commented versions with `#`. Good.
+
+Potential hidden actual line: `arr2[8] += 2` and `arr2[6] += 1`. Good.
+
+Potential hidden actual line: `arr.reverse()` twice. Good.
+
+Potential hidden actual line: `arr[9] += 2`. Good.
+
+Potential hidden actual line: `arr[0] += 2`. Good.
+
+Potential hidden actual line: `apply_twice(arr, 0, 2)`. Good.
+
+Potential hidden actual line: `arr[8] = int(t494) % 97`. Good.
+
+Potential hidden actual line: `arr[4] = acc(arr, 6) % 100`. Good.
+
+Potential hidden actual line: `arr[9] = acc(arr, 7) % 100`. Good.
+
+Potential hidden actual line: `arr[1] += 6`. Good.
+
+Potential hidden actual line: `arr[0:3] = sorted(arr[0:3])`. Good.
+
+Potential hidden actual line: `arr[8] -= 3`. Good.
+
+Potential hidden actual line: `arr[5] -= 3`. Good.
+
+Potential hidden actual line: `arr[2] += 5`. Good.
+
+Potential hidden actual line: `arr[5] = int(t168) % 97`. Good.
+
+Need consider if `t681 = str(arr[2]) + str(arr[9])` occurs before or after `arr.reverse()`? It is after first reverse. Yes.
+
+Need consider if `t494 = str(arr[2]) + str(arr[6])` occurs after apply_twice but before arr[8] assignment. Yes.
+
+Need consider if `t168 = str(arr[8]) + str(arr[8])` occurs after second reverse and arr[2]+=5. Yes.
+
+Could there be actual line `arr[1] = int(t681) % 97` before `arr[9] += 2`? Yes. We did.
+
+Need maybe compute sum of final array using Python mental: 83+74=157, +17=174, +1=175, +16=191, +80=271, +18=289, +27=316, +20=336, +10=346. Good.
+
+Need output strictly as requested:
+ARRAY: [83, 74, 17, 1, 16, 80, 18, 27, 20, 10]
+SUM: 346
+
+Need ensure format: "ARRAY: [numbers, comma separated]" They likely expect spaces after commas? Example print would be `ARRAY: [83, 74, 17, 1, 16, 80, 18, 27, 20, 10]`. Use that.
+
+Double-check no effect from `bump_all` or `mix` not called. No.
+
+Let's maybe simulate with a smaller script mentally? Could there be issue with `acc(arr, 6)` after arr[4] assignment? It uses current arr including arr[4]=97? Wait order: arr[4] = acc(arr,6) %100. The RHS acc(arr,6) is evaluated before assignment to arr[4]. It sums first 6 elements of current arr before modifying index4. Current before: [20,4,27,18,12,16,1,12,77,22]. Sum first 6 = 97. Then assign arr[4]=97. Good.
+
+Then arr[9] = acc(arr,7) %100. RHS evaluated before assignment to arr[9]. Current after arr[4]=97: [20,4,27,18,97,16,1,12,77,22]. Sum first 7 = 183. Assign arr[9]=83. Good.
+
+What about `apply_twice(arr, 0, 2)` uses bump function: a[i] += v twice. Yes +4.
+
+Potential issue: `arr[1], arr[8] = arr[8], arr[1]` after `arr2[8] += 2`: initial A[8]=31, A[1]=12. Swap -> A[1]=31, A[8]=12. Good.
+
+Potential issue: `arr2[6] += 1` after swap: A[6]=17? Wait initial A[6]=17. Did any previous modifications affect index6? No. After swap index6 still 17. +1 = 18. Good.
+
+Reverse: Let's re-evaluate pre-reverse list after step3:
+Initial [20,12,12,1,16,12,17,27,29,14]
++2 at 8 -> [20,12,12,1,16,12,17,27,31,14]
+swap 1 and 8 -> [20,31,12,1,16,12,17,27,12,14]
++1 at 6 -> [20,31,12,1,16,12,18,27,12,14]
+reverse -> [14,12,27,18,12,16,1,12,31,20]. Yes.
+
+Then t681 uses index2=27 index9=20. Good.
+
+After arr[1]=4: [14,4,27,18,12,16,1,12,31,20]
+arr[9]+=2: [14,4,27,18,12,16,1,12,31,22]
+arr[0]+=2: [16,4,...]
+apply +4: [20,4,...]
+Good.
+
+Before t494: [20,4,27,18,12,16,1,12,31,22]. Wait arr[8] is 31 not 77 yet. Yes.
+t494 = "27" + "1" = "271". arr[8]=77. Good.
+
+Before acc6: [20,4,27,18,12,16,1,12,77,22]. Sum first 6=97. arr[4]=97.
+Before acc7: [20,4,27,18,97,16,1,12,77,22]. Sum first 7=183. arr[9]=83.
+Then arr[1]+=6: [20,10,...]
+sorted first 3: [10,20,27]
+arr[8]-=3: 74.
+Reverse: [83,74,12,1,16,97,18,27,20,10]. Wait after sorted and arr[8]-=3 list: [10,20,27,18,97,16,1,12,74,83]. Reverse -> [83,74,12,1,16,97,18,27,20,10]. Yes.
+arr[5]-=3: index5 97 -> 94.
+arr[2]+=5: index2 12 -> 17.
+t168 uses index8=20 -> "2020" mod97=80. arr[5]=80. Final [83,74,17,1,16,80,18,27,20,10]. Good.
+
+Need maybe consider integer conversion of t681: str(arr[2]) + str(arr[9]) could be "2720". int % 97 = 4. Good.
+
+Could there be any actual line `arr[1], arr[1] = arr[1], arr[1]` that somehow triggers something? No.
+
+Need final answer only. Ensure no extra explanation. Final in Russian? Strict format. Use English labels as requested.
+
+Let's produce final.
