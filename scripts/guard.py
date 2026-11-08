@@ -39,13 +39,25 @@ def _loop_repeats(text, n=8, window=8000, exclude=None):
     if len(words) < n * 4:
         return 0
     counts = {}
+    total = 0
     for i in range(len(words) - n + 1):
         sh = tuple(words[i:i + n])
         if exclude and sh in exclude:
             # quoting the task text is not a loop: ignore sequences that come from the prompt
             continue
         counts[sh] = counts.get(sh, 0) + 1
-    return max(counts.values()) if counts else 0
+        total += 1
+    if not counts or not total:
+        return 0
+    top = max(counts.values())
+    # A loop recycles a handful of phrases, so its repeated shingle is a large share of
+    # all DISTINCT shingles. Prose that repeats a stock phrase while doing real work has
+    # thousands of distinct shingles and a tiny share.
+    if os.environ.get("CHAIN_BENCH_LOOP_RATIO"):
+        min_ratio = float(os.environ["CHAIN_BENCH_LOOP_RATIO"])
+    else:
+        min_ratio = 0.10
+    return top if (top / len(counts)) >= min_ratio else 0
 
 
 def _watch_queue(base, model, stop, stall):
