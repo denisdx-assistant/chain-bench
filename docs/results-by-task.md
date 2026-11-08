@@ -28,7 +28,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-Flash-Next-UD-IQ4_XS · ru · 16k · default | 34s ✓ | 85s ✗ | 9s ✓ | 8s ✓ | 7s ✓ | 6s ✓ | 170s ✗ | 13s ✓ | 150s ✗ | 39s ✓ | 102s ✓ | 234s ✓ | 262s ✗ | 163s ✗ | 90s ✓ | 106s ✓ | 106s ✗ | 11/17 |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · ru · 64k · rerun | 30s ✓ | 107s ✗ | 8s ✓ | 7s ✓ | 7s ✓ | 7s ✓ | 158s ✗ | 29s ✓ | 102s ✗ | 22s ✓ | 164s ✓ | 351s ✓ | 179s ✗ | 261s ✗ | 69s ✓ | 68s ✓ | 131s ✗ | 11/17 |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · zh · 16k · default | 45s ✓ | 91s ✓ | 19s ✓ | 24s ✓ | 19s ✓ | 17s ✓ | 239s ✓ | 29s ✓ | 82s ✓ | 37s ✓ | 80s ✗ | 133s ✗ | 171s ✗ | 144s ✓ | 117s ✓ | 141s ✓ | 229s ✗ | 13/17 |
-| Qwen3.8-Flash-Next-UD-IQ4_XS · zh · 64k · rerun | 54s ✓ | 33s ✗ | 10s ✓ | 9s ✓ | 10s ✓ | 11s ✓ | 116s ✗ | 19s ✓ | 94s ✗ | 12s ✓ | 19s ✓ | 71s ✓ | 273s ✗ | · | · | · | · | 9/13 (partial 13/17) |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · zh · 64k · rerun | 54s ✓ | 33s ✗ | 10s ✓ | 9s ✓ | 10s ✓ | 11s ✓ | 116s ✗ | 19s ✓ | 94s ✗ | 12s ✓ | 19s ✓ | 71s ✓ | 273s ✗ | 116s ✓ | 42s ✓ | 140s ✓ | 338s ✗ | 12/17 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · en · 16k · default | 44s ✓ | 195s ✓ | 16s ✓ | 15s ✓ | 16s ✓ | 16s ✓ | 153s ✓ | 17s ✓ | 119s ✗ | 35s ✓ | 99s ✗ | 328s ✗ | 242s ✗ | 168s ✓ | 67s ✓ | 40s ✓ | 401s ✓ | 13/17 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · en · 32k · rerun | 42s ✓ | 151s ✓ | 16s ✓ | 16s ✓ | 17s ✓ | 16s ✓ | 122s ✓ | 17s ✓ | 106s ✗ | 26s ✓ | 76s ✗ | 412s L | 269s ✗ | 313s ✓ | 114s ✓ | 86s ✓ | 347s ✗ | 12/17 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · ru · 16k · default | 65s ✓ | 124s ✗ | 21s ✓ | 11s ✓ | 13s ✓ | 10s ✓ | 134s ✗ | 23s ✓ | 145s ✗ | 24s ✓ | 127s ✓ | 297s ✓ | 210s ✗ | 248s ✗ | 71s ✓ | 55s ✓ | 195s ✗ | 11/17 |
@@ -61,7 +61,9 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · ru · 32k · guarded_8tasks | 26s ✓ | 10s ✓ | 7s ✓ | 8s ✓ | 41s ✗ | 52s ✗ | 47s ✗ | 109s ✓ | 5/8 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · zh · 32k · guarded_8tasks | 31s ✓ | 13s ✓ | 9s ✓ | 8s ✓ | 56s ✗ | 35s ✗ | 43s ✗ | 79s ✓ | 5/8 |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · en · 16k · 8tasks | 57s ✓ | 12s ✓ | 13s ✓ | 12s ✓ | 28s ✗ | 22s ✓ | 71s ✗ | 233s ✗ | 5/8 |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · en · 64k · rerun_8tasks | 19s ✓ | 14s ✓ | 13s ✓ | 12s ✓ | · | · | · | · | 4/4 (partial 4/8) |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · ru · 16k · 8tasks | 26s ✓ | 12s ✓ | 7s ✓ | 6s ✓ | 39s ✗ | 40s ✗ | 52s ✗ | 156s ✓ | 5/8 |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · ru · 64k · rerun_8tasks | 22s ✓ | 10s ✓ | 7s ✓ | 7s ✓ | 42s ✗ | 36s ✓ | 62s ✗ | 52s ✓ | 6/8 |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · zh · 16k · 8tasks | 26s ✓ | 19s ✓ | 17s ✓ | 16s ✓ | 41s ✗ | 47s ✗ | 93s ✗ | 124s ✓ | 5/8 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · en · 16k · 8tasks | 19s ✓ | 16s ✓ | 15s ✓ | 16s ✓ | 87s ✗ | 28s ✗ | 76s ✗ | 294s ✗ | 4/8 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · en · 32k · rerun_8tasks | 23s ✓ | 16s ✓ | 16s ✓ | 17s ✓ | 129s ✗ | 31s ✓ | 51s ✗ | 339s ✗ | 5/8 |

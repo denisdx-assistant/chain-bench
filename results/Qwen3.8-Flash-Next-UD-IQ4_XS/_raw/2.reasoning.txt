@@ -1,65 +1,17 @@
-We need answer user's question in Chinese likely. Need parse messy file. Need compute: “重载-2”比 33 号船多载多少吨？只回答一个整数。
+We need answer user's question. Need parse document. It's a long noisy text with repeated notes, many irrelevant records. Question: "By how many tonnes does "heavylift-2" carry more than ship-33? Answer with a single integer."
 
-We need identify relevant records. There is a lot of noise. Need determine ship capacities? "重载-2" is alias for 25号船: "25 号船也被称为“重载-2”。" Need compare load of ship 25 (aka 重载-2) and ship 33. Need compute based on rules and baseline. There are conflicting baselines? Need infer current calculation maybe latest? Let's inspect relevant statements:
+We need extract relevant facts:
+- Base cargo capacity of a ship is 40 tonnes.
+- Ships with numbers divisible by five have a capacity 6 tonnes above the base.
+- Ships with numbers divisible by seven have a capacity 4 tonnes below the base.
+- Ship-33 matches neither rule.
+- Ship-25 is also called "heavylift-2".
+Need compute capacity of heavylift-2 (Ship-25) and ship-33, difference.
 
-- "编号能被五整除的船，载重比基准高 10 吨。"
-- "若船舶同时符合两条规则，只适用五的倍数规则。"
-- "编号能被七整除的船，载重比基准低 4 吨。"
-- "编号能被三整除的船，载重比基准低 4 吨。"
-- "船舶的基准载重为 50 吨。"
-- "船舶的基准载重为 40 吨。"
-- "33 号船不符合任何规则。"
-- "52 号船不符合任何规则。"
-- "25 号船也被称为“重载-2”。"
+Ship-25 number 25 divisible by five? yes. Not divisible by seven. Capacity = base 40 + 6 = 46 tonnes.
+Ship-33: number 33 divisible by five? no. Divisible by seven? no (7*4=28, 7*5=35). Matches neither rule => base capacity 40 tonnes.
+Difference = 46 - 40 = 6 tonnes. Answer single integer: 6.
 
-Question: “重载-2”比 33 号船多载多少吨？ Only integer.
+Need ensure no conflicting info: "The base cargo capacity of a ship is 40 tonnes." yes. "Ship-33 matches neither rule." yes. "Ship-25 is also called 'heavylift-2'." yes. Rules: divisible by five +6, divisible by seven -4. If both? not relevant. Could there be earlier/later base altitude? irrelevant. Need final only integer likely. But ensure no hidden trap: "heavylift-2" maybe ship-25, number 25 divisible by 5, capacity 46. Ship-33 neither rule, capacity 40. Difference 6.
 
-Need determine baseline load. There are two baseline statements: 50 and 40. Which applies? Need maybe latest record? The file includes general notes: "文件中还包含关于审批顺序、准备时间和参与人员的一般说明。部分记录涉及较早时期，不影响当前计算。" Repeated. Could indicate some records are earlier and don't affect current calculation. Need identify current baseline maybe last occurrence? There are two "船舶的基准载重为 50 吨。" and later "船舶的基准载重为 40 吨。" Which is current? Need infer from order? The file is a sequence of records. Usually in these tasks, if conflicting general rules, later record overrides earlier? But note says some records involve earlier period, not affect current calculation. Need maybe use latest baseline? Let's examine order:
-
-... "编号能被五整除的船，载重比基准高 10 吨。" appears after many variable lines. Then "汉斯 将 variable723 比较..." etc. Later "编号能被七整除的船，载重比基准低 4 吨。" Later "船舶的基准载重为 50 吨。" appears after "73 号涡轮机..."? Let's locate:
-- "编号能被五整除的船，载重比基准高 10 吨。" near after "彼得 减少 后将结果记入日志。"
-- "编号能被七整除的船，载重比基准低 4 吨。" after variable652 etc.
-- "船舶的基准载重为 50 吨。" after "73 号涡轮机比 70 号多输出 5 兆瓦。" and before "指标 variable279..."
-- "船舶的基准载重为 40 吨。" after "帖木儿 减少 后将结果记入汇总表。"? Let's scroll: near end: "帖木儿 减少 后将结果记入汇总表。
-40 号苍鹭在 20 米的高度飞行。
-罗莎 将 variable503 标记 了 6 个单位。
-帖木儿 重新计算 后将结果记入台账。
-船舶的基准载重为 40 吨。
-72 号涡轮机比 70 号少输出 25 兆瓦。"
-So baseline 40 appears later than baseline 50. If later overrides, baseline = 40.
-
-But need consider "部分记录涉及较早时期，不影响当前计算" maybe indicates earlier period records not affect current calculation. Which baseline is earlier? Could be 50 earlier, 40 later current. Or maybe 40 is earlier? Need order: 50 appears before 40, so 40 later. Usually latest record is current. But there are also repeated general notes at beginning and end, not relevant.
-
-Need compute ship 25: number divisible by 5 => load = baseline + 10. If baseline 40 => 50. Ship 33: "33 号船不符合任何规则." Does that mean load = baseline? It says doesn't meet any rule, so no adjustment, load = baseline = 40. Difference = 10. If baseline 50 => ship25=60, ship33=50, difference=10. Difference independent of baseline if both use same baseline and 33 baseline. So answer 10. Need ensure if "不符合任何规则" means not subject to any rule but still baseline? Yes.
-
-But there is also "若船舶同时符合两条规则，只适用五的倍数规则。" 25 divisible by 5 only? 25 not divisible by 7 or 3. So +10. 33 divisible by 3, but explicit "33 号船不符合任何规则." Contradiction? Rule says numbers divisible by three load lower by 4. But explicit record says 33 doesn't meet any rules. Which overrides? Need parse: "编号能被三整除的船，载重比基准低 4 吨。" and "33 号船不符合任何规则." If 33 is divisible by 3, but record says it doesn't meet any rule. Could be exception: specific record overrides general rule? Need determine. If 33 follows divisible by 3, load = baseline -4. Then difference = (baseline+10) - (baseline-4) = 14. If explicit "不符合任何规则" means no adjustment, difference=10. Which is intended? Need analyze wording: "33 号船不符合任何规则。" This is a record about ship 33. It likely means it does not satisfy any of the numeric rules? But mathematically 33 divisible by 3, so contradiction. In these synthetic tasks, explicit statements can override general rules? Need infer from patterns.
-
-Question: “重载-2”比 33 号船多载多少吨？ Need use aliases and rules. There are statements:
-- "编号能被五整除的船，载重比基准高 10 吨。"
-- "若船舶同时符合两条规则，只适用五的倍数规则。"
-- "编号能被七整除的船，载重比基准低 4 吨。"
-- "编号能被三整除的船，载重比基准低 4 吨。"
-- "33 号船不符合任何规则。"
-- "52 号船不符合任何规则。"
-
-Why include "33 号船不符合任何规则"? It may be a distractor or to clarify that despite number divisible by 3? But if it says doesn't meet any rules, then for 33 no adjustment. But if general rule says divisible by 3, it does meet. Could be that "不符合任何规则" means not subject to any special rule (maybe because it's an exception). In logic puzzles, specific fact overrides general rule? Need decide.
-
-Let's inspect similar tasks? They often have noisy records, aliases, rules, exceptions. The phrase "33 号船不符合任何规则。" likely means when calculating ship 33, do not apply any of the numeric divisibility rules; its load is baseline. It may be included to resolve ambiguity for 33 (divisible by 3) and maybe 52 (divisible by? 52 divisible by? not 5,7,3; but divisible by 4? car rule not ship). For 52, it doesn't meet any ship rules anyway. For 33, it would meet divisible by 3, but explicit says no rules. So likely use baseline for 33. Difference 10.
-
-But need consider "重载-2" alias: 25号船. 25 divisible by 5 => +10. If 33 no rules => baseline. Difference = 10. If 33 divisible by 3 => -4, difference = 14. Which answer expected? Need evaluate from wording: "33 号船不符合任何规则。" In Chinese, "does not conform to any rule" could mean it is not affected by any rule. So yes baseline.
-
-Need also consider baseline conflict: if 33 no rules and 25 +10, difference independent of baseline. Good.
-
-Need answer only integer. Final should be "10". But ensure no hidden rule: "若船舶同时符合两条规则，只适用五的倍数规则。" 25 only five. 33 divisible by 3 but explicit no rules. If explicit not considered rule? It is a record. Could be "不符合任何规则" means it doesn't satisfy any of the conditions (divisible by 5,7,3) — false. But maybe numbers are IDs not necessarily numeric? No, 33 is numeric. Could be "规则" refers to some other rules? But likely exception.
-
-Need maybe compute using latest baseline? Difference unaffected. Need only integer.
-
-Double-check if "重载-2" could be alias for 25号船, but maybe "25 号船也被称为“重载-2”。" yes.
-
-Could there be another "重载-2"? No.
-
-Could ship load baseline be different for different ships? "船舶的基准载重为 50 吨" and "40 吨". If one is earlier not current. But difference unaffected if both same baseline. Unless 33 no rules means maybe no baseline? No, load = baseline.
-
-Could "33 号船不符合任何规则" mean it doesn't meet any rule, so maybe its load is not defined? But question expects integer; likely baseline.
-
-Need final only integer. Ensure no extra. final: 10.
+Need final concise single integer.
