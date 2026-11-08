@@ -577,6 +577,82 @@
    "expected_array": "[21, 15, 6, 11, 31, 18, 18, 19, 12, 18]",
    "expected_sum": 169,
    "error": null
+  },
+  {
+   "file": "v4_seed315.py",
+   "ok": false,
+   "kind": "wrong",
+   "arr_ok": false,
+   "sum_ok": false,
+   "latency_s": 778.4,
+   "finish": "stop",
+   "reasoning_chars": 171013,
+   "reasoning_tail": "erse, it would appear in the comment block after reverse as actual line, but I don't recall seeing actual line there; all lines after reverse start #. So slice before reverse. Good.\n\nNow maybe there is an actual line `arr[5:8] = sorted(arr[5:8])` *before* `bump_all`? If it were before bump_all, then after reverse final different and digit counts? Let's see source: The slice line appears near bottom after many comments, while bump_all appears much earlier (I saw it in middle before arr[6]+=8/s502). So no.\n\nPotential issue: `bump_all` adds 3 to even indices; if array length changes? No.\n\nLet's maybe compute if there were an actual line `arr[9] -= 6` hidden after bump_all but before s502; final sum would be different by -6? If present, source likely would have a short line. I can search the user message for non-comment lines containing `-=`: There is early `arr[5] -= 8`; maybe also `arr[9] -= 6`? In the prompt near lower part, I see a comment \"# поmetka: arr[9] *= 41 — ne execution\" and later actual \"arr[9] += 8\". No \"-=6\". The line \"arr[5] -= 8\" is one of few actual arithmetic assignments. If there were `arr[9] -= 6`, it would be in my extracted list; I didn't note it except memory doubt. Let's search visually: After `arr[5] *= 2`, the next actual line in prompt might be `bump_all(arr, 3)`. Between them are many comments. No -6. Good.\n\nLet's also check if there is actual line `arr[0] = int(t109) % 97` maybe before some tmp assignments? It appears after t109. yes.\n\nWhat about line `t851 = str(arr[3]) + str(arr[4])`: arr[4] is 7 but after bump_all later becomes 10; t851 computed before bump. Good.\n\nPotential issue: The string snapshots for digit counts use `''.join(str(x) for x in arr)`; if any arr element negative, `str(-6)` includes '-' not counted by `\\d`, length would reduce by 1 compared to digits? But no negatives except maybe if arr[5] -=8 from initial 12 positive; all values positive. Good.\n\nLet's final answer with exact format. Ensure no trailing spaces? Fine.\n",
+   "repeat_max": 0,
+   "raw": "ARRAY: [24, 5, 26, 16, 14, 10, 19, 17, 70, 19]\nSUM: 220",
+   "raw_tail": "ARRAY: [24, 5, 26, 16, 14, 10, 19, 17, 70, 19]\nSUM: 220",
+   "server_timings": {
+    "cache_n": 0,
+    "prompt_n": 142889,
+    "prompt_ms": 52489.9,
+    "prompt_per_token_ms": 0.367,
+    "prompt_per_second": 2722.2,
+    "predicted_n": 63339,
+    "predicted_ms": 725680.1,
+    "predicted_per_token_ms": 11.457,
+    "predicted_per_second": 87.3,
+    "draft_n": 40825,
+    "draft_n_accepted": 36192
+   },
+   "usage": {
+    "prompt_tokens": 142889,
+    "completion_tokens": 63339,
+    "total_tokens": 206228,
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    }
+   },
+   "expected_array": "[18, 2, 19, 18, 7, 16, 27, 32, 73, 18]",
+   "expected_sum": 230,
+   "error": null
+  },
+  {
+   "file": "v4_seed316.py",
+   "ok": false,
+   "kind": "wrong",
+   "arr_ok": false,
+   "sum_ok": false,
+   "latency_s": 341.8,
+   "finish": "stop",
+   "reasoning_chars": 70327,
+   "reasoning_tail": "r bump_all comments, line `arr[3] -= 6`, then many comments, then `arr[0], arr[5] = arr[5], arr[0]`. Yes we did.\n\nDouble-check line `arr[1] *= 2` occurs after swap; yes. If before swap would affect different element. Code: after swap comments, line `arr[1] *= 2`, then comments, `arr[8]-=9`, `arr[7]+=2`. Yes.\n\nDouble-check line `arr[8] -= 9`: index8 after bump_all was 2; yes becomes -7. Good.\n\nDouble-check `bump_all(arr, 1)` occurs before arr[3]-=6 and swaps; yes. It added to even indices based on current values: index0 28? Wait after step4 arr[5]=70 but index0 still 28? Let's re-evaluate order of first mutations: Step1 set index0=22, step2 no, step3 swap index0 and2 -> [28,26,22,...], step4 set index5=70 -> [28,26,22,1,26,70...]. Then bump_all adds to even indices: index0 29, index2 23, index4 27, index6 30, index8 2. Yes.\n\nIf `arr[5] = acc(arr,9)%100` after swap uses sum first9 including index5 old=11? We did. Good.\n\nCheck `acc(arr,9)` recursion: if n <=0 return 0; returns a[8]+a[7]+...+a[0]. Sum first 9 in order but same. For initial after step3 arr = [28,26,22,1,26,11,29,26,1,27]. Sum indices 0-8: 28+26=54; +22=76; +1=77; +26=103; +11=114; +29=143; +26=169; +1=170. Yes.\n\nCheck `arr[0] = acc(arr,7)` after initial: sum indices 0-6: 1+26+28+1+26+11+29 =? 1+26=27, +28=55, +1=56, +26=82, +11=93, +29=122. 122%100=22. Good.\n\nCheck sorted slice: [22,26,28] sorted same; if not same? yes ascending.\n\nNow possible hidden mutation in `TRAP` assignments? They are strings but variable names like TRAP_0 = \"arr[5] = 635\". No effect. The MANUAL string contains newlines with arr mutations but no exec. Good.\n\nPotential issue: There is a line `# поmetka: запис 748 ...` not code; no.\n\nNeed maybe output without spaces? User says `[numbers, comma separated]`; likely Python list format with spaces after commas acceptable? The print in program would be `ARRAY: [18, -7, 30, -5, 27, 29, 30, 23, 52, 27]` because Python prints list with space after comma. We'll match that.\n\nLet's just final.\n",
+   "repeat_max": 0,
+   "raw": "ARRAY: [18, -7, 30, -5, 27, 29, 30, 23, 52, 27]\nSUM: 224",
+   "raw_tail": "ARRAY: [18, -7, 30, -5, 27, 29, 30, 23, 52, 27]\nSUM: 224",
+   "server_timings": {
+    "cache_n": 0,
+    "prompt_n": 142899,
+    "prompt_ms": 52422.9,
+    "prompt_per_token_ms": 0.367,
+    "prompt_per_second": 2725.9,
+    "predicted_n": 25012,
+    "predicted_ms": 288963.7,
+    "predicted_per_token_ms": 11.553,
+    "predicted_per_second": 86.6,
+    "draft_n": 15424,
+    "draft_n_accepted": 13794
+   },
+   "usage": {
+    "prompt_tokens": 142899,
+    "completion_tokens": 25012,
+    "total_tokens": 167911,
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    }
+   },
+   "expected_array": "[27, 52, 25, 30, 38, 18, -10, 28, -7, 70]",
+   "expected_sum": 271,
+   "error": null
   }
  ]
 }
