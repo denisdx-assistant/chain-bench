@@ -1,0 +1,247 @@
+We need answer user's puzzle: execute program mentally? Need final array and sum. We have huge code with many dummy comments/labels/traps. Need parse actual executable statements affecting arr. Need be careful. Program defines functions, MANUAL string, TRAP constants (not executed except definitions). Then arr initial [27,9,9,24,3,14,16,29,5,9]. Then many assignments to variables code_0 etc reading arr but not modifying arr. Then actual executable statements interspersed among comments. Need identify all non-comment statements that modify arr or use functions affecting arr. Also variables t607, s148, t345, t556, s108 etc computed from current arr. Need simulate in order.
+
+We need produce final array and sum. Need ensure no hidden executed code: definitions, assignments to non-arr variables don't affect arr except reading. Comments starting # ignored. Strings MANUAL/TRAP not executed. There are function definitions acc, bump, bump_all, mix, apply_twice. mix not called? Need check calls: arr[4] = acc(arr,7)%100; arr[5] = int(t607)%97; arr[2]=len(re.findall(...))%50; arr[5]=acc(arr,7)%100; bump_all(arr,5) multiple times; apply_twice(arr,5,1); arr[9] -= 7; arr[9] -=6; arr[3],arr[4]=...; arr[2]+=3; arr[3]*=2; arr[2]+=2; arr[2]*=2; arr[1],arr[8]=arr[8],arr[1]; arr[6],arr[9]=arr[9],arr[6]; arr[9]=int(t345)%97; arr[3]=int(t556)%97; arr[1]=len(re.findall(r'\d', s108))%50; maybe bump_all calls. Need find all executable lines not comments. Let's extract from provided code.
+
+We need simulate exactly Python semantics. re imported. acc recursive sum first n elements? acc(a,n): if n<=0 return 0 else a[n-1]+acc(a,n-1). So sum of first n elements (indices 0..n-1). bump_all(a,v): for i in range(0,len(a),2): a[i]+=v. apply_twice(a,i,v): bump twice => a[i]+=2v.
+
+Important: Many lines like code_0 = re.sub(...) no effect on arr. tmp/copy/note/label no effect. Need ignore comments. Need identify actual statements after initial arr and before if __main__. Let's list in order with line numbers maybe. We can manually scan.
+
+Initial arr = [27, 9, 9, 24, 3, 14, 16, 29, 5, 9]
+
+Then many variable assignments reading arr. No modifications. Need note values of arr at certain computed strings:
+- t607 = str(arr[2]) + str(arr[5]) occurs after some modifications? Need locate. It appears after many comments and after arr[3] *= 2? Let's scan sequence of actual executable statements in order.
+
+I'll reconstruct from code:
+
+After initial arr, many assignments code_0... note_799. Then:
+
+arr[4] = acc(arr, 7) % 100
+# comments...
+arr[2] += 3
+# comments...
+arr[3] *= 2
+# comments...
+t607 = str(arr[2]) + str(arr[5])
+# comments...
+arr[5] = int(t607) % 97
+# comments...
+bump_all(arr, 5)
+# comments...
+arr[3], arr[4] = arr[4], arr[3]
+# comments...
+s148 = ''.join(str(x) for x in arr)
+# comments...
+arr[2] = len(re.findall(r'\d', s148)) % 50
+# comments...
+arr[5] = acc(arr, 7) % 100
+# comments...
+arr[9] -= 7
+# comments...
+arr[9] -= 6
+# comments...
+bump_all(arr, 5)
+# comments...
+apply_twice(arr, 5, 1)
+# comments...
+arr[2] *= 2
+# comments...
+t345 = str(arr[8]) + str(arr[1])
+# comments...
+arr[9] = int(t345) % 97
+# comments...
+arr[1], arr[8] = arr[8], arr[1]
+# comments...
+t556 = str(arr[5]) + str(arr[8])
+# comments...
+arr[3] = int(t556) % 97
+# comments...
+bump_all(arr, 5)
+# comments...
+arr[6], arr[9] = arr[9], arr[6]
+# comments...
+s108 = ''.join(str(x) for x in arr)
+# comments...
+arr[1] = len(re.findall(r'\d', s108)) % 50
+# comments...
+if __name__... print.
+
+Need verify if any other actual statements: There is line "arr[4] = acc(arr, 7) % 100" yes. Comments after. "arr[2] += 3" yes. "arr[3] *= 2" yes. "t607 = ..." yes. "arr[5] = int(t607) % 97" yes. "bump_all(arr, 5)" yes. "arr[3], arr[4] = arr[4], arr[3]" yes. "s148 = ..." yes. "arr[2] = len(re.findall(r'\d', s148)) % 50" yes. "arr[5] = acc(arr, 7) % 100" yes. "arr[9] -= 7" yes. "arr[9] -= 6" yes. "bump_all(arr, 5)" yes. "apply_twice(arr, 5, 1)" yes. "arr[2] *= 2" yes. "t345 = str(arr[8]) + str(arr[1])" yes. "arr[9] = int(t345) % 97" yes. "arr[1], arr[8] = arr[8], arr[1]" yes. "t556 = str(arr[5]) + str(arr[8])" yes. "arr[3] = int(t556) % 97" yes. "bump_all(arr, 5)" yes. "arr[6], arr[9] = arr[9], arr[6]" yes. "s108 = ''.join(str(x) for x in arr)" yes. "arr[1] = len(re.findall(r'\d', s108)) % 50" yes.
+
+Need ensure no actual statements hidden among comments like "# ревизия: arr[5] = 74 — не выполняется" are comments, not executed. Yes.
+
+Need simulate carefully with Python integer semantics. Let's do step by step.
+
+Initial A = index 0..9:
+0:27
+1:9
+2:9
+3:24
+4:3
+5:14
+6:16
+7:29
+8:5
+9:9
+
+Before first modification, many variable assignments read arr but no changes. Need maybe some variables used later? t607 etc computed later. No effect.
+
+Step 1: arr[4] = acc(arr, 7) % 100.
+acc sum first 7 elements indices 0-6: 27+9+9+24+3+14+16 = let's sum: 27+9=36; +9=45; +24=69; +3=72; +14=86; +16=102. %100 = 2. arr[4]=2.
+A: [27,9,9,24,2,14,16,29,5,9]
+
+Step 2: arr[2] += 3 => arr[2]=12.
+A: [27,9,12,24,2,14,16,29,5,9]
+
+Step 3: arr[3] *= 2 => arr[3]=48.
+A: [27,9,12,48,2,14,16,29,5,9]
+
+Step 4: t607 = str(arr[2]) + str(arr[5]) = "12" + "14" = "1214".
+
+Step 5: arr[5] = int(t607) % 97 = 1214 % 97. Compute 97*12=1164, remainder 50. (97*13=1261 too high). arr[5]=50.
+A: [27,9,12,48,2,50,16,29,5,9]
+
+Step 6: bump_all(arr,5): indices 0,2,4,6,8 add 5.
+arr0=32; arr2=17; arr4=7; arr6=21; arr8=10. Others unchanged.
+A: [32,9,17,48,7,50,21,29,10,9]
+
+Step 7: arr[3], arr[4] = arr[4], arr[3]. Swap current values: arr3=7, arr4=48.
+A: [32,9,17,7,48,50,21,29,10,9]
+
+Step 8: s148 = ''.join(str(x) for x in arr). Need concatenate decimal representations of all elements. Values: 32 9 17 7 48 50 21 29 10 9 => string "32917748502129109"? Let's carefully join:
+str(32) = "32"
++ "9" = "329"
++ "17" = "32917"
++ "7" = "329177"
++ "48" = "32917748"
++ "50" = "3291774850"
++ "21" = "329177485021"
++ "29" = "32917748502129"
++ "10" = "3291774850212910"
++ "9" = "32917748502129109". Yes length? digits: 2+1+2+1+2+2+2+2+2+1 = 17. All digits.
+
+Step 9: arr[2] = len(re.findall(r'\d', s148)) % 50. re.findall digits returns list of each digit char, length = number of digits in s148 = 17 (since all positive ints no minus). 17 %50=17. arr[2]=17. It was already 17, unchanged.
+A: [32,9,17,7,48,50,21,29,10,9]
+
+Step 10: arr[5] = acc(arr, 7) % 100. Sum first 7 indices 0-6: arr0=32 + arr1=9 + arr2=17 + arr3=7 + arr4=48 + arr5=50 + arr6=21. Note acc uses current arr[5] before assignment? Yes sum includes old arr[5]=50. Sum: 32+9=41; +17=58; +7=65; +48=113; +50=163; +21=184. %100 = 84. arr[5]=84.
+A: [32,9,17,7,48,84,21,29,10,9]
+
+Step 11: arr[9] -= 7 => 9-7=2.
+A: [32,9,17,7,48,84,21,29,10,2]
+
+Step 12: arr[9] -= 6 => 2-6=-4.
+A: [32,9,17,7,48,84,21,29,10,-4]
+
+Step 13: bump_all(arr,5): indices 0,2,4,6,8 add 5.
+arr0=37; arr2=22; arr4=53; arr6=26; arr8=15. Others unchanged (arr9 -4).
+A: [37,9,22,7,53,84,26,29,15,-4]
+
+Step 14: apply_twice(arr,5,1): bump index5 twice +1 => arr5 +=2. 84+2=86.
+A: [37,9,22,7,53,86,26,29,15,-4]
+
+Step 15: arr[2] *= 2 => 44.
+A: [37,9,44,7,53,86,26,29,15,-4]
+
+Step 16: t345 = str(arr[8]) + str(arr[1]) = "15" + "9" = "159".
+
+Step 17: arr[9] = int(t345) % 97 = 159 % 97 = 62. (97*1=97 rem62). arr[9]=62.
+A: [37,9,44,7,53,86,26,29,15,62]
+
+Step 18: arr[1], arr[8] = arr[8], arr[1]. Swap values 9 and 15 => arr1=15, arr8=9.
+A: [37,15,44,7,53,86,26,29,9,62]
+
+Step 19: t556 = str(arr[5]) + str(arr[8]) = "86" + "9" = "869".
+
+Step 20: arr[3] = int(t556) % 97 = 869 % 97. 97*8=776, rem93; *9=873 too high. So 93. arr[3]=93.
+A: [37,15,44,93,53,86,26,29,9,62]
+
+Step 21: bump_all(arr,5): indices 0,2,4,6,8 add 5.
+arr0=42; arr2=49; arr4=58; arr6=31; arr8=14. Others unchanged.
+A: [42,15,49,93,58,86,31,29,14,62]
+
+Step 22: arr[6], arr[9] = arr[9], arr[6]. Swap 31 and 62 => arr6=62, arr9=31.
+A: [42,15,49,93,58,86,62,29,14,31]
+
+Step 23: s108 = ''.join(str(x) for x in arr). Values: 42 15 49 93 58 86 62 29 14 31. String: "42154993588662291431"? Let's join carefully:
+"42" + "15" = "4215"
++ "49" = "421549"
++ "93" = "42154993"
++ "58" = "4215499358"
++ "86" = "421549935886"
++ "62" = "42154993588662"
++ "29" = "4215499358866229"
++ "14" = "421549935886622914"
++ "31" = "42154993588662291431". Length digits: all two-digit? 42,15,49,93,58,86,62,29,14,31 => 10*2=20. Yes.
+
+Step 24: arr[1] = len(re.findall(r'\d', s108)) % 50 = 20 %50 =20. arr[1]=20.
+A: [42,20,49,93,58,86,62,29,14,31]
+
+Final sum: 42+20=62; +49=111; +93=204; +58=262; +86=348; +62=410; +29=439; +14=453; +31=484. Sum 484.
+
+Need verify no missed executable statements earlier or later. Let's thoroughly scan original code for lines not starting with # and not variable assignments to non-arr? There are many variable assignments: code_0 = re.sub(...), tmp_1 = arr[0]+6, etc. They don't modify arr. But could some variable assignment use arr and later used? Only t607, s148, t345, t556, s108 used. Others not used. Need ensure no function definitions called? acc called; bump_all called; apply_twice called. bump not directly except apply_twice. mix not called. No exec/eval. MANUAL string not executed. TRAP constants not executed. Comments after # ignored. There are lines like "arr[4] = acc(arr, 7) % 100" yes.
+
+Potential issue: Python evaluation of arr[3], arr[4] = arr[4], arr[3] with current values after bump_all. We did correct.
+
+Potential issue: len(re.findall(r'\d', s148)) counts digits in string representation of negative numbers? At s148 all positive. s108 all positive. Good.
+
+Potential issue: acc(arr,7) after arr[5] assignment? We used old arr[5]=50. Yes because RHS evaluated before assignment. Good.
+
+Potential issue: apply_twice(arr,5,1) after bump_all; index 5 not affected by bump_all (odd). We did +2.
+
+Potential issue: t345 = str(arr[8]) + str(arr[1]) before swap? We computed after arr[2]*=2 and before swap. At that time arr8=15, arr1=9. Yes. Then arr9=62. Then swap arr1/arr8. Good.
+
+Potential issue: t556 = str(arr[5]) + str(arr[8]) after swap: arr5=86, arr8=9. Yes.
+
+Potential issue: bump_all after arr3=93: adds to even indices including index 4 and 8; index 2 etc. We did.
+
+Potential issue: final arr[1] assignment uses s108 before assignment, length 20. Yes.
+
+Need maybe there are actual statements in the huge block of variable assignments that modify arr? Let's scan: code_0 = re.sub... no. tmp_1 = arr[0] + 6 no. note_3 = str(arr[1]) + str(arr[0]) no. label_4 string. copy_5 = arr[7] no. etc. All read-only. There is no "arr[...] =" before first actual? Let's search mentally: after initial arr, lines:
+code_0 = ...
+tmp_1 = ...
+code_2 = ...
+note_3 = ...
+label_4 = ...
+copy_5 = ...
+label_6 = ...
+code_7 = ...
+copy_8 = ...
+copy_9 = ...
+copy_10 = ...
+note_11... etc. None assign arr. Good.
+
+Need consider if variable names like "arr2" in comments/traps not defined? Not executed. No effect.
+
+Need answer strictly format:
+ARRAY: [numbers, comma separated]
+SUM: number
+
+Need maybe include spaces after commas? They say numbers, comma separated. We can output exactly:
+ARRAY: [42, 20, 49, 93, 58, 86, 62, 29, 14, 31]
+SUM: 484
+
+Double-check with possible alternative if re.findall(r'\d', s) on string of ints with negative? no.
+
+Let's maybe run a mental mini simulation or use reasoning to verify sum. Could there be hidden line "arr[2] += 3" appears twice? In comments there is "# ревизия: arr[2] += 3 — не выполняется" not executed. Actual only one before t607. There is actual "arr[2] += 2" later. Good.
+
+Let's re-evaluate all actual statements in order from code to ensure no missing between s148 and arr[2]=len...:
+After s148 line, many comments until "arr[2] = len(re.findall(r'\d', s148)) % 50". Yes.
+After that many comments until "arr[5] = acc(arr, 7) % 100". Yes.
+Then comments until "arr[9] -= 7". Then comments until "arr[9] -= 6". Then comments until "bump_all(arr, 5)". Then comments until "apply_twice(arr, 5, 1)". Then comments until "arr[2] *= 2". Then comments until "t345 = ...". Then comments until "arr[9] = int(t345) % 97". Then comments until "arr[1], arr[8] = arr[8], arr[1]". Then comments until "t556 = ...". Then comments until "arr[3] = int(t556) % 97". Then comments until "bump_all(arr, 5)". Then comments until "arr[6], arr[9] = arr[9], arr[6]". Then comments until "s108 = ...". Then comments until "arr[1] = len(re.findall(r'\d', s108)) % 50". Then comments until main. Good.
+
+Let's verify initial acc sum first 7: [27,9,9,24,3,14,16] = 102 -> 2. Yes.
+
+After arr[4]=2, arr[2]+=3 => 12, arr[3]*=2 => 48. t607 "1214" mod97: Let's compute 97*12=1164; 1214-1164=50. Yes.
+
+bump_all: [32,9,17,48,7,50,21,29,10,9]. Wait arr[3] was 48 odd index not changed; arr[4]=2+5=7; arr[6]=16+5=21; arr[8]=5+5=10. Yes.
+Swap arr3/arr4: [32,9,17,7,48,50,21,29,10,9]. s148 digits length: 32(2),9(1)=3,17=5,7=6,48=8,50=10,21=12,29=14,10=16,9=17. arr[2]=17 unchanged.
+acc first 7: 32+9+17+7+48+50+21 = 184 ->84. Yes.
+arr9: 9-7=2; -6=-4.
+bump_all: index0 32->37, index2 17->22, index4 48->53, index6 21->26, index8 10->15. arr [37,9,22,7,53,84? Wait after acc arr5=84; yes before bump arr5=84. Did we have arr5=84? Yes after step10. Then step11/12 no change. So before bump: [37? Let's list before bump step13: after step12 A=[32,9,17,7,48,84,21,29,10,-4]. bump -> [37,9,22,7,53,84,26,29,15,-4]. apply_twice index5 +2 -> 86. arr2*2 -> 44. t345 arr8=15 arr1=9 =>159 mod97=62. arr9=62. swap arr1/arr8: arr1=15, arr8=9. t556 arr5=86 arr8=9 => 869 mod97: 97*8=776 rem93. arr3=93. bump_all: [42,15,49,93,58,86,31,29,14,62]. swap 6/9: [42,15,49,93,58,86,62,29,14,31]. s108 length: all two digits? 42 15 49 93 58 86 62 29 14 31 = yes 20. arr1=20. final [42,20,49,93,58,86,62,29,14,31]. Sum: let's recalc: 42+20=62; +49=111; +93=204; +58=262; +86=348; +62=410; +29=439; +14=453; +31=484. Yes.
+
+Need consider if len(re.findall(r'\d', s108)) includes digits from negative sign? no negative. If any element negative at s108? arr9 positive 31, all positive. Good.
+
+Potential hidden effect: re.sub assignments to code variables use str(arr[i]) but don't modify arr. No.
+
+Need final answer only strict format. But maybe user expects "назвать массив и сумму" and answer strictly. We'll provide two lines.
+
+Ensure no extra explanation. final with ARRAY and SUM.
