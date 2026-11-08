@@ -66,9 +66,11 @@ def main():
     for p in glob.glob("results/_speed_uniq/*.json") + glob.glob("results/_speed/*.json"):
         name = os.path.basename(p)[:-5]
         try:
-            probes[name] = json.load(open(p))
+            data = json.load(open(p))
         except Exception:
-            pass
+            continue
+        # the same model can appear in both probe folders; merging beats last-file-wins
+        probes.setdefault(name, []).extend(data if isinstance(data, list) else [])
 
     def probe_vals(folder, want_kind, want):
         """Every comparable run at this size, so repeated passes are averaged, not dropped.
