@@ -23,7 +23,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · en · 64k · default | 25s ✓ | 104s ✓ | 11s ✓ | 12s ✓ | 10s ✓ | 14s ✓ | 253s ✓ | 15s ✓ | 123s ✗ | 113s ✓ | 75s ✗ | 593s ✓ | 245s ✗ | 508s ✗ | 110s ✓ | 95s ✓ | 313s ✗ | 12/17 |
 | Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · ru · 64k · default | 335s ✓ | 681s L | 8s ✓ | 8s ✓ | 10s ✓ | 9s ✓ | 459s L | 17s ✓ | 264s ✗ | 83s ✓ | 145s ✓ | 370s ✓ | 236s ✗ | 284s ✗ | 106s ✓ | 184s ✓ | 209sw R | 11/17 |
 | Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · zh · 64k · default | 25s ✓ | 99s ✓ | 10s ✓ | 9s ✓ | 12s ✓ | 24s ✓ | 338s ✓ | 17s ✓ | 168s ✗ | 79s ✓ | 107s ✗ | 333s ✗ | 229s ✗ | 146s ✓ | 108s ✗ | 293s ✓ | 225s ✗ | 11/17 |
-| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · zh · 64k · par2 | 4s ✓ | · | 36s ✓ | · | · | · | · | · | · | · | · | · | · | · | · | · | · | 2/2 (partial 2/17) |
+| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · zh · 64k · par2 | 4s ✓ | 0s ✓ | 36s ✓ | 36s ✓ | 4s ✓ | 4s ✓ | 0s ✓ | 36s ✓ | 36s ✗ | 4s ✓ | 0s ✗ | 36s ✗ | 0s ✗ | 0s ✓ | 0s ✗ | 0s ✓ | 200s ✗ | 11/17 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · en · 32k · guarded | 43s ✓ | 112s ✓ | 12s ✓ | 12s ✓ | 13s ✓ | 13s ✓ | 125s ✓ | 16s ✓ | 97s ✗ | 30s ✓ | 88s ✗ | 283s ✗ | 121s ✗ | 98s ✓ | 45s ✓ | 66s ✓ | 317s ✗ | 12/17 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · ru · 32k · guarded | 157sw ✓ | 73sw ✗ | 9sw ✓ | 8sw ✓ | 11sw ✓ | 6sw ✓ | 131sw ✗ | 10sw ✓ | 168sw ✗ | 27sw ✓ | 203sw ✓ | 214sw ✓ | 202sw ✗ | 82sw ✗ | 75sw ✓ | 97sw ✓ | 183sw ✗ | 11/17 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · zh · 32k · guarded | 30s ✓ | 72s ✓ | 11s ✓ | 8s ✓ | 10s ✓ | 10s ✓ | 300s ✗ | 16s ✓ | 70s ✗ | 24s ✓ | 62s ✗ | 185s ✗ | 299s ✗ | 128s ✓ | 146s ✓ | 120s ✓ | 379s ✗ | 11/17 |
