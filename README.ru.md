@@ -100,7 +100,7 @@ YaRN, температурой или бюджетом — контекст по
 | Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN | 146m44s · 33% err | 4100 | 14m14s 11/17 | 14m45s 10/17 | 17m43s 11.5/17 | 15m10s 13/24 | 100m03s 15/20 |
 | Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · ctx ? · no YaRN · understands Russian but answers in English; ru chains measure capability, not language | 340m56s · 52% err | 8743 | 43m39s 12/17 | 56m48s 11/17 | 21m49s 11/17 | 22m50s 15/24 | 218m40s 0/20 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · ctx 1M · YaRN · T 0.3 · pen 0.3 | 131m36s · 37% err | 4899 | 24m51s 12/17 | 27m36s 11/17 | 31m10s 11/17 | 13m15s 15/24 | 47m59s 11/20 |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · budget 64 | 57m31s · 32% err | 5800 | 32m30s 12/17 | 25m01s 11/17 | — | — | — |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · budget 64 | 86m15s · 33% err | 3986 | 32m30s 12/17 | 25m01s 11/17 | 28m44s 11/17 | 9m27s 10/16 (ru/en only) | — |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · pen 0.2 | 138m21s · 28% err | 5511 | 31m20s 11.5/17 | 27m22s 11/17 | 24m52s 12.5/17 | 18m21s 15.5/24 | 54m47s 16/20 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · pen 0.2 · 2 runs averaged | 155m06s · 27% err | 5211 | 34m18s 12.5/17 | 28m21s 11/17 | 33m41s 13.5/17 | 24m28s 15.5/24 | 58m46s 15/20 |
 | Ripple-65B-Preview-Q6_K · ctx 175k · no YaRN · pen mixed (0 / 0.3) · chains: 12 tasks at 16k pen 0, 5 at 32k pen 0.3; programs all at 32k pen 0.3 | 120m57s · 29% err | 4684 | 120m57s 12/17 | — | — | — | 121m49s 0/7 of 20 run |
