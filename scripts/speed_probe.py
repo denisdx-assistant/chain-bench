@@ -14,9 +14,16 @@ ASK = ("Расскажи историю о рыбаке и море, приме�
        "Затем ниже идёт технический документ, который к истории отношения не имеет.\n\n")
 
 
+CHARS_PER_TOKEN = float(os.environ.get("CHAIN_BENCH_CHARS_PER_TOKEN", "6.2"))
+
+
 def build_prompt(target_tokens, reserve):
-    # ~1.35 tokens per word for mixed text; keep total under the window
-    body = int(max(0, (target_tokens - reserve) * 4.0))
+    """Filler sized so that prompt + reserved output stays inside the window.
+
+    The filler is ordinary prose, which tokenises at roughly 6.2 characters per
+    token on this tokenizer; the measured prompt_n is printed for verification.
+    """
+    body = int(max(0, (target_tokens - reserve) * CHARS_PER_TOKEN))
     reps = max(1, body // len(FILLER))
     return ASK + FILLER * reps
 
