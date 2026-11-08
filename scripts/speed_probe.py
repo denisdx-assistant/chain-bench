@@ -96,6 +96,21 @@ def random_filler(words_target):
             since += 1
     return " ".join(out), count
 
+def looks_like_echo(answer):
+    """True when the reply reproduces the English source instead of a Russian story.
+
+    The instruction is Russian and asks for a story, so a genuine answer is mostly
+    Cyrillic; the filler is a stream of English dictionary words. A reply with almost no
+    Cyrillic is the source quoted back, and its tokens/second is not writing speed.
+    """
+    head = (answer or "")[:600]
+    if head.lower().lstrip().startswith(("последние 10 слов", "last ten words", "last 10 words")):
+        return False
+    letters = [c for c in head if c.isalpha()]
+    if not letters:
+        return False
+    cyr = sum(1 for c in letters if "\u0400" <= c <= "\u04ff") / len(letters)
+    return cyr < 0.05
 
 def build_prompt(target_tokens, reserve):
     """Filler sized so that prompt + reserved output stays inside the window.
@@ -190,6 +205,8 @@ def main():
                "wall_s": round(wall, 1),
                "story_head": (msg.get("content") or "")[:120].replace("\n", " "),
                "prompt_hash": hashlib.sha256(prompt.encode()).hexdigest()[:16],
+               "echo": looks_like_echo(msg.get("content")),
+               "answer_head": (msg.get("content") or "")[:300],
                "max_tokens": a.max_tokens}
         recs.append(rec)
         print("  цель %-7s | промпт %-8s | префилл %-5s t/s | генерация %-5s t/s (%s tok) | %s c"

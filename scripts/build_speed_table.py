@@ -85,6 +85,9 @@ def main():
             ok_want = (rec.get("want") in (900000, 1000000)) if want == 1000000 else rec.get("want") == want
             if not ok_want or rec.get("error"):
                 continue
+            # a reply that re-quotes the source is not a writing-speed measurement
+            if want_kind == "gen" and rec.get("echo"):
+                continue
             pn, cache = rec.get("prompt_n") or 0, rec.get("cache_n") or 0
             if pn + cache < min(want, 900000) * 0.95:
                 continue
