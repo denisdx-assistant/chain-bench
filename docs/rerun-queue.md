@@ -64,3 +64,16 @@ and only these three tasks will be re-run:
 | 8 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 13 | `finish=length` at 16 384 tokens, 816 s | ⬜ pending — needs the 175k build |
 
 The remaining 14 tasks in that set finished with `stop`.
+
+## Remaining length cut (audited 2026-11-08)
+
+A scan of every canonical result file (Ripple excluded) found exactly one task still
+marked `finish=length` with an empty answer:
+
+| Model | Run | Task | Status |
+|---|---|---|---|
+| `Qwen3.8-Flash-Next-UD-Q4_K_XL` | `chains_en_20k_32k_rerun.json` | chain 12 (heron-09) | ⬜ pending — model is not loaded |
+
+Everything else was already retried and merged: Q4_K_XL programs 300/302/305, IQ3_S
+chains ru 12 and program 313, IQ4_XS programs 302/313. DeepSeek had seven cuts at 32k,
+all retried at 64k (six solved) and the last one at 128k (solved). gemma had none.

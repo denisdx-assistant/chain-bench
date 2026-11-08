@@ -62,21 +62,42 @@ def main():
                         acc[folder][name]["tok"].append(st["predicted_n"])
                     break
 
+    probes = {}
+    for p in glob.glob("results/_speed/*.json"):
+        name = os.path.basename(p)[:-5]
+        try:
+            probes[name] = json.load(open(p))
+        except Exception:
+            pass
+
+    def probe_cell(folder, want_kind, want):
+        for rec in probes.get(folder) or []:
+            if rec.get("want") == want:
+                if want_kind == "pre" and rec.get("prompt_tps"):
+                    return "%d t/s" % round(rec["prompt_tps"])
+                if want_kind == "gen" and rec.get("gen_tps"):
+                    return "%d t/s" % round(rec["gen_tps"])
+        return "—"
+
     def med(xs):
         return int(round(statistics.median(xs))) if xs else None
 
-    head = ("| Model | Prefill 5k | Prefill 20k | Prefill 60k | Prefill 150k | Gen 5k | Gen 20k | Gen 60k | "
-            "Gen 150k | Tokens/task | Notes |")
-    sep = "|---|---|---|---|---|---|---|---|---|---|---|"
+    head = ("| Model | Prefill 5k | Prefill 20k | Prefill 60k | Prefill 150k | Prefill 250k | Prefill 500k | "
+            "Prefill 1M | Gen 5k | Gen 20k | Gen 60k | Gen 150k | Gen 250k | Gen 500k | Gen 1M | Tokens/task | Notes |")
+    sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"
     lines = [head, sep]
     for folder in sorted(acc):
         cells = []
         for name, _, _ in BUCKETS[:4]:
             v = med(acc[folder][name]["pre"])
             cells.append("%s t/s" % v if v else "—")
+        for want in (250000, 500000, 1000000):
+            cells.append(probe_cell(folder, "pre", want))
         for name, _, _ in BUCKETS[:4]:
             v = med(acc[folder][name]["gen"])
             cells.append("%s t/s" % v if v else "—")
+        for want in (250000, 500000, 1000000):
+            cells.append(probe_cell(folder, "gen", want))
         alltok = [t for name, _, _ in BUCKETS for t in acc[folder][name]["tok"]]
         cells.append(str(med(alltok)) if alltok else "—")
         cells.append(note_for(folder, cfg))
