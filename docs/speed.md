@@ -27,7 +27,7 @@ depend on the cache, so every run of the right size counts there.
 | Qwen3.8-27B-UD-Q6_K_XL | — | 1557 t/s | 1342 t/s | — | — | — | — | — | 62 t/s | 54 t/s | — | — | — | — | 4099 | host A |
 | Qwen3.8-27B-UD-Q8_K_XL | — | 1327 t/s | — | 721 t/s | — | — | — | — | 58 t/s | 53 t/s | 40 t/s | — | — | — | 4100 | host A |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S | — | 1496 t/s | 2085 t/s | 2438 t/s | — | — | — | — | 90 t/s | 89 t/s | 98 t/s | — | — | — | 4899 | host A |
-| Qwen3.8-Flash-Next-UD-IQ4_XS | — | 1480 t/s | 2029 t/s | 2389 t/s | 2401 t/s | 2278 t/s | 2058 t/s | — | 86 t/s | 88 t/s | 96 t/s | 154 t/s | 111 t/s | 50 t/s | 5511 | host A (2xV100) |
+| Qwen3.8-Flash-Next-UD-IQ4_XS | — | 1480 t/s | 2029 t/s | 2389 t/s | 2427 t/s | 2278 t/s | 2058 t/s | — | 86 t/s | 88 t/s | 96 t/s | 119 t/s | 111 t/s | 50 t/s | 5511 | host A (2xV100) |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL | — | 1132 t/s | 1530 t/s | 1796 t/s | — | — | — | — | 78 t/s | 79 t/s | 83 t/s | — | — | — | 5211 | host A (2xV100) |
 | Ripple-65B-Preview-Q6_K | — | 482 t/s | — | 372 t/s | — | — | — | — | 20 t/s | — | 14 t/s | — | — | — | 10428 | host A (2xV100) |
 | gemma-4-31B-it-UD-Q8_K_XL | — | 1041 t/s | — | 494 t/s | — | — | — | — | 71 t/s | 60 t/s | 43 t/s | — | — | — | 1601 | host A (2xV100) |
@@ -79,6 +79,7 @@ the generated text repeated.
 | Target | Prompt | Cache | Prefill | Gen | Written | Finish | What it did |
 |---|---|---|---|---|---|---|---|
 | 250k | 251 219 | 0 | 2401 t/s | 154 t/s | 64 000 | length | re-quoted the source text |
+| 250k retry | 251 219 | 0 | 2454 t/s | 84 t/s | 23 822 | stop | quoted the last ten words, then wrote the story |
 | 500k | 502 354 | 0 | 2278 t/s | 111 t/s | 61 383 | stop | answered, then wrote the story |
 | 900k | 904 358 | 0 | 2058 t/s | 50 t/s | 4 394 | stop | discussed the count, no story |
 
@@ -87,7 +88,10 @@ budget re-quoting the source. No context window would have been enough for that 
 the task — the request failed, not the budget. That is why the check changed to the last ten
 words.
 
-The 154 t/s on that point is an echo-driven upper bound, not a generation speed.
+The 154 t/s on that point is an echo-driven upper bound, not a generation speed. Repeating
+the same size with the tail check and a 128k budget gave 84 t/s: the model printed the last
+ten words, then wrote the story and stopped by itself. That is the number to trust, and both
+runs stay in the file so the column shows their average.
 
 The 900k point is the opposite case: prefill is a real 2058 t/s, but the answer stopped
 after 4 394 tokens without a story, so its generation figure is not comparable either.
