@@ -31,14 +31,18 @@ request reports the speed of the few uncached tokens, which is not comparable.
 | Ripple-65B-Preview-Q6_K | — | 482 t/s | — | 372 t/s | — | — | — | — | 20 t/s | — | 14 t/s | — | — | — | 10428 | host A (2xV100) |
 | gemma-4-31B-it-UD-Q8_K_XL | — | 1041 t/s | — | 494 t/s | — | — | — | — | 71 t/s | 60 t/s | 43 t/s | — | — | — | 1601 | host A (2xV100) |
 
-## The cache does fire on synthetic prompts
+## The earlier probe was deterministic, and the cache proved it
 
-The first pass at 250k/500k/900k used a deterministic pseudo-random word stream and assumed
-the server could not cache it. It could: the three responses reported `cache_n` of 114 688,
-262 144 and 409 600 tokens against `prompt_n` of 66 789, 163 157 and 405 825. With most of
-the prompt served from cache, `prompt_per_second` describes only the uncached remainder, so
-those points are not comparable and have been removed from the table rather than published.
+The first attempt at 250k/500k/900k tried to defeat the cache with filler whose every
+sentence carried a different number. That filler was **fully deterministic**: the same
+size produced byte-identical text on every run. So the second request at a given size was
+a prefix match of the first, and the server rightly served it from cache -- `cache_n` of
+114 688, 262 144 and 409 600 tokens against `prompt_n` of 66 789, 163 157 and 405 825.
+With most of the prompt cached, `prompt_per_second` covers only the uncached remainder and
+the points are not comparable. They are excluded from the table, not published.
 
-The current pass generates a fresh word stream per run and checks `cache_n` on every point;
-a point is only accepted with `cache_n = 0` and an actual `prompt_n` within 10% of the
-target. Points that fail either check stay out of the table.
+A cache hit on a supposedly unique prompt is therefore a bug report, not a server
+artefact: it means the generated text repeated. The probe now draws its word stream from
+`os.urandom(16)` per run, and two separate processes were checked to produce different
+prompts. Every point is also accepted only with `cache_n = 0` and an actual `prompt_n`
+within 10% of the target.
