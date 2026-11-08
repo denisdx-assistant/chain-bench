@@ -118,7 +118,8 @@ def wait_for_queue(base, model, max_wait=None, step=None, log=print):
     return waited
 
 def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
-                max_repeat=None, threshold_n=8, client='chain-bench', frequency_penalty=0.0, presence_penalty=0.0):
+                max_repeat=None, threshold_n=8, client='chain-bench', frequency_penalty=0.0, presence_penalty=0.0,
+                top_p=None, min_p=None, repeat_penalty=None):
     _prompt_sh = _shingles(prompt)
     if max_repeat is None:
         # a hosted model cannot hang a GPU, and max_tokens already bounds the bill,
@@ -132,6 +133,12 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
         payload["frequency_penalty"] = frequency_penalty
     if presence_penalty:
         payload["presence_penalty"] = presence_penalty
+    if top_p is not None:
+        payload["top_p"] = top_p
+    if min_p is not None:
+        payload["min_p"] = min_p
+    if repeat_penalty is not None:
+        payload["repeat_penalty"] = repeat_penalty
     payload["messages"] = [{"role": "user", "content": prompt}]
     wait_for_queue(BASE, model)
     body = json.dumps(payload).encode()

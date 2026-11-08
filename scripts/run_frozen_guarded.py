@@ -110,6 +110,9 @@ def main():
     ap.add_argument("--temp", type=float, default=0.3)
     ap.add_argument("--fp", type=float, default=0.3)
     ap.add_argument("--pp", type=float, default=0.3)
+    ap.add_argument("--top-p", type=float, default=None)
+    ap.add_argument("--min-p", type=float, default=None)
+    ap.add_argument("--repeat-penalty", type=float, default=None)
     ap.add_argument("--only", default="", help="comma list of program stems")
     ap.add_argument("--force", action="store_true", help="overwrite an existing result file")
     ap.add_argument("--resume", action="store_true",
@@ -168,6 +171,7 @@ def main():
             out = ask_guarded(code + QUESTION, a.model, max_tokens=a.max_tokens,
                               timeout=a.timeout, temperature=TEMP_DEFAULT,
                               frequency_penalty=a.fp, presence_penalty=a.pp,
+                              top_p=a.top_p, min_p=a.min_p, repeat_penalty=a.repeat_penalty,
                               client='chain-bench-frozen')
             if not out.get("stalled"):
                 break
