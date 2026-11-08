@@ -46,3 +46,17 @@ the rest cached. Generation speed is unaffected and already measured (83 / 84 / 
 t/s at 181k / 425k / 815k of prompt). Prefill at these sizes can only be measured
 with prompt caching disabled on the server side, or by reading `prompt_ms` of a
 genuinely cold request.
+
+## Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M (running)
+
+Full series at a 32k budget, launched 17:22 HKT from `/tmp/series_iq1m.sh`:
+chains en/ru/zh (17 tasks), the three 8-task subsets, then programs v4 (20 tasks).
+
+Two things are specific to this model:
+
+- it **understands Russian but does not answer in it**, so the Russian chains measure
+  reasoning, not language. The answers will be English and the ru column must be read
+  with that in mind.
+- `local-only` is disabled, so the runner addresses the model by its own id
+  (`qwen3.8-flash-next-abiray-coder-iq1_m`); the provider is
+  `local_qwen3.8-flash-next-abiray-coder-iq1_m`.
