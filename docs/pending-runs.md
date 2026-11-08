@@ -36,3 +36,13 @@ acceptable on this model.
 - needs: model added to aidir and `local-only` pointed at it
 
 Both runs are strictly sequential: one model is loaded at a time.
+
+## 3. Large-context prefill needs the prompt cache off
+
+`scripts/speed_probe.py` builds an instruction-first prompt and filler sized to a
+target, but the server serves almost all of it from its prompt cache even when every
+filler line carries a unique number: the last attempt reported `prompt_n = 5` with
+the rest cached. Generation speed is unaffected and already measured (83 / 84 / 67
+t/s at 181k / 425k / 815k of prompt). Prefill at these sizes can only be measured
+with prompt caching disabled on the server side, or by reading `prompt_ms` of a
+genuinely cold request.

@@ -39,7 +39,8 @@ def build_prompt(target_tokens, reserve):
     The filler is ordinary prose, which tokenises at roughly 6.2 characters per
     token on this tokenizer; the measured prompt_n is printed for verification.
     """
-    body = int(max(0, (target_tokens - reserve) * CHARS_PER_TOKEN))
+    # target_tokens is the prompt size we want; the reserve only guards the window
+    body = int(max(0, target_tokens * CHARS_PER_TOKEN))
     return ASK + unique_filler(body)
 
 
@@ -65,22 +66,42 @@ def main():
         sizes.append(int(float(s[:-1]) * mult) if s[-1] in "km" else int(s))
     os.makedirs(a.out_dir, exist_ok=True)
     out = os.path.join(a.out_dir, (a.label or a.model).replace("/", "_") + ".json")
-    recs = []
-    for want in sizes:
-        prompt = build_prompt(want, a.max_tokens)
+    def call(prompt):
         body = json.dumps({"model": a.model, "messages": [{"role": "user", "content": prompt}],
                            "max_tokens": a.max_tokens, "stream": False,
                            "temperature": 0.7}).encode()
         req = urllib.request.Request(base + "/v1/chat/completions", data=body, headers=hdr)
         t0 = time.time()
-        try:
-            r = urllib.request.urlopen(req, timeout=3600)
-            d = json.loads(r.read())
-        except Exception as e:
-            print("  %7s | ошибка: %s" % (want, str(e)[:120]), flush=True)
-            recs.append({"want": want, "error": str(e)[:160]})
-            continue
-        st = d.get("timings") or {}
+        r = urllib.request.urlopen(req, timeout=3600)
+        return json.loads(r.read()), time.time() - t0
+
+    global CHARS_PER_TOKEN
+    recs = []
+    for want in sizes:
+        attempt = 0
+        while True:
+            attempt += 1
+            prompt = build_prompt(want, a.max_tokens)
+            try:
+                d, wall = call(prompt)
+            except Exception as e:
+                print("  %7s | ошибка: %s" % (want, str(e)[:120]), flush=True)
+                recs.append({"want": want, "error": str(e)[:160]})
+                break
+            st = d.get("timings") or {}
+            got = st.get("prompt_n") or 0
+            cached = st.get("cache_n") or 0
+            # calibrate from the first real measurement, then verify every size once
+            if got and cached == 0 and attempt < 3:
+                ratio = len(prompt) / float(got)
+                dev = abs(got - want) / float(want)
+                if dev > 0.08:
+                    CHARS_PER_TOKEN = ratio
+                    print("  %7s | получено %d (%+.0f%%), пересчёт по %.2f симв./токен"
+                          % (want, got, 100 * (got - want) / want, ratio), flush=True)
+                    continue
+                CHARS_PER_TOKEN = ratio
+            break
         ch = (d.get("choices") or [{}])[0]
         msg = ch.get("message") or {}
         rec = {"want": want,
@@ -89,7 +110,7 @@ def main():
                "gen_tps": st.get("predicted_per_second"),
                "predicted_n": st.get("predicted_n"),
                "finish": ch.get("finish_reason"),
-               "wall_s": round(time.time() - t0, 1),
+               "wall_s": round(wall, 1),
                "story_head": (msg.get("content") or "")[:120].replace("\n", " ")}
         recs.append(rec)
         print("  цель %-7s | промпт %-8s | префилл %-5s t/s | генерация %-5s t/s (%s tok) | %s c"
