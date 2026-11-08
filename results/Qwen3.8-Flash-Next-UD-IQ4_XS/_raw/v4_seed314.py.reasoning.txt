@@ -1,0 +1,333 @@
+We need answer user's request: execute program mentally? Need name final array and sum. We have huge Python code with many comments/traps. Need compute final arr after running actual executable statements only. Need be careful. We can simulate. Need output strict format.
+
+We need parse code. It defines functions acc, bump, bump_all, mix, apply_twice. Then MANUAL string unused? TRAP strings unused. arr initialized [7, 15, 4, 6, 1, 21, 21, 10, 8, 13]. Then many assignments to tmp/copy/note/code/label variables that read arr but do not modify arr. Comments ignored. Need identify actual executable statements affecting arr.
+
+Let's extract all non-comment lines after arr init that affect arr or variables used later? There are many s131, s240, s858, s44, s13 strings used for len digits. Also arr modifications:
+- arr[0], arr[4] = arr[4], arr[0]
+- arr2 = arr (alias)
+- arr2[2] += 5
+- arr[9] = len(re.findall(r'\d', s131)) % 50
+- arr[0], arr[2] = arr[2], arr[0]
+- arr[4] += 3
+- arr[2], arr[5] = arr[5], arr[2]
+- arr[5], arr[5] = arr[5], arr[5] (no effect)
+- arr[0] *= 2
+- arr[0], arr[6] = arr[6], arr[0]
+- arr[5] += 1
+- arr2 = arr (alias again)
+- arr2[8] += 4
+- arr[4], arr[2] = arr[2], arr[4]
+- s240 = ''.join(str(x) for x in arr)
+- arr[6] = len(re.findall(r'\d', s240)) % 50
+- arr[2] += 2
+- s858 = ''.join(str(x) for x in arr)
+- arr[9] = len(re.findall(r'\d', s858)) % 50
+- s44 = ''.join(str(x) for x in arr)
+- arr[5] = len(re.findall(r'\d', s44)) % 50
+- arr[2], arr[3] = arr[3], arr[2]
+- s13 = ''.join(str(x) for x in arr)
+- arr[7] = len(re.findall(r'\d', s13)) % 50
+- arr[3] = acc(arr, 7) % 100
+- apply_twice(arr, 4, 5)
+Need ensure no other executable statements: definitions, MANUAL, TRAP assignments (strings) no effect. Many tmp/copy/note/code/label assignments read arr but no modifications. Comments all start #. Need check if any line like "arr[0], arr[4] = arr[4], arr[0]" before s131? Yes after many tmp. Need track order exactly.
+
+Let's simulate carefully. Initial arr = [7,15,4,6,1,21,21,10,8,13]
+Indices 0..9.
+
+Before first modification, many tmp/copy/note/code/label assignments read arr but no changes. They don't affect arr. Need maybe re.sub on str(arr[i]) no effect. OK.
+
+First executable affecting arr:
+arr[0], arr[4] = arr[4], arr[0]
+Swap 0 and 4: arr[0]=1, arr[4]=7. Others same.
+arr = [1,15,4,6,7,21,21,10,8,13]
+
+Then many comments. Then arr2 = arr (alias). Then comments. Then arr2[2] += 5 => arr[2] +=5: 4+5=9.
+arr = [1,15,9,6,7,21,21,10,8,13]
+
+Then comments. Then s131 = ''.join(str(x) for x in arr). Need compute digits count. arr values: 1,15,9,6,7,21,21,10,8,13. Concatenate: "1" + "15" + "9" + "6" + "7" + "21" + "21" + "10" + "8" + "13" = let's count digits: 1(1),15(2)=3,9=4,6=5,7=6,21=8,21=10,10=12,8=13,13=15. s131 length digits 15. re.findall(r'\d', s131) count 15. %50 = 15. arr[9] = 15.
+arr = [1,15,9,6,7,21,21,10,8,15]
+
+Then comments. Then arr[0], arr[2] = arr[2], arr[0]: swap 0 and 2: arr[0]=9, arr[2]=1.
+arr = [9,15,1,6,7,21,21,10,8,15]
+
+Then comments. Then arr[4] += 3: 7+3=10.
+arr = [9,15,1,6,10,21,21,10,8,15]
+
+Then comments. Then arr[2], arr[5] = arr[5], arr[2]: swap index2=1 and index5=21 => arr[2]=21, arr[5]=1.
+arr = [9,15,21,6,10,1,21,10,8,15]
+
+Then comments. Then arr[5], arr[5] = arr[5], arr[5] no effect.
+Then comments. Then arr[0] *= 2: 9*2=18.
+arr = [18,15,21,6,10,1,21,10,8,15]
+
+Then comments. Then arr[0], arr[6] = arr[6], arr[0]: swap 0=18 and 6=21 => arr[0]=21, arr[6]=18.
+arr = [21,15,21,6,10,1,18,10,8,15]
+
+Then comments. Then arr[5] += 1: 1+1=2.
+arr = [21,15,21,6,10,2,18,10,8,15]
+
+Then comments. Then arr2 = arr (alias). Then comments. Then arr2[8] += 4: arr[8]=8+4=12.
+arr = [21,15,21,6,10,2,18,10,12,15]
+
+Then comments. Then arr[4], arr[2] = arr[2], arr[4]: swap index4=10 and index2=21 => arr[4]=21, arr[2]=10.
+arr = [21,15,10,6,21,2,18,10,12,15]
+
+Then comments. Then s240 = ''.join(str(x) for x in arr). Need count digits. Values: 21(2),15(2)=4,10(2)=6,6(1)=7,21(2)=9,2(1)=10,18(2)=12,10(2)=14,12(2)=16,15(2)=18. All positive no minus. digits=18. %50=18. arr[6] = 18. It was 18 already.
+arr = [21,15,10,6,21,2,18,10,12,15]
+
+Then comments. Then arr[2] += 2: 10+2=12.
+arr = [21,15,12,6,21,2,18,10,12,15]
+
+Then comments. Then s858 = ''.join(str(x) for x in arr). Count digits: 21(2),15(2)=4,12(2)=6,6(1)=7,21(2)=9,2(1)=10,18(2)=12,10(2)=14,12(2)=16,15(2)=18. digits=18. %50=18. arr[9]=18.
+arr = [21,15,12,6,21,2,18,10,12,18]
+
+Then comments. Then s44 = ''.join(str(x) for x in arr). Count digits: 21(2),15(2)=4,12(2)=6,6(1)=7,21(2)=9,2(1)=10,18(2)=12,10(2)=14,12(2)=16,18(2)=18. digits=18. %50=18. arr[5]=18.
+arr = [21,15,12,6,21,18,18,10,12,18]
+
+Then comments. Then arr[2], arr[3] = arr[3], arr[2]: swap index2=12 and index3=6 => arr[2]=6, arr[3]=12.
+arr = [21,15,6,12,21,18,18,10,12,18]
+
+Then comments. Then s13 = ''.join(str(x) for x in arr). Count digits: 21(2),15(2)=4,6(1)=5,12(2)=7,21(2)=9,18(2)=11,18(2)=13,10(2)=15,12(2)=17,18(2)=19. digits=19. %50=19. arr[7]=19.
+arr = [21,15,6,12,21,18,18,19,12,18]
+
+Then comments. Then arr[3] = acc(arr, 7) % 100. Need compute acc(a,n) sum first n elements recursively: if n<=0 return 0 else a[n-1]+acc(a,n-1). So sum arr[0:7] indices 0..6. Current arr before assignment: [21,15,6,12,21,18,18,19,12,18]. Sum first 7 = 21+15=36; +6=42; +12=54; +21=75; +18=93; +18=111. %100 = 11. arr[3]=11.
+arr = [21,15,6,11,21,18,18,19,12,18]
+
+Then comments. Then apply_twice(arr, 4, 5): bump(a,i,v) twice: a[4]+=5 twice => +10. arr[4]=21+10=31.
+arr = [21,15,6,11,31,18,18,19,12,18]
+
+Then comments until main print. No more modifications? Need check after apply_twice there are only comments. Yes.
+
+Final sum: 21+15=36; +6=42; +11=53; +31=84; +18=102; +18=120; +19=139; +12=151; +18=169. Sum 169.
+
+Need ensure no hidden executable lines among TRAP? They are assignments to TRAP_ variables strings, no arr. MANUAL string unused. Functions definitions no effect. Need check if any line like "arr[0], arr[4] = arr[4], arr[0]" appears in comments? We included actual one after many tmp. There are many comment lines with arr operations but start #, ignored. Need ensure actual executable statements not missed: There is "arr2 = arr" twice. "arr2[2] += 5", "arr[9] = len...", etc. Need scan entire code for lines not starting with # and not variable tmp/copy/note/code/label? Let's systematically list all non-comment executable lines after arr init:
+- arr = [...]
+- code_0 = ...
+... many tmp/copy/note/code/label assignments. They don't modify arr but read. Need ensure some variable names like "arr[0], arr[4] = arr[4], arr[0]" actual. Yes.
+- # comments many
+- arr2 = arr
+- # comments
+- arr2[2] += 5
+- # comments
+- s131 = ''.join(...)
+- # comments
+- arr[9] = len(...)
+- # comments
+- arr[0], arr[2] = arr[2], arr[0]
+- # comments
+- arr[4] += 3
+- # comments
+- arr[2], arr[5] = arr[5], arr[2]
+- # comments
+- arr[5], arr[5] = arr[5], arr[5]
+- # comments
+- arr[0] *= 2
+- # comments
+- arr[0], arr[6] = arr[6], arr[0]
+- # comments
+- arr[5] += 1
+- # comments
+- arr2 = arr
+- # comments
+- arr2[8] += 4
+- # comments
+- arr[4], arr[2] = arr[2], arr[4]
+- # comments
+- s240 = ''.join(...)
+- # comments
+- arr[6] = len(...)
+- # comments
+- arr[2] += 2
+- # comments
+- s858 = ''.join(...)
+- # comments
+- arr[9] = len(...)
+- # comments
+- s44 = ''.join(...)
+- # comments
+- arr[5] = len(...)
+- # comments
+- arr[2], arr[3] = arr[3], arr[2]
+- # comments
+- s13 = ''.join(...)
+- # comments
+- arr[7] = len(...)
+- # comments
+- arr[3] = acc(arr, 7) % 100
+- # comments
+- apply_twice(arr, 4, 5)
+- if __name__... print.
+
+Need check if any actual line "arr[0], arr[4] = arr[4], arr[0]" before arr2? Yes after tmp_799. We included. Need check if there are any other actual assignments to arr elements hidden among comments? Comments all start with #. There are lines like "# временная запись: arr2[7] = 75 — не выполняется" ignored. Good.
+
+Need verify digit counts and modulo. re.findall(r'\d', s) counts digits in concatenated decimal representations. All numbers positive integers. Need ensure if any number becomes negative? No. If zero? no. If multi-digit count correct. Let's recalc from start maybe with table to avoid mistakes.
+
+Initial: [7,15,4,6,1,21,21,10,8,13]
+After swap 0,4: [1,15,4,6,7,21,21,10,8,13]
+After arr2[2]+=5: [1,15,9,6,7,21,21,10,8,13]
+s131 digits: 1(1),15(2)=3,9=4,6=5,7=6,21=8,21=10,10=12,8=13,13=15. arr9=15. [1,15,9,6,7,21,21,10,8,15]
+swap 0,2: [9,15,1,6,7,21,21,10,8,15]
+arr4+=3: [9,15,1,6,10,21,21,10,8,15]
+swap 2,5: [9,15,21,6,10,1,21,10,8,15]
+arr5,arr5 no effect.
+arr0*=2: [18,15,21,6,10,1,21,10,8,15]
+swap 0,6: [21,15,21,6,10,1,18,10,8,15]
+arr5+=1: [21,15,21,6,10,2,18,10,8,15]
+arr2=arr; arr2[8]+=4: [21,15,21,6,10,2,18,10,12,15]
+swap 4,2: [21,15,10,6,21,2,18,10,12,15]
+s240 digits: 21 2; 15 2 total4; 10 2 total6; 6 1 total7; 21 2 total9; 2 1 total10; 18 2 total12; 10 2 total14; 12 2 total16; 15 2 total18. arr6=18 (same). [21,15,10,6,21,2,18,10,12,15]
+arr2+=2: [21,15,12,6,21,2,18,10,12,15]
+s858 digits: 21(2),15(4),12(6),6(7),21(9),2(10),18(12),10(14),12(16),15(18). arr9=18. [21,15,12,6,21,2,18,10,12,18]
+s44 digits: 21(2),15(4),12(6),6(7),21(9),2(10),18(12),10(14),12(16),18(18). arr5=18. [21,15,12,6,21,18,18,10,12,18]
+swap 2,3: [21,15,6,12,21,18,18,10,12,18]
+s13 digits: 21(2),15(4),6(5),12(7),21(9),18(11),18(13),10(15),12(17),18(19). arr7=19. [21,15,6,12,21,18,18,19,12,18]
+acc first 7: indices 0-6: 21+15+6+12+21+18+18 = 111. %100=11. arr3=11. [21,15,6,11,21,18,18,19,12,18]
+apply_twice arr4 +5 twice: 21+10=31. [21,15,6,11,31,18,18,19,12,18]
+Sum: 21+15=36; +6=42; +11=53; +31=84; +18=102; +18=120; +19=139; +12=151; +18=169. Yes.
+
+Need consider Python recursion acc with n=7 fine. apply_twice uses bump function modifies list. Good.
+
+Potential trap: The variable arr2 = arr alias, but later arr2 = arr again. No copy. Good.
+
+Potential trap: s131 computed before arr[9] assignment? Yes after arr2[2]+=5 and before arr[9]=... We used correct.
+
+Potential trap: re.findall(r'\d', s131) counts digits in string representation of list? No s131 is ''.join(str(x) for x in arr), not str(arr). Good. If it were str(arr) would include brackets commas, but it's join. Good.
+
+Potential trap: modulo 50 of digit count; counts <50 so same. Good.
+
+Potential trap: There are many tmp/copy/note/code/label assignments before first swap that read arr but no modifications. They don't affect arr. But some code_ variables use re.sub replacing digits with #, no effect. Good.
+
+Need final answer strictly:
+ARRAY: [21, 15, 6, 11, 31, 18, 18, 19, 12, 18]
+SUM: 169
+
+Need ensure spaces? User says strictly as:
+ARRAY: [numbers, comma separated]
+SUM: number
+We can output exactly two lines. No extra explanation. Final only.
+
+Double-check if any actual executable line "arr[0], arr[4] = arr[4], arr[0]" appears twice? There is one actual after tmp_799. Comments include many but ignored. Good.
+
+Let's maybe scan code for lines that start with "arr" not # in provided text:
+- arr = [7,...]
+- arr[0], arr[4] = arr[4], arr[0]
+- arr2 = arr
+- arr2[2] += 5
+- arr[9] = len(...)
+- arr[0], arr[2] = arr[2], arr[0]
+- arr[4] += 3
+- arr[2], arr[5] = arr[5], arr[2]
+- arr[5], arr[5] = arr[5], arr[5]
+- arr[0] *= 2
+- arr[0], arr[6] = arr[6], arr[0]
+- arr[5] += 1
+- arr2 = arr
+- arr2[8] += 4
+- arr[4], arr[2] = arr[2], arr[4]
+- s240...
+- arr[6] = len(...)
+- arr[2] += 2
+- s858...
+- arr[9] = len(...)
+- s44...
+- arr[5] = len(...)
+- arr[2], arr[3] = arr[3], arr[2]
+- s13...
+- arr[7] = len(...)
+- arr[3] = acc(...)
+- apply_twice(arr, 4, 5)
+Also maybe "arr[0], arr[4] = arr[4], arr[0]" after MANUAL? No. Good.
+
+Need consider if code_0 etc assignments before first swap could raise error? They use re.sub on str(arr[4]) etc. All valid. No effect. Some label strings. Good.
+
+Could there be line "arr2 = arr" before first actual swap? In code: after many comments, there is "arr2 = arr" then comments then arr2[2]+=5. We included after first swap. Wait order: The actual first swap arr[0], arr[4] = arr[4], arr[0] appears before a huge block of comments, then arr2 = arr, then more comments, then arr2[2] += 5. Yes.
+
+Let's verify exact position: In code after tmp_799:
+arr[0], arr[4] = arr[4], arr[0]
+# временная запись...
+...
+arr2 = arr
+# справка...
+...
+arr2[2] += 5
+...
+s131 = ''.join(...)
+...
+arr[9] = len(...)
+...
+arr[0], arr[2] = arr[2], arr[0]
+...
+arr[4] += 3
+...
+arr[2], arr[5] = arr[5], arr[2]
+...
+arr[5], arr[5] = arr[5], arr[5]
+...
+arr[0] *= 2
+...
+arr[0], arr[6] = arr[6], arr[0]
+...
+arr[5] += 1
+...
+arr2 = arr
+...
+arr2[8] += 4
+...
+arr[4], arr[2] = arr[2], arr[4]
+...
+s240 = ...
+...
+arr[6] = len(...)
+...
+arr[2] += 2
+...
+s858 = ...
+...
+arr[9] = len(...)
+...
+s44 = ...
+...
+arr[5] = len(...)
+...
+arr[2], arr[3] = arr[3], arr[2]
+...
+s13 = ...
+...
+arr[7] = len(...)
+...
+arr[3] = acc(arr, 7) % 100
+...
+apply_twice(arr, 4, 5)
+
+Yes.
+
+Need maybe compute s131 after arr2[2]+=5 but before arr[9]=... We did. Note arr2 alias so arr[2]=9. Good.
+
+Let's consider if any of the tmp/copy/note/code/label assignments after arr modifications but before s131? Actually all tmp assignments are before first swap. After first swap, only comments and actual modifications. So no reads that matter. Good.
+
+Potential issue: Python tuple assignment arr[0], arr[4] = arr[4], arr[0] uses original values simultaneously. We did.
+
+Potential issue: apply_twice(arr, 4, 5) after arr[3]=acc... It modifies arr[4] from 21 to 31. Good.
+
+Potential issue: acc(arr,7) after arr[7]=19 but before arr[3] assignment. It sums first 7 elements including arr[3] old value 12, not new. We used old 12. Good. If acc uses a[n-1] recursively, sum indices 0..6. Yes.
+
+Let's recalc acc: arr before assignment [21,15,6,12,21,18,18,19,12,18]. Sum first 7 = 21+15+6+12+21+18+18 = 111. %100=11. Good.
+
+Potential issue: len(re.findall(r'\d', s)) counts digits in strings of numbers; if number is negative, '-' not digit. No negatives. If number 0, one digit. No zero? arr[5] became 2 etc. No zero. Good.
+
+Need final answer no markdown? Strict lines. We'll output exactly.
+
+But let's think if there is any hidden effect from functions definitions? No.
+
+Could the huge TRAP variables assignments be executed and maybe memory? no effect. They are strings. MANUAL string no effect.
+
+Could re module import fail? no.
+
+Could recursion acc with n=7 use arr modified during call? no.
+
+Let's maybe simulate with a small script mentally? Already.
+
+Need ensure final array order: [21, 15, 6, 11, 31, 18, 18, 19, 12, 18]
+Sum: 21+15+6+11+31+18+18+19+12+18 = let's sum alternative: (21+31)=52, (15+6+11)=32 total84, (18+18+19+12+18)=85? 18+18=36, +19=55, +12=67, +18=85. 84+85=169. Good.
+
+Need final.

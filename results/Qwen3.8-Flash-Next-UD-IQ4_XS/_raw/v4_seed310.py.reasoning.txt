@@ -1,0 +1,387 @@
+We need answer user's request: execute program mentally? Need final array and sum. We need parse huge Python code. Need determine final arr after running. We can simulate carefully. Need likely only active statements matter; comments ignored. There are many assignments to arr, arr2 alias, functions defined but only some called. Need compute final array and sum.
+
+We need analyze code. It's a generated obfuscated program with many traps and comments. Need execute semantics.
+
+Initial:
+import re
+functions acc, bump, bump_all, mix, apply_twice.
+MANUAL string irrelevant? TRAP variables irrelevant? They are strings assigned but not used. Then arr = [18, 3, 7, 22, 9, 6, 10, 19, 29, 28]
+
+Then many lines: code_0 = re.sub(...), tmp_... etc. These do not modify arr. Need watch for active statements that modify arr or arr2 (alias). Comments ignored. Need process in order all non-comment executable statements after initial arr. There are many assignments to variables using arr values, but no effect except maybe re? No.
+
+Need identify active modifications:
+- arr[9] -= 3
+- arr[8] -= 9
+- arr2 = arr (alias)
+- arr2[2] += 1 (modifies arr[2])
+- arr[1] = acc(arr, 6) % 100
+- arr[6] = acc(arr, 5) % 100
+- apply_twice(arr, 2, 4)
+- arr2 = arr (again)
+- arr2[4] += 7
+- apply_twice(arr, 2, 4)
+- arr[6] -= 8
+- arr.reverse()
+- s385 = ''.join(str(x) for x in arr)
+- arr[3] = len(re.findall(r'\d', s385)) % 50
+- arr[3] *= 2
+- arr[4:7] = sorted(arr[4:7])
+- arr[6] -= 5
+- arr[9] += 7
+- t334 = str(arr[1]) + str(arr[1])
+- arr[9] = int(t334) % 97
+- arr[6] += 2
+- arr[3] *= 2
+- arr2 = arr
+- arr2[1] += 7
+- s623 = ''.join(str(x) for x in arr)
+- arr[1] = len(re.findall(r'\d', s623)) % 50
+Then print.
+
+Need ensure no other active statements hidden among comments? There are lines like "arr[9] -= 3" not comment. Many comment lines start #. Need scan entire code for non-comment lines after arr. Also assignments to variables like code_0 etc don't affect arr. Need check if any line like "arr[5], arr[5] = arr[5], arr[5]"? In comments only? There are many trap strings but not executed. Need ensure no active statements in TRAP variables? They are just strings. MANUAL string not executed.
+
+Need compute final array exactly. Let's simulate step by step with care.
+
+Initial arr indices 0..9:
+0:18
+1:3
+2:7
+3:22
+4:9
+5:6
+6:10
+7:19
+8:29
+9:28
+
+Before modifications, many tmp/copy/code lines read arr but no changes. Need note acc uses current arr.
+
+Active sequence in order after all those variable assignments:
+
+1. arr[9] -= 3
+2. comments...
+3. arr[8] -= 9
+4. comments...
+5. arr2 = arr
+6. comments...
+7. arr2[2] += 1
+8. comments...
+9. arr[1] = acc(arr, 6) % 100
+10. comments...
+11. arr[6] = acc(arr, 5) % 100
+12. comments...
+13. apply_twice(arr, 2, 4)
+14. comments...
+15. arr2 = arr (again)
+16. comments...
+17. arr2[4] += 7
+18. comments...
+19. apply_twice(arr, 2, 4)
+20. comments...
+21. arr[6] -= 8
+22. comments...
+23. arr.reverse()
+24. comments...
+25. s385 = ''.join(str(x) for x in arr)
+26. comments...
+27. arr[3] = len(re.findall(r'\d', s385)) % 50
+28. comments...
+29. arr[3] *= 2
+30. comments...
+31. arr[4:7] = sorted(arr[4:7])
+32. comments...
+33. arr[6] -= 5
+34. comments...
+35. arr[9] += 7
+36. comments...
+37. t334 = str(arr[1]) + str(arr[1])
+38. comments...
+39. arr[9] = int(t334) % 97
+40. comments...
+41. arr[6] += 2
+42. comments...
+43. arr[3] *= 2
+44. comments...
+45. arr2 = arr
+46. comments...
+47. arr2[1] += 7
+48. comments...
+49. s623 = ''.join(str(x) for x in arr)
+50. comments...
+51. arr[1] = len(re.findall(r'\d', s623)) % 50
+
+Need verify if any active line "arr[9] -= 3" before arr2 alias? yes.
+
+Let's compute.
+
+Functions:
+acc(a,n): if n<=0 return 0 else a[n-1]+acc(a,n-1). So sum first n elements (indices 0..n-1).
+apply_twice(a,i,v): bump twice => a[i] += 2*v.
+
+Step 1: arr[9] -=3: arr9=25.
+arr = [18,3,7,22,9,6,10,19,29,25]
+Step 3: arr[8]-=9: arr8=20.
+arr = [18,3,7,22,9,6,10,19,20,25]
+Step 5 arr2=arr alias.
+Step 7 arr2[2]+=1 => arr[2]=8.
+arr = [18,3,8,22,9,6,10,19,20,25]
+
+Step 9: arr[1] = acc(arr,6)%100. acc first 6: indices 0..5: 18+3+8+22+9+6 = 66? 18+3=21, +8=29, +22=51, +9=60, +6=66. %100=66. arr[1]=66.
+arr = [18,66,8,22,9,6,10,19,20,25]
+
+Step 11: arr[6] = acc(arr,5)%100. first 5 indices 0..4: 18+66+8+22+9 = 123? 18+66=84, +8=92, +22=114, +9=123. %100=23. arr[6]=23.
+arr = [18,66,8,22,9,6,23,19,20,25]
+
+Step 13: apply_twice(arr,2,4): arr[2]+=8 => 16.
+arr = [18,66,16,22,9,6,23,19,20,25]
+
+Step 15 arr2=arr (same)
+Step 17 arr2[4]+=7 => arr[4]=16.
+arr = [18,66,16,22,16,6,23,19,20,25]
+
+Step 19 apply_twice(arr,2,4): arr[2]+=8 => 24.
+arr = [18,66,24,22,16,6,23,19,20,25]
+
+Step 21 arr[6]-=8 => 15.
+arr = [18,66,24,22,16,6,15,19,20,25]
+
+Step 23 arr.reverse(): reverse list in place.
+Before reverse: [18,66,24,22,16,6,15,19,20,25]
+After reverse: [25,20,19,15,6,16,22,24,66,18]
+Check indices:
+0=25 (old9)
+1=20 (old8)
+2=19 (old7)
+3=15 (old6)
+4=6 (old5)
+5=16 (old4)
+6=22 (old3)
+7=24 (old2)
+8=66 (old1)
+9=18 (old0)
+
+Step 25 s385 = ''.join(str(x) for x in arr). Need string of numbers concatenated: "2520191561622246618"? Let's concatenate carefully:
+arr values: 25,20,19,15,6,16,22,24,66,18.
+strs: '25' + '20' = '2520'
++ '19' = '252019'
++ '15' = '25201915'
++ '6' = '252019156'
++ '16' = '25201915616'
++ '22' = '2520191561622'
++ '24' = '252019156162224'
++ '66' = '25201915616222466'
++ '18' = '2520191561622246618'
+Yes length? 2+2+2+2+1+2+2+2+2+2 = 19 digits. All digits. re.findall(r'\d', s385) counts digits = 19. %50 = 19.
+Step 27 arr[3] = 19.
+arr currently [25,20,19,15,6,16,22,24,66,18]
+Set index3=19: [25,20,19,19,6,16,22,24,66,18]
+
+Step 29 arr[3] *= 2 => 38.
+arr = [25,20,19,38,6,16,22,24,66,18]
+
+Step 31 arr[4:7] = sorted(arr[4:7]). Slice indices 4,5,6 values [6,16,22], sorted [6,16,22] unchanged.
+arr same.
+
+Step 33 arr[6] -=5 => index6 22-5=17.
+arr = [25,20,19,38,6,16,17,24,66,18]
+
+Step 35 arr[9] +=7 => 18+7=25.
+arr = [25,20,19,38,6,16,17,24,66,25]
+
+Step 37 t334 = str(arr[1]) + str(arr[1]) = '20'+'20'='2020'.
+Step 39 arr[9] = int(t334)%97 = 2020 % 97. Compute 97*20=1940, remainder 80. 97*21=2037 too high. So 80.
+arr = [25,20,19,38,6,16,17,24,66,80]
+
+Step 41 arr[6] +=2 => 19.
+arr = [25,20,19,38,6,16,19,24,66,80]
+
+Step 43 arr[3] *=2 => 76.
+arr = [25,20,19,76,6,16,19,24,66,80]
+
+Step 45 arr2=arr
+Step 47 arr2[1]+=7 => arr[1]=27.
+arr = [25,27,19,76,6,16,19,24,66,80]
+
+Step 49 s623 = ''.join(str(x) for x in arr). Values: 25,27,19,76,6,16,19,24,66,80.
+Concatenate: '25'+'27'='2527'; +'19'='252719'; +'76'='25271976'; +'6'='252719766'; +'16'='25271976616'; +'19'='2527197661619'; +'24'='252719766161924'; +'66'='25271976616192466'; +'80'='2527197661619246680'.
+Need count digits: 2+2+2+2+1+2+2+2+2+2 = 19 again? Let's count string length: 25(2),27(4),19(6),76(8),6(9),16(11),19(13),24(15),66(17),80(19). All digits, count=19. %50=19.
+Step 51 arr[1] = 19.
+Final arr = [25,19,19,76,6,16,19,24,66,80]
+
+Sum: 25+19=44; +19=63; +76=139; +6=145; +16=161; +19=180; +24=204; +66=270; +80=350. Sum 350.
+
+Need be absolutely sure no other active statements overlooked. The code includes many lines like "arr[9] -= 3" and "arr[8] -= 9" etc. Need scan from initial arr to end for any non-comment line that modifies arr or arr2. Also functions definitions not called except apply_twice twice. There are assignments to variables code_0 etc that call re.sub on str(arr[i]) but no side effects. There are note/copy/tmp/label assignments. They don't modify arr. There are string variables TRAP_... not used. MANUAL not used.
+
+Potential issue: Python list slice assignment arr[4:7] = sorted(arr[4:7]) if sorted returns list length 3, okay.
+
+Potential issue: arr.reverse() after arr2 alias? arr2 still references same list, but no modifications between reverse and next arr2=arr? Actually after reverse, there are no arr2 modifications until arr2=arr later. Fine.
+
+Potential issue: acc(arr,6) uses current arr after arr[1] maybe? We computed. Need verify order: line "arr[1] = acc(arr, 6) % 100" occurs after arr2[2]+=1. Yes. But there are many preceding lines that assign tmp etc using arr values before modifications? They don't affect. Need ensure no active line before arr[9]-=3 that modifies arr? There are only variable assignments. Could any of those variable names shadow builtins or functions? No.
+
+Potential issue: The code has "arr[9] -= 3" after all code_ lines. Then many comments. Then "arr[8] -= 9". Then comments. Then "arr2 = arr". Then comments. Then "arr2[2] += 1". Then comments. Then "arr[1] = acc(arr, 6) % 100". Good.
+
+Need maybe there is active line "arr[6] = acc(arr, 5) % 100" after arr[1] assignment. Yes.
+
+Need check apply_twice(arr,2,4) called twice. It modifies arr[2] by +8 each. We did.
+
+Need check arr2[4]+=7 after second alias. Yes.
+
+Need check arr[6]-=8 before reverse. Yes.
+
+Need check s385 after reverse and before arr[3] assignment. Yes.
+
+Need check len(re.findall(r'\d', s385)) % 50: re.findall returns list of all digit characters. Since all numbers non-negative? Yes all values positive? At that point values [25,20,19,15,6,16,22,24,66,18], all positive. If negative, '-' not digit. No negatives. Count digits 19. Good.
+
+Need check t334 = str(arr[1]) + str(arr[1]) after arr[9]+=7 and before arr[9] assignment. At that point arr[1]=20? Let's recalc after reverse: arr[1]=20. Then arr[3]=19, arr[3]=38, slice unchanged, arr[6]=17, arr[9]=25. arr[1] still 20. t334='2020'. Good.
+
+Need check final s623 after arr2[1]+=7: arr[1]=27. Then set to 19. Good.
+
+Could there be active line "arr[9] += 7" before t334? yes we did. Then arr[9] overwritten by 80. Good.
+
+Need check if any active line "arr[6] += 2" after arr[9] assignment, yes. Then arr[3]*=2. Good.
+
+Need check if any active line "arr2 = arr" before arr2[1]+=7; yes. But arr2 already alias; no effect.
+
+Potential hidden active statements in comments? Comments start with #, ignored. Lines like "# временная запись: arr[5] *= 87 — не выполняется" are comments. Good.
+
+Need consider Python execution of huge code: variable names like code_0 etc assigned many times. No syntax errors? There are lines with Russian strings, okay. Need ensure no line like "arr[5], arr[5] = arr[5], arr[5]" active? Search mentally: In comments only? There are many comment lines with such. But maybe some non-comment trap assignments? The TRAP_ variables are strings, not executed. There is no exec. So fine.
+
+Need maybe MANUAL string contains lines but not executed. Good.
+
+Need final answer strictly format:
+ARRAY: [numbers, comma separated]
+SUM: number
+
+Need ensure spaces? They said strictly as:
+ARRAY: [numbers, comma separated]
+SUM: number
+So output exactly two lines. Could include brackets and comma space. Use final array [25, 19, 19, 76, 6, 16, 19, 24, 66, 80], sum 350.
+
+Double-check with alternative simulation maybe using mental or write pseudo? We can't run code but can reason. Let's re-evaluate from start to catch any missed active modifications among the long variable assignment block. The block:
+arr = [18, 3, 7, 22, 9, 6, 10, 19, 29, 28]
+
+code_0 = re.sub(r'[0-9]', '#', str(arr[0]))
+tmp_1 = arr[4] + 48
+...
+All are assignments to variables. None modify arr. Some use arr values but no side effects. There are label_ variables strings. No function calls that mutate arr? re.sub doesn't mutate. str doesn't. join later. acc not called until later. apply_twice not called until later. bump etc not called except apply_twice. Good.
+
+Need check if any variable assignment line accidentally modifies arr via augmented assignment? e.g., "arr[9] -= 3" is first after block. Yes.
+
+Let's scan the text after code_799:
+arr[9] -= 3
+# справка...
+...
+arr[8] -= 9
+...
+arr2 = arr
+...
+arr2[2] += 1
+...
+arr[1] = acc(arr, 6) % 100
+...
+arr[6] = acc(arr, 5) % 100
+...
+apply_twice(arr, 2, 4)
+...
+arr2 = arr
+...
+arr2[4] += 7
+...
+apply_twice(arr, 2, 4)
+...
+arr[6] -= 8
+...
+arr.reverse()
+...
+s385 = ''.join(str(x) for x in arr)
+...
+arr[3] = len(re.findall(r'\d', s385)) % 50
+...
+arr[3] *= 2
+...
+arr[4:7] = sorted(arr[4:7])
+...
+arr[6] -= 5
+...
+arr[9] += 7
+...
+t334 = str(arr[1]) + str(arr[1])
+...
+arr[9] = int(t334) % 97
+...
+arr[6] += 2
+...
+arr[3] *= 2
+...
+arr2 = arr
+...
+arr2[1] += 7
+...
+s623 = ''.join(str(x) for x in arr)
+...
+arr[1] = len(re.findall(r'\d', s623)) % 50
+
+Are there any active lines between these that we missed? The huge comments are all #. There are no blank? fine.
+
+Let's recalc with table to ensure no arithmetic mistakes:
+Initial: [18,3,7,22,9,6,10,19,29,28]
+After arr9-=3: [18,3,7,22,9,6,10,19,29,25]
+After arr8-=9: [18,3,7,22,9,6,10,19,20,25]
+After arr2[2]+=1: [18,3,8,22,9,6,10,19,20,25]
+acc6: 18+3+8+22+9+6=66 -> arr1=66: [18,66,8,22,9,6,10,19,20,25]
+acc5: 18+66+8+22+9=123 -> 23 arr6: [18,66,8,22,9,6,23,19,20,25]
+apply_twice i2 v4: +8 arr2=16: [18,66,16,22,9,6,23,19,20,25]
+arr2[4]+=7: arr4=16: [18,66,16,22,16,6,23,19,20,25]
+apply_twice i2: arr2=24: [18,66,24,22,16,6,23,19,20,25]
+arr6-=8: 15: [18,66,24,22,16,6,15,19,20,25]
+reverse: [25,20,19,15,6,16,22,24,66,18]
+s385 digits count: values digits: 25(2),20(2)=4,19=6,15=8,6=9,16=11,22=13,24=15,66=17,18=19. arr3=19: [25,20,19,19,6,16,22,24,66,18]
+arr3*=2: 38: [25,20,19,38,6,16,22,24,66,18]
+slice 4:7 sorted [6,16,22] unchanged.
+arr6-=5: 17: [25,20,19,38,6,16,17,24,66,18]
+arr9+=7: 25: [25,20,19,38,6,16,17,24,66,25]
+t334 from arr1=20 -> 2020 %97 =? 97*20=1940 rem80. arr9=80: [25,20,19,38,6,16,17,24,66,80]
+arr6+=2: 19: [25,20,19,38,6,16,19,24,66,80]
+arr3*=2: 76: [25,20,19,76,6,16,19,24,66,80]
+arr2[1]+=7: 27: [25,27,19,76,6,16,19,24,66,80]
+s623 digits count: 25(2),27(4),19(6),76(8),6(9),16(11),19(13),24(15),66(17),80(19). arr1=19: [25,19,19,76,6,16,19,24,66,80]
+Sum: 25+19+19+76+6+16+19+24+66+80.
+Group: (25+75?) Let's sum: 25+19=44; +19=63; +76=139; +6=145; +16=161; +19=180; +24=204; +66=270; +80=350. Yes.
+
+Need consider if re.findall(r'\d', s385) counts digits in string representation of negative numbers? none. If numbers can be multi-digit, yes count each digit. Good.
+
+Potential issue: In Python, augmented assignment arr[9] -= 3 evaluates arr[9], subtracts, assigns. Fine.
+
+Potential issue: apply_twice uses bump(a,i,v) which does a[i] += v. Called twice. Good.
+
+Potential issue: acc recursion with n=6 uses current arr after arr[1] maybe? For first acc, arr[1] is being assigned; RHS evaluated before assignment, so uses old arr[1]=3. We used old. Good. For second acc, arr[6] assigned; RHS uses current arr before assignment, arr[6]=10? Wait after first acc, arr = [18,66,8,22,9,6,10,19,20,25]. acc(arr,5) uses first 5 elements indices 0..4: 18+66+8+22+9=123. It does not include arr[5]? n=5 includes indices 0-4. Good. If someone mistakenly includes arr[5]? No. We used correct.
+
+Potential issue: acc(arr,6) after arr2[2]+=1 includes arr[5]=6, yes. Good.
+
+Potential issue: The line "arr[1] = acc(arr, 6) % 100" occurs after many tmp/copy lines that might have assigned to arr? No.
+
+Potential issue: There are variables named copy_3 = arr[0], etc. They store ints, no alias. Good.
+
+Potential issue: The code has "arr2 = arr" before arr2[2]+=1. Then later "arr2 = arr" again. No new list. Good.
+
+Potential issue: Could there be active line "arr[4:7] = sorted(arr[4:7])" after arr[3]*=2 and before arr[6]-=5. We did. It sorts indices 4,5,6 values [6,16,22] unchanged. If arr[6] was 22 at that time? Let's check before slice: after reverse and arr3 modifications: [25,20,19,38,6,16,22,24,66,18]. Yes slice [6,16,22]. unchanged. Good.
+
+Potential issue: arr[6]-=5 after slice: index6 22 -> 17. Good.
+
+Potential issue: arr[9]+=7 before t334: index9 18 ->25. Then overwritten. Good.
+
+Potential issue: t334 uses arr[1] after reverse and before final modifications: arr[1]=20. Yes.
+
+Potential issue: final s623 uses arr after arr2[1]+=7 but before arr[1]=digit count. We used [25,27,...]. Count digits 19. If arr[1]=27 two digits, yes. If arr[1] had been 19? no. Count still 19 because all values two digits except 6. Let's verify if any value became one/two digits differently: final before s623: [25,27,19,76,6,16,19,24,66,80]. Digits: 2+2+2+2+1+2+2+2+2+2=19. Good.
+
+Need maybe len(re.findall(r'\d', s623)) % 50 = 19. Yes.
+
+Could there be active line "arr[1] = len(re.findall(r'\d', s623)) % 50" after many comments, then print. Yes.
+
+Now final answer. Need not include explanation, strict format. Ensure no extra text. final: 
+ARRAY: [25, 19, 19, 76, 6, 16, 19, 24, 66, 80]
+SUM: 350
+
+Double-check if user's requested "назвать массив и сумму" maybe expects Russian? But strict format English labels. Use exactly.
+
+Need ensure no trailing spaces. Good.

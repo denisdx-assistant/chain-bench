@@ -1,0 +1,361 @@
+We need answer user's request: execute program mentally / compute final arr and sum. Need provide strict format. We need analyze huge Python code. Need determine final array after running program. It includes many dummy variables, comments, traps, manual? Need parse actual executable statements only. Need be careful with aliases arr2 = arr, slice assignments, functions acc, bump_all, etc. Need compute final arr and sum.
+
+We need simulate program. The code is long but actual operations on arr are limited: initial arr = [21, 17, 10, 25, 23, 10, 17, 16, 14, 9]. Then many tmp/copy/note/code/label assignments reading arr but not modifying. Then actual modifications:
+arr[5] -= 7
+... comments ...
+arr[9] *= 2
+... comments ...
+arr[7] -= 7
+... comments ...
+arr[2] += 1
+... comments ...
+arr[2] -= 5
+... comments ...
+bump_all(arr, 3)
+... comments ...
+arr[0], arr[9] = arr[9], arr[0]
+... comments ...
+arr[4] = acc(arr, 6) % 100
+... comments ...
+arr[1] *= 2
+... comments ...
+arr[2], arr[6] = arr[6], arr[2]
+... comments ...
+t459 = str(arr[8]) + str(arr[5])
+... comments ...
+arr[2] = int(t459) % 97
+... comments ...
+arr[1], arr[9] = arr[9], arr[1]
+... comments ...
+arr[5] += 3
+... comments ...
+arr2 = arr
+... comments ...
+arr2[2] += 3
+... comments ...
+arr[2:5] = sorted(arr[2:5])
+... comments ...
+arr[0] -= 8
+... comments ...
+arr[7] *= 2
+... comments ...
+t99 = str(arr[1]) + str(arr[2])
+... comments ...
+arr[2] = int(t99) % 97
+... comments ...
+arr[0:3] = sorted(arr[0:3])
+... comments ...
+arr[6] = acc(arr, 6) % 100
+... comments ...
+print arr sum.
+
+Need ensure no other executable statements? There are many tmp_ variables assignments reading arr; no modifications. There are TRAP strings not executed. MANUAL string not executed. Functions defined but only acc and bump_all called. Need consider Python semantics: arr2 = arr alias, so arr2[2] += 3 modifies arr[2]. Slice assignment arr[2:5] = sorted(arr[2:5]) modifies in place length same. arr[0:3] = sorted(arr[0:3]). acc(a,n) recursive sum first n elements. bump_all adds v to even indices 0,2,4,6,8. Need compute exact sequence.
+
+Let's simulate carefully. Could write mental or use analysis. Need be extremely careful with order and values. Let's list executable modifications in order with line context.
+
+Initial:
+arr = [21, 17, 10, 25, 23, 10, 17, 16, 14, 9]
+Indices:0..9.
+
+Then many reads no changes.
+
+First modification:
+arr[5] -= 7
+Before arr[5]=10 -> 3.
+arr = [21,17,10,25,23,3,17,16,14,9]
+
+Next actual:
+arr[9] *= 2
+arr[9]=9 ->18.
+arr = [21,17,10,25,23,3,17,16,14,18]
+
+Next:
+arr[7] -= 7
+arr[7]=16 ->9.
+arr = [21,17,10,25,23,3,17,9,14,18]
+
+Next:
+arr[2] += 1
+arr[2]=10 ->11.
+arr = [21,17,11,25,23,3,17,9,14,18]
+
+Next:
+arr[2] -= 5
+arr[2]=11 ->6.
+arr = [21,17,6,25,23,3,17,9,14,18]
+
+Next:
+bump_all(arr, 3)
+for i in range(0,len(a),2): a[i]+=3 => indices 0,2,4,6,8.
+arr[0]=21+3=24
+arr[2]=6+3=9
+arr[4]=23+3=26
+arr[6]=17+3=20
+arr[8]=14+3=17
+Others unchanged: [24,17,9,25,26,3,20,9,17,18]
+
+Next:
+arr[0], arr[9] = arr[9], arr[0]
+RHS evaluated first: (18,24). Assign arr[0]=18, arr[9]=24.
+arr = [18,17,9,25,26,3,20,9,17,24]
+
+Next:
+arr[4] = acc(arr, 6) % 100
+acc sums first 6 elements indices 0..5: 18+17+9+25+26+3 = let's sum:18+17=35, +9=44, +25=69, +26=95, +3=98. %100=98. arr[4]=98.
+arr = [18,17,9,25,98,3,20,9,17,24]
+
+Next:
+arr[1] *= 2
+arr[1]=17 ->34.
+arr = [18,34,9,25,98,3,20,9,17,24]
+
+Next:
+arr[2], arr[6] = arr[6], arr[2]
+RHS (20,9). arr[2]=20, arr[6]=9.
+arr = [18,34,20,25,98,3,9,9,17,24]
+
+Next:
+t459 = str(arr[8]) + str(arr[5])
+arr[8]=17, arr[5]=3 => t459="173".
+
+Next:
+arr[2] = int(t459) % 97
+int("173")=173; 173 % 97 = 76? 97*1=97, remainder 76. arr[2]=76.
+arr = [18,34,76,25,98,3,9,9,17,24]
+
+Next:
+arr[1], arr[9] = arr[9], arr[1]
+RHS (24,34). arr[1]=24, arr[9]=34.
+arr = [18,24,76,25,98,3,9,9,17,34]
+
+Next:
+arr[5] += 3
+arr[5]=3 ->6.
+arr = [18,24,76,25,98,6,9,9,17,34]
+
+Next:
+arr2 = arr (alias)
+
+Next:
+arr2[2] += 3
+arr[2]=76 ->79.
+arr = [18,24,79,25,98,6,9,9,17,34]
+
+Next:
+arr[2:5] = sorted(arr[2:5])
+Slice indices 2,3,4 values [79,25,98], sorted [25,79,98]. Assign to positions 2,3,4.
+arr = [18,24,25,79,98,6,9,9,17,34]
+
+Next:
+arr[0] -= 8
+arr[0]=18 ->10.
+arr = [10,24,25,79,98,6,9,9,17,34]
+
+Next:
+arr[7] *= 2
+arr[7]=9 ->18.
+arr = [10,24,25,79,98,6,9,18,17,34]
+
+Next:
+t99 = str(arr[1]) + str(arr[2])
+arr[1]=24, arr[2]=25 => "2425".
+
+Next:
+arr[2] = int(t99) % 97
+int 2425 % 97. Compute 97*25=2425 exactly? 97*20=1940, *5=485 total 2425. remainder 0. arr[2]=0.
+arr = [10,24,0,79,98,6,9,18,17,34]
+
+Next:
+arr[0:3] = sorted(arr[0:3])
+Slice values [10,24,0], sorted [0,10,24]. Assign positions 0,1,2.
+arr = [0,10,24,79,98,6,9,18,17,34]
+
+Next:
+arr[6] = acc(arr, 6) % 100
+acc first 6 indices 0..5: 0+10+24+79+98+6 = let's sum:0+10=10, +24=34, +79=113, +98=211, +6=217. %100=17. arr[6]=17.
+arr = [0,10,24,79,98,6,17,18,17,34]
+
+Then print sum: sum = 0+10+24+79+98+6+17+18+17+34. Compute: 0+10=10; +24=34; +79=113; +98=211; +6=217; +17=234; +18=252; +17=269; +34=303. Sum 303.
+
+Need verify no hidden executable statements among comments? Comments start #, ignored. Strings TRAP not executed. MANUAL not executed. tmp/copy/note/code/label assignments are executable but only read arr and assign variables; no side effects except re.sub? re.sub on str(arr[i]) no arr modification. label strings no effect. Need check if any line like "arr[6] = 87 — не выполняется" is comment? It's within # comment lines, yes. Need ensure actual code lines not commented. The huge block after initial variables includes many lines like tmp_0 = arr[3] + 48 etc. They don't modify arr. There are no function calls except bump_all and acc. Need check if any line with "arr[...]" not comment? We listed. Need ensure order: There is a line "arr[5] -= 7" before comments. Then many comments. Then "arr[9] *= 2". Then comments. Then "arr[7] -= 7". Then comments. Then "arr[2] += 1". Then comments. Then "arr[2] -= 5". Then comments. Then "bump_all(arr, 3)". Then comments. Then "arr[0], arr[9] = arr[9], arr[0]". Then comments. Then "arr[4] = acc(arr, 6) % 100". Then comments. Then "arr[1] *= 2". Then comments. Then "arr[2], arr[6] = arr[6], arr[2]". Then comments. Then "t459 = str(arr[8]) + str(arr[5])". Then comments. Then "arr[2] = int(t459) % 97". Then comments. Then "arr[1], arr[9] = arr[9], arr[1]". Then comments. Then "arr[5] += 3". Then comments. Then "arr2 = arr". Then comments. Then "arr2[2] += 3". Then comments. Then "arr[2:5] = sorted(arr[2:5])". Then comments. Then "arr[0] -= 8". Then comments. Then "arr[7] *= 2". Then comments. Then "t99 = str(arr[1]) + str(arr[2])". Then comments. Then "arr[2] = int(t99) % 97". Then comments. Then "arr[0:3] = sorted(arr[0:3])". Then comments. Then "arr[6] = acc(arr, 6) % 100". Then comments. Then if __name__ print.
+
+Need consider Python tuple assignment with arr[0], arr[9] = arr[9], arr[0] after bump_all: yes.
+
+Need consider acc recursion: def acc(a,n): if n<=0 return 0; return a[n-1]+acc(a,n-1). For n=6 sum first 6. Good.
+
+Need consider bump_all: for i in range(0,len(a),2): a[i]+=v. len=10, indices 0,2,4,6,8. Good.
+
+Potential trap: There are variables named arr2 in MANUAL string? Not executed. There is line "arr2[4] = 59" inside MANUAL string not executed. There are comments with arr2 not executed. Only actual arr2 = arr near end. Good.
+
+Potential trap: The code has many assignments like code_2 = re.sub(r'[0-9]', '#', str(arr[5])) before modifications; no effect. But could re.sub import? imported re. No side effects.
+
+Potential trap: There are lines like "label_6 = "запись 6 не применялась"" no effect.
+
+Need maybe run through with exact values again to avoid arithmetic mistakes. Let's do a table.
+
+Initial: [21,17,10,25,23,10,17,16,14,9]
+1 arr[5]-=7: index5 10-7=3 => [21,17,10,25,23,3,17,16,14,9]
+2 arr[9]*=2: 9*2=18 => [21,17,10,25,23,3,17,16,14,18]
+3 arr[7]-=7: 16-7=9 => [21,17,10,25,23,3,17,9,14,18]
+4 arr[2]+=1: 10+1=11 => [21,17,11,25,23,3,17,9,14,18]
+5 arr[2]-=5: 11-5=6 => [21,17,6,25,23,3,17,9,14,18]
+6 bump_all +3 even: idx0 24, idx2 9, idx4 26, idx6 20, idx8 17 => [24,17,9,25,26,3,20,9,17,18]
+7 swap 0 and 9: [18,17,9,25,26,3,20,9,17,24]
+8 arr[4]=acc first6 %100: first6 18+17+9+25+26+3=98 => [18,17,9,25,98,3,20,9,17,24]
+9 arr[1]*=2: 34 => [18,34,9,25,98,3,20,9,17,24]
+10 swap 2 and 6: idx2=20 idx6=9 => [18,34,20,25,98,3,9,9,17,24]
+11 t459 = str(arr[8]) + str(arr[5]) = '17'+'3'='173'
+12 arr[2]=173%97=76 => [18,34,76,25,98,3,9,9,17,24]
+13 swap 1 and 9: arr[1]=24 arr[9]=34 => [18,24,76,25,98,3,9,9,17,34]
+14 arr[5]+=3: 6 => [18,24,76,25,98,6,9,9,17,34]
+15 arr2=arr
+16 arr2[2]+=3: 79 => [18,24,79,25,98,6,9,9,17,34]
+17 arr[2:5]=sorted([79,25,98])=[25,79,98] => [18,24,25,79,98,6,9,9,17,34]
+18 arr[0]-=8: 10 => [10,24,25,79,98,6,9,9,17,34]
+19 arr[7]*=2: 18 => [10,24,25,79,98,6,9,18,17,34]
+20 t99 = str(arr[1]) + str(arr[2]) = '24'+'25'='2425'
+21 arr[2]=2425%97=0 => [10,24,0,79,98,6,9,18,17,34]
+22 arr[0:3]=sorted([10,24,0])=[0,10,24] => [0,10,24,79,98,6,9,18,17,34]
+23 arr[6]=acc first6 %100: 0+10+24+79+98+6=217%100=17 => [0,10,24,79,98,6,17,18,17,34]
+Sum: 0+10=10; +24=34; +79=113; +98=211; +6=217; +17=234; +18=252; +17=269; +34=303.
+
+Need ensure after arr[6]=acc(arr,6), acc uses current arr including arr[6]? n=6 uses indices 0..5, so arr[6] old not included. Good.
+
+Potential issue: In Python, augmented assignment to list element like arr[5] -= 7 is equivalent to arr.__setitem__(5, arr.__getitem__(5)-7). Fine.
+
+Potential issue: Slice assignment with sorted(arr[2:5]) creates new list; length same. Fine.
+
+Potential issue: t459 = str(arr[8]) + str(arr[5]) after swap 2 and 6 but before arr[2] assignment. We used arr[8]=17, arr[5]=3. Good.
+
+Potential issue: t99 after arr[0]-=8 and arr[7]*=2 but before arr[2] assignment. We used arr[1]=24, arr[2]=25. Good.
+
+Need answer strictly:
+ARRAY: [0, 10, 24, 79, 98, 6, 17, 18, 17, 34]
+SUM: 303
+
+But let's consider if there are any executable statements hidden in the huge block before modifications that could modify arr via functions? There are no calls to bump or apply_twice except bump_all. There are definitions only. There are assignments like tmp_0 = arr[3] + 48; no modification. code_2 = re.sub... no modification. note_3 = str... no modification. copy_4 = arr[4] no modification. label_6 string. Good.
+
+Need maybe check if any line not comment but contains "arr[6] = 87 — не выполняется"? It is after #? The line: "# примечание: arr[6] = 87 — не выполняется" yes comment. All trap-like lines in comments start with #. There are no semicolons? Need scan for actual code lines among comments? The provided code has many lines starting with #. Some lines like "arr[5] -= 7" actual. Need ensure no line like "arr[0], arr[9] = arr[9], arr[0]" appears in comments too? There are comments with similar but not executed. Actual one after bump_all. Good.
+
+Could there be an actual line "arr2 = arr" before many comments, then later "arr2[2] += 3" actual. Yes.
+
+Need maybe consider that after arr2=arr, any later arr modifications also reflect arr2 but no further arr2 modifications except arr2[2]+=3. Good.
+
+Let's maybe verify by writing a small mental Python? Can't execute, but can reason. Could there be issue with recursion acc after arr[6] assignment? It uses list a=arr; n=6; returns sum first 6. Good.
+
+Need final answer only strict format. But before final, ensure no hidden effect from import re? no.
+
+Let's think about possible traps: The title says "Тест 2 v4: исполнить программу, назвать массив и сумму." There are TRAP variables and MANUAL. They might be red herrings. Need ignore strings. The program has many comments "не выполняется". Need only actual code. Good.
+
+Double-check all actual statements in order by scanning code text:
+- import re
+- def acc...
+- def bump...
+- def bump_all...
+- def mix...
+- def apply_twice...
+- MANUAL = """...""" (string assignment, no effect)
+- TRAP_0 = ... etc (string assignments)
+- arr = [...]
+- tmp_0 = arr[3] + 48 ... many assignments. Need check if any of these assignments use functions that mutate? re.sub no. str no. int? no. There are no calls to bump, mix, apply_twice in this block. Good.
+- arr[5] -= 7
+- comments...
+- arr[9] *= 2
+- comments...
+- arr[7] -= 7
+- comments...
+- arr[2] += 1
+- comments...
+- arr[2] -= 5
+- comments...
+- bump_all(arr, 3)
+- comments...
+- arr[0], arr[9] = arr[9], arr[0]
+- comments...
+- arr[4] = acc(arr, 6) % 100
+- comments...
+- arr[1] *= 2
+- comments...
+- arr[2], arr[6] = arr[6], arr[2]
+- comments...
+- t459 = str(arr[8]) + str(arr[5])
+- comments...
+- arr[2] = int(t459) % 97
+- comments...
+- arr[1], arr[9] = arr[9], arr[1]
+- comments...
+- arr[5] += 3
+- comments...
+- arr2 = arr
+- comments...
+- arr2[2] += 3
+- comments...
+- arr[2:5] = sorted(arr[2:5])
+- comments...
+- arr[0] -= 8
+- comments...
+- arr[7] *= 2
+- comments...
+- t99 = str(arr[1]) + str(arr[2])
+- comments...
+- arr[2] = int(t99) % 97
+- comments...
+- arr[0:3] = sorted(arr[0:3])
+- comments...
+- arr[6] = acc(arr, 6) % 100
+- comments...
+- if __name__ == "__main__": print...
+
+Need check if there is an actual line "arr[2] = int(t459) % 97" after t459. Yes.
+
+Potential issue: t459 = str(arr[8]) + str(arr[5]) after arr[2],arr[6] swap. At that time arr[8]=17, arr[5]=3. Good. If we had mistakenly used arr[5] after later +=3? No, t459 before arr[5]+=3. Good.
+
+Potential issue: t99 = str(arr[1]) + str(arr[2]) after arr[0]-=8 and arr[7]*=2 but before arr[2]=... At that time arr[1]=24, arr[2]=25. Good. If slice sorted changed arr[2] to 25? Yes after arr[2:5] sorted, arr[2]=25. Then arr[0]-=8, arr[7]*=2. Good.
+
+Let's recalc from bump_all maybe there was swap before acc? Yes.
+
+Let's consider if acc(arr,6) after first swap uses arr[4] old 26? We set arr[4]=98 after computing. Good.
+
+Could there be integer overflow? no.
+
+Need final format exactly:
+ARRAY: [0, 10, 24, 79, 98, 6, 17, 18, 17, 34]
+SUM: 303
+
+No extra text. Ensure comma separated numbers. Good.
+
+But let's be paranoid: The code includes function mix defined but not called. apply_twice not called. bump not called except apply_twice not called. Good.
+
+Could there be actual line "arr[6] = acc(arr, 6) % 100" after many comments; yes. It uses acc with current arr after arr[0:3] sorted. We computed first six sum 217. Let's recalc current before final: [0,10,24,79,98,6,9,18,17,34]. Sum first six = 0+10+24+79+98+6 = 217. %100=17. arr[6] becomes 17 (was 9). Final [0,10,24,79,98,6,17,18,17,34]. Sum = previous sum before final? Previous sum: 0+10+24+79+98+6+9+18+17+34 = let's sum: 0+10=10; +24=34; +79=113; +98=211; +6=217; +9=226; +18=244; +17=261; +34=295. Then arr[6] changes from 9 to 17, sum increases by 8 => 303. Good.
+
+Double-check sum after arr[0:3] sorted: before sorted [10,24,0,79,98,6,9,18,17,34] sum = 10+24=34; +0=34; +79=113; +98=211; +6=217; +9=226; +18=244; +17=261; +34=295. Sorted first three [0,10,24] same sum 34, so sum remains 295. final +8 =303. Good.
+
+Let's maybe simulate using alternative aggregate to catch missed modifications:
+Start sum = 21+17+10+25+23+10+17+16+14+9 = let's sum: 21+17=38; +10=48; +25=73; +23=96; +10=106; +17=123; +16=139; +14=153; +9=162.
+Modifications sum changes:
+arr[5]-=7: -7 =>155
+arr[9]*=2: +9 =>164 (from 9 to 18)
+arr[7]-=7: -7 =>157
+arr[2]+=1: +1 =>158
+arr[2]-=5: -5 =>153
+bump_all +3 on 5 elements: +15 =>168
+swap no sum change
+arr[4]=acc first6 %100: old arr[4]=26, new 98 => +72 =>240? Let's check sum before arr[4] after swap: [18,17,9,25,26,3,20,9,17,24] sum = 18+17=35; +9=44; +25=69; +26=95; +3=98; +20=118; +9=127; +17=144; +24=168. Yes sum 168. arr[4] new 98 => +72 =>240.
+arr[1]*=2: old 17 ->34 +17 =>257
+swap no change
+t459 no change
+arr[2]=76: old 20 ->76 +56 =>313
+swap no change
+arr[5]+=3: old 3 ->6 +3 =>316
+arr2[2]+=3: old 76 ->79 +3 =>319
+slice sorted [79,25,98] to [25,79,98] no sum change
+arr[0]-=8: old 18 ->10 -8 =>311
+arr[7]*=2: old 9 ->18 +9 =>320
+t99 no change
+arr[2]=0: old 25 ->0 -25 =>295
+slice sorted first three no sum change
+arr[6]=17: old 9 ->17 +8 =>303. Matches.
+
+Good.
+
+Need final only. Ensure no markdown? User says answer strictly as. We can output two lines. Good.

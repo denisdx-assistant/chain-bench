@@ -1,0 +1,357 @@
+We need answer user's request: execute program mentally? Need final array and sum. We have huge Python code with many comments/traps. Need determine actual executed statements only. Need be careful. User asks in Russian: "Тест 2 v4: исполнить программу, назвать массив и сумму." They provide code. Need output strictly ARRAY: [...] SUM: number.
+
+We need simulate program. It's long but mostly comments and dummy variables. Need identify executable statements affecting arr. Let's parse code.
+
+Initial:
+import re
+functions acc, bump, bump_all, mix, apply_twice defined.
+MANUAL string not executed? It's just assigned. TRAP strings assigned no effect.
+arr = [13, 21, 26, 30, 16, 18, 15, 21, 8, 22]
+
+Then many assignments to copy_0 etc reading arr but not modifying. Need track arr modifications.
+
+Important: comments with "не выполняется" are comments, no effect. Need find actual executable lines not comments.
+
+Let's list executable statements after initial arr:
+- copy_0 = arr[9] etc many no effect.
+- arr.reverse()
+- comments...
+- arr2 = arr (alias)
+- comments...
+- arr2[4] += 2
+- comments...
+- arr[6], arr[3] = arr[3], arr[6]
+- comments...
+- arr.reverse()
+- comments...
+- arr[2], arr[2] = arr[2], arr[2] (no effect)
+- comments...
+- arr[9] *= 2
+- comments...
+- apply_twice(arr, 3, 2)
+- comments...
+- apply_twice(arr, 6, 5)
+- comments...
+- s385 = ''.join(str(x) for x in arr)
+- comments...
+- arr[0] = len(re.findall(r'\d', s385)) % 50
+- comments...
+- arr[7] *= 2
+- comments...
+- arr[0] *= 2
+- comments...
+- arr[6] += 5
+- comments...
+- arr[1] *= 2
+- comments...
+- arr2 = arr (alias again)
+- comments...
+- arr2[2] += 1
+- comments...
+- s388 = ''.join(str(x) for x in arr)
+- comments...
+- arr[7] = len(re.findall(r'\d', s388)) % 50
+- comments...
+- arr[5:8] = sorted(arr[5:8])
+- comments...
+- s425 = ''.join(str(x) for x in arr)
+- comments...
+- arr[9] = len(re.findall(r'\d', s425)) % 50
+- comments...
+- arr2 = arr (alias)
+- comments...
+- arr2[5] += 7
+- comments...
+- arr[2] *= 2
+- comments...
+- if __name__ == "__main__": print...
+
+Need ensure no other executable lines hidden? There are many label_ = strings, tmp_ = arr[...] + ... no effect. Need check for any bump_all/mix/acc calls? I saw only apply_twice calls. No mix. No bump_all. Need check if any line like arr[4], arr[1] = ... in MANUAL string not executed. Comments not executed.
+
+Need simulate exactly with Python semantics.
+
+Let's do step by step carefully. Initial arr:
+index:0 1 2 3 4 5 6 7 8 9
+values:13,21,26,30,16,18,15,21,8,22
+
+Many reads no effect.
+
+First executable modification: arr.reverse()
+After reverse: [22,8,21,15,18,16,30,26,21,13]
+Let's label A0 = [22,8,21,15,18,16,30,26,21,13]
+
+Then arr2 = arr (alias). Then arr2[4] += 2. Since alias, arr[4] += 2. Index4 value 18 -> 20.
+A1 = [22,8,21,15,20,16,30,26,21,13]
+
+Then arr[6], arr[3] = arr[3], arr[6]. Swap indices 6 and 3. Values: arr[6]=30, arr[3]=15. After swap: index3=30, index6=15.
+A2 = [22,8,21,30,20,16,15,26,21,13]
+
+Then arr.reverse()
+Reverse A2: [13,21,26,15,16,20,30,21,8,22]
+Let's verify: A2 indices 0..9: 0 22,1 8,2 21,3 30,4 20,5 16,6 15,7 26,8 21,9 13. Reverse -> [13,21,26,15,16,20,30,21,8,22]. Yes.
+
+Then arr[2], arr[2] = arr[2], arr[2] no effect.
+A3 same.
+
+Then arr[9] *= 2. Index9 22 ->44.
+A4 = [13,21,26,15,16,20,30,21,8,44]
+
+Then apply_twice(arr, 3, 2): apply_twice calls bump(a,i,v) twice: a[3] += 2 twice => +4. Index3 15 ->19.
+A5 = [13,21,26,19,16,20,30,21,8,44]
+
+Then apply_twice(arr, 6, 5): index6 +=10. 30 ->40.
+A6 = [13,21,26,19,16,20,40,21,8,44]
+
+Then s385 = ''.join(str(x) for x in arr). Need count digits in concatenated string. Values: 13 (2),21(2),26(2),19(2),16(2),20(2),40(2),21(2),8(1),44(2). Total digits = 9*2 +1? There are 10 numbers, all two-digit except 8 one-digit. So 19 digits. len=19. arr[0] = 19 % 50 = 19.
+A7 = [19,21,26,19,16,20,40,21,8,44]
+
+Then arr[7] *= 2: index7 21 ->42.
+A8 = [19,21,26,19,16,20,40,42,8,44]
+
+Then arr[0] *= 2: 19 ->38.
+A9 = [38,21,26,19,16,20,40,42,8,44]
+
+Then arr[6] += 5: 40 ->45.
+A10 = [38,21,26,19,16,20,45,42,8,44]
+
+Then arr[1] *= 2: 21 ->42.
+A11 = [38,42,26,19,16,20,45,42,8,44]
+
+Then arr2 = arr (alias). Then arr2[2] += 1: index2 26 ->27.
+A12 = [38,42,27,19,16,20,45,42,8,44]
+
+Then s388 = ''.join(str(x) for x in arr). Count digits: values: 38(2),42(2),27(2),19(2),16(2),20(2),45(2),42(2),8(1),44(2) => 19 again. arr[7] = 19 % 50 = 19.
+A13 = [38,42,27,19,16,20,45,19,8,44]
+
+Then arr[5:8] = sorted(arr[5:8]). Slice indices 5,6,7 values [20,45,19]. Sorted -> [19,20,45]. Assign to positions 5,6,7.
+A14 = [38,42,27,19,16,19,20,45,8,44]
+
+Then s425 = ''.join(str(x) for x in arr). Count digits: 38(2),42(2),27(2),19(2),16(2),19(2),20(2),45(2),8(1),44(2) = 19. arr[9] = 19 % 50 = 19.
+A15 = [38,42,27,19,16,19,20,45,8,19]
+
+Then arr2 = arr (alias). Then arr2[5] += 7: index5 19 ->26.
+A16 = [38,42,27,19,16,26,20,45,8,19]
+
+Then arr[2] *= 2: index2 27 ->54.
+A17 = [38,42,54,19,16,26,20,45,8,19]
+
+Then print array and sum. Need sum: 38+42=80; +54=134; +19=153; +16=169; +26=195; +20=215; +45=260; +8=268; +19=287. Sum 287.
+
+Need verify no other executable statements before first reverse? There are many assignments like copy_0 = arr[9], note_1 = str(arr[8]) + str(arr[3]), tmp_3 = arr[9] + 19, code_4 = re.sub... These don't modify arr. Need ensure no line like arr[4], arr[1] = ... outside comments? The MANUAL string contains but not executed. TRAP strings assigned to variables, not executed. Comments after reverse include many "arr[...] ..." but prefixed #, no effect. Need check if any line not comment but maybe inside string? No.
+
+Need be extremely careful: There is line `arr2 = arr` before `arr2[4] += 2`. Yes. Then later comments include `# примечание: arr2[1] = 70 — не выполняется` etc no effect.
+
+Potential issue: Python tuple assignment `arr[6], arr[3] = arr[3], arr[6]` after arr2 alias? It modifies arr. Good.
+
+Potential issue: `arr.reverse()` is in-place; arr2 alias if assigned before? At first arr2 assigned after first reverse and before arr2[4]. Later second reverse occurs before arr2 = arr? Let's check order: initial many reads, then `arr.reverse()`, comments, `arr2 = arr`, comments, `arr2[4] += 2`, comments, `arr[6], arr[3] = arr[3], arr[6]`, comments, `arr.reverse()`, comments, `arr[2], arr[2] = arr[2], arr[2]`, comments, `arr[9] *= 2`, comments, apply_twice... Yes.
+
+Need check if there is any executable line between first reverse and arr2=arr? Comments only. Good.
+
+Need check if `apply_twice` uses bump which mutates list. Yes.
+
+Need check if `acc` or `mix` called? No.
+
+Need check if `bump_all` called? No.
+
+Need check if any line like `arr[0] = len(re.findall(r'\d', s385)) % 50` uses s385 computed before arr[0] modification. Yes.
+
+Need verify digit counts after modifications: At s385, arr values all positive integers? Yes. If any negative? no. str of int no minus. Count digits = sum len(str(x)). We counted 19. Let's recalc A6: [13,21,26,19,16,20,40,21,8,44]. Digits: 13 2; 21 2 (4); 26 2 (6); 19 2 (8); 16 2 (10); 20 2 (12); 40 2 (14); 21 2 (16); 8 1 (17); 44 2 (19). Yes.
+
+At s388: A12 [38,42,27,19,16,20,45,42,8,44] digits: all two except 8 => 19. Yes.
+
+At s425: A14 [38,42,27,19,16,19,20,45,8,44] digits: all two except 8 => 19. Yes.
+
+Potential issue: `len(re.findall(r'\d', s385))` counts digits in string. Same as len(s385) because only digits. Good.
+
+Need consider if any of the many `label_ = "запись ... не применялась"` no effect.
+
+Need final output exactly:
+ARRAY: [38, 42, 54, 19, 16, 26, 20, 45, 8, 19]
+SUM: 287
+
+But let's not rush. The code is huge; there may be hidden executable statements in comments? No. But need scan entire provided code for lines not starting with # or variable assignment no arr mutation. Could there be `arr[4], arr[1] = arr[1], arr[4]` inside MANUAL string only. TRAP variables are strings, not executed. There are many `# ...` comments. Need ensure no line like `arr2[4] += 2` appears multiple times? We saw one actual `arr2[4] += 2`. Later comments mention arr2[4] but with #. Need scan for actual lines without # that modify arr or arr2. Let's systematically identify all non-comment executable lines after initial definitions.
+
+I'll copy relevant sequence from user code mentally:
+
+arr = [...]
+
+copy_0 = arr[9]
+note_1 = ...
+...
+label_799 = "..."
+
+arr.reverse()
+# comments many
+arr2 = arr
+# comments many
+arr2[4] += 2
+# comments many
+arr[6], arr[3] = arr[3], arr[6]
+# comments many
+arr.reverse()
+# comments many
+arr[2], arr[2] = arr[2], arr[2]
+# comments many
+arr[9] *= 2
+# comments many
+apply_twice(arr, 3, 2)
+# comments many
+apply_twice(arr, 6, 5)
+# comments many
+s385 = ''.join(str(x) for x in arr)
+# comments many
+arr[0] = len(re.findall(r'\d', s385)) % 50
+# comments many
+arr[7] *= 2
+# comments many
+arr[0] *= 2
+# comments many
+arr[6] += 5
+# comments many
+arr[1] *= 2
+# comments many
+arr2 = arr
+# comments many
+arr2[2] += 1
+# comments many
+s388 = ''.join(str(x) for x in arr)
+# comments many
+arr[7] = len(re.findall(r'\d', s388)) % 50
+# comments many
+arr[5:8] = sorted(arr[5:8])
+# comments many
+s425 = ''.join(str(x) for x in arr)
+# comments many
+arr[9] = len(re.findall(r'\d', s425)) % 50
+# comments many
+arr2 = arr
+# comments many
+arr2[5] += 7
+# comments many
+arr[2] *= 2
+# comments many
+
+if __name__ == "__main__":
+    print("ARRAY:", arr)
+    print("SUM:", sum(arr))
+
+Need check if there are any actual assignments to arr inside the huge block of copy/tmp/note/code before first reverse? They are all `copy_... = arr[...]`, `note_... = str(arr[...]) + str(arr[...])`, `tmp_... = arr[...] + ...`, `code_... = re.sub(...)`, `label_... = "..."`. No arr modifications. Good.
+
+Potential issue: `arr2 = arr` alias; later `arr.reverse()` after arr2 assignment? We have first reverse before arr2 assignment, then arr2=arr, then modifications, then second reverse. At second reverse, arr2 still aliases same list. But no arr2 modifications between arr2=arr and second reverse except arr2[4] += 2 and swap. Then second reverse mutates list; arr2 still alias. Later comments mention arr2 but no actual until `arr2 = arr` again. Good.
+
+Potential issue: after second reverse, arr2 still references same list (unless reassigned later). There are no actual arr2 modifications until `arr2 = arr` (same) then arr2[2] +=1. Good.
+
+Potential issue: `arr[5:8] = sorted(arr[5:8])` uses slice assignment. If arr2 alias, it mutates list in place? Slice assignment on list object mutates same list, arr2 sees changes. Good.
+
+Need maybe simulate with actual Python? Could use mental but maybe need ensure no overlooked executable line like `arr[0] = len(re.findall(r'\d', s385)) % 50` after s385 but before arr[7]*=2. Yes.
+
+Let's consider if `re.findall(r'\d', s385)` returns list of digit characters; len = number of digits. Good.
+
+Now, the user's requested answer strictly as two lines. Need final only that, no explanation. But ensure format: "ARRAY: [numbers, comma separated]" and "SUM: number". They likely expect spaces after commas? Example print would output `ARRAY: [38, 42, 54, 19, 16, 26, 20, 45, 8, 19]` and `SUM: 287`. Use exactly.
+
+Double-check arithmetic step by step with table:
+
+Initial: [13,21,26,30,16,18,15,21,8,22]
+reverse: [22,8,21,15,18,16,30,26,21,13]
+arr2[4]+=2: index4 18->20: [22,8,21,15,20,16,30,26,21,13]
+swap 6 and 3: values 30 and 15 -> [22,8,21,30,20,16,15,26,21,13]
+reverse: [13,21,26,15,16,20,30,21,8,22]
+arr[9]*=2: 22->44: [13,21,26,15,16,20,30,21,8,44]
+apply_twice(3,2): index3 15+4=19: [13,21,26,19,16,20,30,21,8,44]
+apply_twice(6,5): index6 30+10=40: [13,21,26,19,16,20,40,21,8,44]
+s385 digits 19 -> arr0=19: [19,21,26,19,16,20,40,21,8,44]
+arr7*=2: 21->42: [19,21,26,19,16,20,40,42,8,44]
+arr0*=2: 19->38: [38,21,26,19,16,20,40,42,8,44]
+arr6+=5: 40->45: [38,21,26,19,16,20,45,42,8,44]
+arr1*=2: 21->42: [38,42,26,19,16,20,45,42,8,44]
+arr2[2]+=1: 26->27: [38,42,27,19,16,20,45,42,8,44]
+s388 digits 19 -> arr7=19: [38,42,27,19,16,20,45,19,8,44]
+arr[5:8]=sorted([20,45,19])=[19,20,45]: positions 5=19,6=20,7=45: [38,42,27,19,16,19,20,45,8,44]
+s425 digits 19 -> arr9=19: [38,42,27,19,16,19,20,45,8,19]
+arr2[5]+=7: 19->26: [38,42,27,19,16,26,20,45,8,19]
+arr[2]*=2: 27->54: [38,42,54,19,16,26,20,45,8,19]
+Sum: 38+42=80; +54=134; +19=153; +16=169; +26=195; +20=215; +45=260; +8=268; +19=287.
+
+Need check if `arr[5:8] = sorted(arr[5:8])` after arr7 set to 19: slice [16? Wait index5=20, index6=45, index7=19]. Yes sorted [19,20,45]. Good.
+
+Potential hidden effect: `arr2 = arr` before `arr2[4] += 2`; then after second reverse, arr2 still alias. But later there is actual line `arr2 = arr` before `arr2[2] += 1`. No issue.
+
+Potential hidden effect: There is line `arr[6], arr[3] = arr[3], arr[6]` after `arr2[4] += 2`. Good.
+
+Potential hidden effect: The code defines `MANUAL` with lines that look like assignments but inside triple quotes. Not executed. TRAP variables strings not executed. Comments with `#` not executed.
+
+Potential hidden effect: Some lines like `label_45 = "запись 45 не применялась"` no effect. Good.
+
+Need maybe consider Python recursion? acc not called. apply_twice uses bump, no issue.
+
+Now final answer only. Ensure no extra text. final can be direct.
+
+But let's think if there is any possibility that `arr2 = arr` and then `arr.reverse()` affects arr2? Yes but we accounted. If arr2 alias before second reverse, after second reverse arr2 same reversed list. But no arr2 modifications until reassign. Good.
+
+Let's maybe scan the huge comment blocks for any line not commented due to missing #? The user code has many lines starting with `#`. Need ensure no line like `# проверено: запись 416 обработана, изменений нет` all comments. There are actual lines interspersed:
+- `arr.reverse()`
+- `arr2 = arr`
+- `arr2[4] += 2`
+- `arr[6], arr[3] = arr[3], arr[6]`
+- `arr.reverse()`
+- `arr[2], arr[2] = arr[2], arr[2]`
+- `arr[9] *= 2`
+- `apply_twice(arr, 3, 2)`
+- `apply_twice(arr, 6, 5)`
+- `s385 = ...`
+- `arr[0] = ...`
+- `arr[7] *= 2`
+- `arr[0] *= 2`
+- `arr[6] += 5`
+- `arr[1] *= 2`
+- `arr2 = arr`
+- `arr2[2] += 1`
+- `s388 = ...`
+- `arr[7] = ...`
+- `arr[5:8] = sorted(arr[5:8])`
+- `s425 = ...`
+- `arr[9] = ...`
+- `arr2 = arr`
+- `arr2[5] += 7`
+- `arr[2] *= 2`
+
+Need check if there is an actual line `arr[0] = len(re.findall(r'\d', s385)) % 50` after many comments. Yes.
+
+Could there be actual line `arr[7] = len(re.findall(r'\d', s388)) % 50` after comments. Yes.
+
+Could there be actual line `arr[9] = len(re.findall(r'\d', s425)) % 50`. Yes.
+
+Need check if any of the dummy variables named `arr2`? There is `arr2 = arr` only actual. No `arr2` initialized before? It is assigned after first reverse. Good.
+
+Potential issue: In Python, `arr[5:8] = sorted(arr[5:8])` if slice length same, no length change. Good.
+
+Potential issue: `len(re.findall(r'\d', s385)) % 50` if s385 includes digits from negative? no.
+
+Potential issue: The initial array values all two-digit except 8. After modifications, could any value become three-digit? We have max 54, 45, etc. No three-digit. If any became 100? no. So digit count remains 19 each time? Let's check after arr[9]*=2: 44 two-digit. apply_twice: 19,40. arr0=19. arr7=42, arr0=38, arr6=45, arr1=42, arr2=27, arr7=19, slice sorted values 19,20,45, arr9=19, arr5=26, arr2=54. All two-digit except 8. So digit counts always 19. Good.
+
+Could there be value 0? no. If 0 one digit but no.
+
+Need final with comma separated numbers. Use Python list representation: spaces after commas. The prompt says "numbers, comma separated" maybe no spaces? It says Answer strictly as:
+ARRAY: [numbers, comma separated]
+SUM: number
+The program print would include spaces. To be safe, use standard list with spaces. They likely accept. Could use no spaces? "comma separated" ambiguous. The example in code print uses spaces. Use `ARRAY: [38, 42, 54, 19, 16, 26, 20, 45, 8, 19]`.
+
+Let's consider if final sum maybe they want sum of array after program, not printed? Yes.
+
+Need ensure no effect from `MANUAL` string? It is assigned but not executed. Good.
+
+Let's maybe think about traps: TRAP_0 etc strings assigned to variables, not executed. Comments say "не выполняется" to distract. The actual modifications are few. Good.
+
+Could there be a line `arr[4], arr[1] = arr[1], arr[4]` inside MANUAL but not executed. Good.
+
+Potential hidden: `code_4 = re.sub(r'[0-9]', '#', str(arr[4]))` uses re but no effect. Good.
+
+Potential hidden: `tmp_3 = arr[9] + 19` no effect. Good.
+
+Potential hidden: `note_1 = str(arr[8]) + str(arr[3])` no effect. Good.
+
+Potential hidden: `copy_0 = arr[9]` no effect. Good.
+
+Potential hidden: `label_45 = "запись 45 не применялась"` no effect. Good.
+
+Now final. Ensure no analysis in final. Done.

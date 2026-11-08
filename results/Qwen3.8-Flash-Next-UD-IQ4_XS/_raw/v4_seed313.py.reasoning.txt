@@ -1,0 +1,654 @@
+We need answer user's request: execute program mentally? Need name final array and sum. We have huge Python code with many dummy variables and comments. Need determine actual executed statements affecting arr. Need be careful. User asks in Russian: "Тест 2 v4: исполнить программу, назвать массив и сумму." They provide code. Need output strictly ARRAY: [...] SUM: number.
+
+We need simulate program. It's long but mostly assignments to variables not affecting arr except some actual statements. Need parse all executable lines that modify arr or call functions modifying arr. There are many lines like code_0 = re.sub... no effect on arr. Many note/copy/tmp/label no effect. Then comments no effect. Actual statements:
+- import re
+- function definitions acc, bump, bump_all, mix, apply_twice
+- MANUAL string, TRAP variables strings no effect.
+- arr = [19, 6, 22, 14, 16, 28, 1, 7, 27, 5]
+- many assignments to code_*, note_*, tmp_*, copy_*, label_* reading arr but no mutation.
+- t83 = str(arr[3]) + str(arr[9])
+- comments
+- arr[1] = int(t83) % 97
+- comments
+- t601 = str(arr[4]) + str(arr[3])
+- comments
+- arr[1] = int(t601) % 97
+- comments
+- arr2 = arr (alias)
+- comments
+- arr2[6] += 1 (mutates arr)
+- comments
+- arr.reverse()
+- comments
+- arr[4], arr[7] = arr[7], arr[4]
+- comments
+- arr[6:9] = sorted(arr[6:9])
+- comments
+- arr[4] *= 2
+- comments
+- bump_all(arr, 2)
+- comments
+- arr.reverse()
+- comments
+- arr.reverse()
+- comments
+- arr[1], arr[3] = arr[3], arr[1]
+- comments
+- arr[4] *= 2
+- comments
+- t185 = str(arr[0]) + str(arr[5])
+- comments
+- arr[6] = int(t185) % 97
+- comments
+- arr[4] = acc(arr, 6) % 100
+- comments
+- arr[5] *= 2
+- comments
+- arr.reverse()
+- comments
+- bump_all(arr, 3)
+- comments
+- arr[4] += 2
+- comments
+- t972 = str(arr[3]) + str(arr[7])
+- comments
+- arr[3] = int(t972) % 97
+- comments
+- apply_twice(arr, 9, 4)
+- comments
+- if __name__ == "__main__": print...
+
+Need ensure no other executable statements hidden? There are many lines like code_0 = re.sub... no mutation. Some lines like copy_5 = arr[3] no mutation. tmp_11 = arr[5] + 40 no mutation. label strings. Comments start # ignored. Need check if any line with arr assignment in comments? No, comments ignored. Need check if any actual line after t83: arr[1] = int(t83) % 97. Yes.
+
+Need simulate exactly. Let's do step by step carefully. Initial arr length 10:
+index:0 1 2 3 4 5 6 7 8 9
+values:19,6,22,14,16,28,1,7,27,5
+
+Before t83 no mutations. t83 = str(arr[3]) + str(arr[9]) = '14' + '5' = '145'. int 145 % 97 = 48? 97*1=97, 145-97=48. arr[1]=48.
+arr: [19,48,22,14,16,28,1,7,27,5]
+
+t601 = str(arr[4]) + str(arr[3]) = '16' + '14' = '1614'. int 1614 % 97. 97*16=1552, remainder 62. (97*16=1552; 1614-1552=62). arr[1]=62.
+arr: [19,62,22,14,16,28,1,7,27,5]
+
+arr2 = arr alias.
+arr2[6] += 1 => arr[6]=2.
+arr: [19,62,22,14,16,28,2,7,27,5]
+
+arr.reverse() => reverse list in place:
+old indices 0..9 values [19,62,22,14,16,28,2,7,27,5]
+reversed: [5,27,7,2,28,16,14,22,62,19]
+Check: index0=5 (old9),1=27(old8),2=7(old7),3=2(old6),4=28(old5),5=16(old4),6=14(old3),7=22(old2),8=62(old1),9=19(old0).
+
+arr[4], arr[7] = arr[7], arr[4]. Current arr: [5,27,7,2,28,16,14,22,62,19]
+Swap index4 (28) and index7 (22): arr becomes [5,27,7,2,22,16,14,28,62,19]
+
+arr[6:9] = sorted(arr[6:9]). Slice indices 6,7,8 values [14,28,62]. sorted [14,28,62] same. arr unchanged: [5,27,7,2,22,16,14,28,62,19]
+
+arr[4] *= 2 => index4 22*2=44. arr: [5,27,7,2,44,16,14,28,62,19]
+
+bump_all(arr, 2): for i in range(0,len(a),2): a[i]+=v. len=10, i=0,2,4,6,8 add 2.
+index0 5+2=7
+index2 7+2=9
+index4 44+2=46
+index6 14+2=16
+index8 62+2=64
+arr: [7,27,9,2,46,16,16,28,64,19]
+
+arr.reverse() => reversed: [19,64,28,16,16,46,2,9,27,7]
+Check old: 0 7,1 27,2 9,3 2,4 46,5 16,6 16,7 28,8 64,9 19 -> reversed [19,64,28,16,16,46,2,9,27,7]
+
+arr.reverse() again => back to [7,27,9,2,46,16,16,28,64,19]
+
+arr[1], arr[3] = arr[3], arr[1]. Current [7,27,9,2,46,16,16,28,64,19]. Swap index1=27 and index3=2 => [7,2,9,27,46,16,16,28,64,19]
+
+arr[4] *= 2 => 46*2=92. arr: [7,2,9,27,92,16,16,28,64,19]
+
+t185 = str(arr[0]) + str(arr[5]) = '7' + '16' = '716'. int 716 % 97. 97*7=679, remainder 37. arr[6]=37.
+arr: [7,2,9,27,92,16,37,28,64,19]
+
+arr[4] = acc(arr, 6) % 100. Need acc(a,n) returns sum of first n elements? if n<=0 return 0 else a[n-1]+acc(a,n-1). So sum arr[0:6] (indices 0..5) before assignment. Current arr before assignment: [7,2,9,27,92,16,37,28,64,19]. Sum first 6 = 7+2+9+27+92+16 = 153? 7+2=9, +9=18, +27=45, +92=137, +16=153. 153 % 100 = 53. arr[4]=53.
+arr: [7,2,9,27,53,16,37,28,64,19]
+
+arr[5] *= 2 => index5 16*2=32. arr: [7,2,9,27,53,32,37,28,64,19]
+
+arr.reverse() => reversed: [19,64,28,37,32,53,27,9,2,7]
+Check old: 0 7,1 2,2 9,3 27,4 53,5 32,6 37,7 28,8 64,9 19 -> reversed [19,64,28,37,32,53,27,9,2,7]
+
+bump_all(arr, 3): add 3 to even indices 0,2,4,6,8.
+index0 19+3=22
+index2 28+3=31
+index4 32+3=35
+index6 27+3=30
+index8 2+3=5
+Odd unchanged: index1 64, index3 37, index5 53, index7 9, index9 7.
+arr: [22,64,31,37,35,53,30,9,5,7]
+
+arr[4] += 2 => index4 35+2=37. arr: [22,64,31,37,37,53,30,9,5,7]
+
+t972 = str(arr[3]) + str(arr[7]) = '37' + '9' = '379'. int 379 % 97. 97*3=291, remainder 88. arr[3]=88.
+arr: [22,64,31,88,37,53,30,9,5,7]
+
+apply_twice(arr, 9, 4): bump(a,i,v) twice => arr[9] += 4 twice = +8. index9 7+8=15.
+arr: [22,64,31,88,37,53,30,9,5,15]
+
+Then print sum. Sum = 22+64=86; +31=117; +88=205; +37=242; +53=295; +30=325; +9=334; +5=339; +15=354. Sum 354.
+
+Need verify no missed executable statements: There are many lines like code_0 = re.sub... no effect. But note: Some variables named copy_5 = arr[3] etc. No mutation. There are functions defined but only called at actual statements: bump_all, acc, apply_twice. mix not called. bump not directly except apply_twice. Need check if any line like arr[1] = int(t83) % 97 appears twice? Yes after t83 and after t601. We did.
+
+Need check if there are any actual statements in the huge block before t83 that mutate arr? Let's scan from arr initialization to t83:
+arr = [...]
+code_0 = re.sub... no
+note_1 = str... no
+...
+copy_5 = arr[3] no
+...
+tmp_11 = arr[5] + 40 no
+...
+label_15 = ... no
+...
+All are assignments to variables, not arr. No function calls that mutate? re.sub no. str no. int? no. There is no arr[...] = ... before t83 except none. Good.
+
+Need check after t83 before t601: comments only? There is arr[1] = int(t83) % 97 then many comments, then t601 = ... then comments, then arr[1] = int(t601) % 97. Good.
+
+Need check after arr2=arr: there are comments and actual arr2[6] += 1. Good.
+
+Need check if any line like "arr[4], arr[7] = arr[7], arr[4]" after reverse? Yes.
+
+Need check if any line like "arr[6:9] = sorted(arr[6:9])" after swap. Yes.
+
+Need check if any line like "arr[4] *= 2" before bump_all(arr,2). Yes.
+
+Need check if any line like "bump_all(arr, 2)" actual. Yes.
+
+Need check if any line like "arr.reverse()" multiple. We counted: after arr2[6]+=1, then after bump_all(arr,2), then later another arr.reverse() before arr[1],arr[3]? Let's scan sequence after bump_all(arr,2):
+# comments
+arr.reverse()
+# comments
+arr[1], arr[3] = arr[3], arr[1]
+# comments
+arr[4] *= 2
+# comments
+t185 = ...
+...
+arr[6] = ...
+...
+arr[4] = acc...
+...
+arr[5] *= 2
+...
+arr.reverse()
+...
+bump_all(arr,3)
+...
+arr[4] += 2
+...
+t972...
+arr[3]=...
+apply_twice...
+
+But earlier after arr[6:9] = sorted, there is arr[4] *= 2 then bump_all(arr,2). Yes.
+
+Need ensure order of two reverses after bump_all(arr,2): I saw:
+bump_all(arr, 2)
+# comments
+arr.reverse()
+# comments
+arr[1], arr[3] = arr[3], arr[1]
+Wait there is also an arr.reverse() before arr[4],arr[7]? Let's reconstruct from code after arr2=arr:
+arr2 = arr
+comments
+arr2[6] += 1
+comments
+arr.reverse()
+comments
+arr[4], arr[7] = arr[7], arr[4]
+comments
+arr[6:9] = sorted(arr[6:9])
+comments
+arr[4] *= 2
+comments
+bump_all(arr, 2)
+comments
+arr.reverse()
+comments
+arr[1], arr[3] = arr[3], arr[1]
+comments
+arr[4] *= 2
+comments
+t185 = ...
+...
+
+But I earlier had after bump_all(arr,2): arr.reverse(), then arr.reverse() again before arr[1],arr[3]? Let's check code: There is a line "arr.reverse()" after many comments following bump_all(arr,2). Then later another "arr.reverse()" before arr[1], arr[3]? Need inspect provided text around there.
+
+From user code:
+...
+# проверено: запись 865 обработана, изменений нет
+# справка: запись 505 обработана, изменений нет
+# замечание: запись 635 обработана, изменений нет
+# отладка: запись 744 обработана, изменений нет
+# пометка: запись 769 обработана, изменений нет
+# примечание: arr2[3] = 53 — не выполняется
+# временная запись: arr[1] *= 96 — не выполняется
+# справка: запись 582 обработана, изменений нет
+# справка: запись 415 обработана, изменений нет
+# замечание: запись 586 обработана, изменений нет
+# ревизия: запись 826 обработана, изменений нет
+# отладка: запись 933 обработана, изменений нет
+# временная запись: arr[7] += 99 — не выполняется
+# проверено: запись 339 обработана, изменений нет
+# архив: запись 827 обработана, изменений нет
+# отладка: arr[6] *= 39 — не выполняется
+# примечание: arr[6] += 75 — не выполняется
+# примечание: arr[6], arr[7] = arr[7], arr[6] — не выполняется
+# замечание: arr[5] += 52 — не выполняется
+# примечание: запись 297 обработана, изменений нет
+# примечание: запись 953 обработана, изменений нет
+# черновик: запись 485 обработана, изменений нет
+# архив: arr2[4] = 24 — не выполняется
+# временная запись: запись 291 обработана, изменений нет
+# примечание: запись 606 обработана, изменений нет
+# замечание: arr[2], arr[9] = arr[9], arr[2] — не выполняется
+# справка: arr[3] = 77 — не выполняется
+# проверено: arr[6] += 40 — не выполняется
+# замечание: arr2[5] = 44 — не выполняется
+# проверено: arr[0] += 47 — не выполняется
+# ревизия: запись 793 обработана, изменений нет
+# пометка: запись 340 обработана, изменений нет
+# пометка: запись 209 обработана, изменений нет
+# примечание: запись 409 обработана, изменений нет
+# справка: arr2[1] = 49 — не выполняется
+# примечание: arr[9] = 78 — не выполняется
+# примечание: arr[8] += 71 — не выполняется
+# пометка: запись 410 обработана, изменений нет
+# пометка: arr[8] = 97 — не выполняется
+# замечание: arr2[3] = 40 — не выполняется
+# архив: запись 139 обработана, изменений нет
+# временная запись: arr[2] += 32 — не выполняется
+# черновик: arr2[6] = 30 — не выполняется
+# черновик: arr[1] = 10 — не выполняется
+# проверено: запись 9 обработана, изменений нет
+# ревизия: arr[9] += 61 — не выполняется
+# ревизия: arr2[7] = 16 — не выполняется
+# примечание: arr[2], arr[4] = arr[4], arr[2] — не выполняется
+# архив: запись 587 обработана, изменений нет
+# ревизия: arr[2], arr[1] = arr[1], arr[2] — не выполняется
+# справка: arr2[7] = 80 — не выполняется
+# временная запись: запись 732 обработана, изменений нет
+# пометка: запись 770 обработана, изменений нет
+# проверено: запись 655 обработана, изменений нет
+# пометка: arr[9] = 78 — не выполняется
+# пометка: запись 886 обработана, изменений нет
+# справка: arr[1], arr[6] = arr[6], arr[1] — не выполняется
+# замечание: arr[8] *= 99 — не выполняется
+# справка: arr2[7] = 41 — не выполняется
+# черновик: запись 518 обработана, изменений нет
+# временная запись: запись 908 обработана, изменений нет
+# отладка: запись 169 обработана, изменений нет
+# черновик: arr2[2] = 9 — не выполняется
+# временная запись: arr[8] *= 23 — не выполняется
+# замечание: arr2[9] = 18 — не выполняется
+# пометка: запись 354 обработана, изменений нет
+# замечание: запись 538 обработана, изменений нет
+# отладка: arr[7] += 76 — не выполняется
+# отладка: запись 749 обработана, изменений нет
+# примечание: запись 280 обработана, изменений нет
+# справка: запись 755 обработана, изменений нет
+arr[1], arr[3] = arr[3], arr[1]
+...
+
+Wait where is the first arr.reverse() after bump_all(arr,2)? Let's search in provided text: I recall after bump_all(arr,2) there are many comments then "arr.reverse()" before a block? Let's locate. The code segment:
+...
+# примечание: arr[1] = 41 — не выполняется
+bump_all(arr, 2)
+# примечание: arr[0], arr[9] = arr[9], arr[0] — не выполняется
+...
+# пометка: запись 75 обработана, изменений нет
+arr.reverse()
+# черновик: запись 765 обработана, изменений нет
+...
+# примечание: arr2[3] = 53 — не выполняется
+# временная запись: arr[1] *= 96 — не выполняется
+...
+arr[1], arr[3] = arr[3], arr[1]
+
+Actually there is only one arr.reverse() between bump_all(arr,2) and arr[1],arr[3]? I earlier counted two reverses after bump_all(arr,2): one immediately after bump_all? Let's inspect from user text around bump_all(arr,2):
+...
+# примечание: arr[1] = 41 — не выполняется
+bump_all(arr, 2)
+# примечание: arr[0], arr[9] = arr[9], arr[0] — не выполняется
+# проверено: arr2[6] = 61 — не выполняется
+...
+# пометка: запись 75 обработана, изменений нет
+arr.reverse()
+# черновик: запись 765 обработана, изменений нет
+...
+# примечание: arr2[3] = 53 — не выполняется
+...
+arr[1], arr[3] = arr[3], arr[1]
+
+Then later after arr[4]*=2 and t185 etc, there is another arr.reverse() before bump_all(arr,3). Let's find:
+...
+arr[5] *= 2
+# архив: arr[6] *= 23 — не выполняется
+...
+# черновик: запись 175 обработана, изменений нет
+arr.reverse()
+# временная запись: запись 43 обработана, изменений нет
+...
+bump_all(arr, 3)
+
+So sequence after bump_all(arr,2): one reverse, then swap arr[1],arr[3], then arr[4]*=2, t185, arr[6], acc, arr[5]*=2, reverse, bump_all(3). I earlier mistakenly inserted two reverses after bump_all(arr,2) (one before swap and one after? Actually I had: bump_all(arr,2); arr.reverse(); arr.reverse(); arr[1],arr[3]... That would be wrong if only one reverse. Need verify carefully. Let's scroll user code around first bump_all(arr,2). It is huge. I need ensure exact order of actual statements. Let's extract all non-comment lines from after arr2=arr maybe. We can manually scan for lines not starting with # and not variable assignments? Need list actual mutation statements in order. Let's parse entire code from arr initialization to end, ignoring comments and non-mutating assignments. But need ensure no hidden actual statements like "arr[1] = int(t83) % 97" etc. Let's systematically identify all lines that are not comments and not simple variable assignments? The code includes many variable assignments (code_0, note_1, tmp_11, copy_5, label_15) which are executable but no arr mutation. We can ignore for arr state except they read arr at that time? They don't affect later except variables t83, t601, t185, t972. Other tmp/copy/note/code not used later? They are not used except maybe no. So only t variables matter.
+
+Need list actual statements that mutate arr or call functions that mutate arr, in order:
+1 arr = [...]
+2 arr[1] = int(t83) % 97 (after t83)
+3 arr[1] = int(t601) % 97 (after t601)
+4 arr2 = arr (alias)
+5 arr2[6] += 1
+6 arr.reverse()
+7 arr[4], arr[7] = arr[7], arr[4]
+8 arr[6:9] = sorted(arr[6:9])
+9 arr[4] *= 2
+10 bump_all(arr, 2)
+11 ??? arr.reverse()? Need confirm if there is one before arr[1],arr[3].
+12 arr[1], arr[3] = arr[3], arr[1]
+13 arr[4] *= 2
+14 t185 = ...
+15 arr[6] = int(t185) % 97
+16 arr[4] = acc(arr, 6) % 100
+17 arr[5] *= 2
+18 arr.reverse()
+19 bump_all(arr, 3)
+20 arr[4] += 2
+21 t972 = ...
+22 arr[3] = int(t972) % 97
+23 apply_twice(arr, 9, 4)
+
+But need check if there is an arr.reverse() after bump_all(arr,2) and before arr[1],arr[3]. The code snippet I saw: after bump_all(arr,2), many comments, then "arr.reverse()" then many comments, then "arr[1], arr[3] = arr[3], arr[1]". Yes likely one. Did I earlier include two reverses? I had after bump_all(arr,2): arr.reverse(); arr.reverse(); then swap. That was wrong if only one. Need verify from original text: Let's search mentally in user message around "bump_all(arr, 2)". It appears once. Immediately after that line, comments. Then later I saw "arr.reverse()" before a block of comments? Let's locate exact: In user code after many lines:
+...
+# примечание: arr[1] = 41 — не выполняется
+bump_all(arr, 2)
+# примечание: arr[0], arr[9] = arr[9], arr[0] — не выполняется
+# проверено: arr2[6] = 61 — не выполняется
+...
+# пометка: запись 75 обработана, изменений нет
+arr.reverse()
+# черновик: запись 765 обработана, изменений нет
+...
+# примечание: arr2[3] = 53 — не выполняется
+...
+arr[1], arr[3] = arr[3], arr[1]
+
+Yes one reverse. Then later after arr[5]*=2:
+...
+# черновик: запись 175 обработана, изменений нет
+arr.reverse()
+# временная запись: запись 43 обработана, изменений нет
+...
+bump_all(arr, 3)
+
+So total reverses: after arr2[6]+=1, after bump_all(arr,2), after arr[5]*=2. Not two after bump_all(arr,2). Need recompute final array with correct sequence. My previous simulation had an extra reverse before swap (two reverses) which canceled? Let's see: I did after bump_all(arr,2): arr.reverse(); arr.reverse(); then swap. That resulted in same as no reverse before swap. If actual has one reverse, state differs. Need recompute from bump_all(arr,2) onward carefully.
+
+Let's recompute from start with correct sequence.
+
+Initial:
+A0 = [19,6,22,14,16,28,1,7,27,5]
+t83 -> arr[1]=48: [19,48,22,14,16,28,1,7,27,5]
+t601 -> arr[1]=62: [19,62,22,14,16,28,1,7,27,5]
+arr2[6]+=1: [19,62,22,14,16,28,2,7,27,5]
+reverse: R1 = [5,27,7,2,28,16,14,22,62,19]
+swap arr[4],arr[7]: index4=28,index7=22 -> [5,27,7,2,22,16,14,28,62,19]
+slice sort 6:9 values [14,28,62] unchanged.
+arr[4]*=2: 22*2=44 -> [5,27,7,2,44,16,14,28,62,19]
+bump_all(arr,2): even indices +2:
+idx0 5->7
+idx1 27
+idx2 7->9
+idx3 2
+idx4 44->46
+idx5 16
+idx6 14->16
+idx7 28
+idx8 62->64
+idx9 19
+A = [7,27,9,2,46,16,16,28,64,19]
+
+Now actual: arr.reverse() once:
+A_rev = [19,64,28,16,16,46,2,9,27,7]
+Then arr[1], arr[3] = arr[3], arr[1]: swap index1=64 and index3=16 -> [19,16,28,64,16,46,2,9,27,7]
+Then arr[4] *= 2: index4 16*2=32 -> [19,16,28,64,32,46,2,9,27,7]
+t185 = str(arr[0]) + str(arr[5]) = '19' + '46' = '1946'. int 1946 % 97. Compute 97*20=1940, remainder 6. arr[6]=6.
+A = [19,16,28,64,32,46,6,9,27,7]
+arr[4] = acc(arr,6) % 100. Sum first 6 indices 0..5: 19+16+28+64+32+46 = let's sum: 19+16=35; +28=63; +64=127; +32=159; +46=205. 205 % 100 = 5. arr[4]=5.
+A = [19,16,28,64,5,46,6,9,27,7]
+arr[5] *= 2: 46*2=92 -> [19,16,28,64,5,92,6,9,27,7]
+arr.reverse(): reversed -> [7,27,9,6,92,5,64,28,16,19]
+Check old indices: 0 19,1 16,2 28,3 64,4 5,5 92,6 6,7 9,8 27,9 7 => reversed [7,27,9,6,92,5,64,28,16,19]
+bump_all(arr,3): even indices +3:
+idx0 7->10
+idx1 27
+idx2 9->12
+idx3 6
+idx4 92->95
+idx5 5
+idx6 64->67
+idx7 28
+idx8 16->19
+idx9 19
+A = [10,27,12,6,95,5,67,28,19,19]
+arr[4] += 2: 95+2=97 -> [10,27,12,6,97,5,67,28,19,19]
+t972 = str(arr[3]) + str(arr[7]) = '6' + '28' = '628'. int 628 % 97. 97*6=582, remainder 46. arr[3]=46.
+A = [10,27,12,46,97,5,67,28,19,19]
+apply_twice(arr,9,4): arr[9]+=8: 19+8=27.
+Final = [10,27,12,46,97,5,67,28,19,27]
+Sum: 10+27=37; +12=49; +46=95; +97=192; +5=197; +67=264; +28=292; +19=311; +27=338. Sum 338.
+
+Need verify if there are any other actual statements between bump_all(arr,2) and arr.reverse? Maybe there is an arr[?] assignment hidden? Need scan around that region. The code after bump_all(arr,2) includes many comments, then arr.reverse(), then comments, then arr[1],arr[3]... But could there be another actual line like "arr[4] *= 2" before reverse? We need ensure order: In my earlier list, after arr[6:9] sorted, there is arr[4] *= 2, then bump_all(arr,2). Then after bump_all, maybe there is another arr[4] *= 2 before reverse? Let's inspect original around first "arr[4] *= 2". There are two occurrences of arr[4] *= 2: one before bump_all(arr,2), one after arr[1],arr[3] swap. Need ensure no third. Search text: I saw:
+...
+arr[6:9] = sorted(arr[6:9])
+# comments
+arr[4] *= 2
+# comments
+bump_all(arr, 2)
+...
+arr.reverse()
+...
+arr[1], arr[3] = arr[3], arr[1]
+...
+arr[4] *= 2
+...
+
+Yes two.
+
+Need verify t185 calculation: At that point after reverse and swap and arr[4]*=2, arr = [19,16,28,64,32,46,2,9,27,7]? Wait before t185 after arr[4]*=2: Let's recompute step by step with correct sequence to avoid arithmetic mistakes.
+
+Detailed table:
+Initial I = [19, 6, 22, 14, 16, 28, 1, 7, 27, 5]
+After arr[1]=48: [19,48,22,14,16,28,1,7,27,5]
+After arr[1]=62: [19,62,22,14,16,28,1,7,27,5]
+After arr2[6]+=1: [19,62,22,14,16,28,2,7,27,5]
+After reverse: [5,27,7,2,28,16,14,22,62,19]
+After swap 4/7: [5,27,7,2,22,16,14,28,62,19]
+After slice sort: same
+After arr[4]*=2: [5,27,7,2,44,16,14,28,62,19]
+After bump_all +2 even: [7,27,9,2,46,16,16,28,64,19]
+After reverse: [19,64,28,16,16,46,2,9,27,7]
+After swap 1/3: [19,16,28,64,16,46,2,9,27,7]
+After arr[4]*=2: [19,16,28,64,32,46,2,9,27,7]
+t185 = str(arr[0]) + str(arr[5]) = '19'+'46'='1946'; 1946 % 97 =? 97*20=1940 rem 6. arr[6]=6 -> [19,16,28,64,32,46,6,9,27,7]
+acc(arr,6): sum first 6: 19+16+28+64+32+46 = 205; %100=5. arr[4]=5 -> [19,16,28,64,5,46,6,9,27,7]
+arr[5]*=2: 46*2=92 -> [19,16,28,64,5,92,6,9,27,7]
+reverse: [7,27,9,6,92,5,64,28,16,19]
+bump_all +3 even: idx0 10, idx2 12, idx4 95, idx6 67, idx8 19 -> [10,27,12,6,95,5,67,28,19,19]
+arr[4]+=2: [10,27,12,6,97,5,67,28,19,19]
+t972 = str(arr[3]) + str(arr[7]) = '6'+'28'='628'; 628 % 97: 97*6=582 rem 46. arr[3]=46 -> [10,27,12,46,97,5,67,28,19,19]
+apply_twice(9,4): +8 -> [10,27,12,46,97,5,67,28,19,27]
+Sum 338.
+
+Need check if apply_twice uses bump(a,i,v) twice: bump does a[i] += v. Yes +8.
+
+Need check if any actual statement "arr[4] = acc(arr, 6) % 100" uses arr after arr[6]=6? Yes we did. acc sums first 6 elements of current arr including arr[4] old 32 and arr[5] 46. Good.
+
+Need check if any actual statement "arr[6] = int(t185) % 97" before acc; yes.
+
+Need check if any actual statement "arr[4] += 2" after bump_all(arr,3); yes.
+
+Need check if any actual statement "arr[3] = int(t972) % 97" after arr[4]+=2; yes.
+
+Potential issue: There are many variable assignments like tmp_11 = arr[5] + 40 before mutations. They don't affect arr. But could some of these variables be used later? t83, t601, t185, t972 only. Others not used. Good.
+
+Potential issue: The code defines MANUAL string with lines like arr[5]=2 etc but never executes it. It's just string. TRAP variables strings no effect. Good.
+
+Potential issue: There are comments that look like "проверено: arr[1], arr[2] = arr[2], arr[1] — не выполняется" but comments ignored. Good.
+
+Potential issue: Need ensure Python's re.sub calls with str(arr[i]) don't mutate. No.
+
+Potential issue: The huge number of variable assignments may cause memory but irrelevant.
+
+Need maybe run mentally with exact Python semantics for slice assignment arr[6:9] = sorted(arr[6:9]). If sorted returns list length 3, replaces same length. Good.
+
+Need check if arr2 = arr alias and later arr.reverse() affects arr2 too but no further arr2 mutations except none. Good.
+
+Need check if there is any line "arr2[6] += 1" after arr2=arr but before reverse. Yes.
+
+Need check if there is any line "arr[1] = int(t83) % 97" and later "arr[1] = int(t601) % 97". We did. t601 uses arr[4] and arr[3] after first arr[1] assignment but arr[1] not involved. Good.
+
+Need check if t83 uses arr[3]=14, arr[9]=5 initial. Yes.
+
+Need check if t601 uses arr[4]=16, arr[3]=14 initial (unchanged). Yes.
+
+Need check if any mutation before t601? Only arr[1] assignment. So t601 unaffected. Good.
+
+Need check if any mutation before t83? None. Good.
+
+Now need final answer strictly:
+ARRAY: [10, 27, 12, 46, 97, 5, 67, 28, 19, 27]
+SUM: 338
+
+But before final, let's double-check by maybe simulating with a smaller script mentally? Could there be an actual line "arr[4] = acc(arr, 6) % 100" after arr[5]*=2? No order: t185, arr[6], arr[4]=acc, arr[5]*=2. Good.
+
+Let's scan original code for actual statements after t185:
+t185 = str(arr[0]) + str(arr[5])
+# comments
+arr[6] = int(t185) % 97
+# comments
+arr[4] = acc(arr, 6) % 100
+# comments
+arr[5] *= 2
+# comments
+arr.reverse()
+# comments
+bump_all(arr, 3)
+# comments
+arr[4] += 2
+# comments
+t972 = str(arr[3]) + str(arr[7])
+# comments
+arr[3] = int(t972) % 97
+# comments
+apply_twice(arr, 9, 4)
+
+Yes.
+
+Need ensure no line "arr[4] *= 2" between arr.reverse() and arr[1],arr[3]? We have after swap. Good.
+
+Let's maybe extract all non-comment lines from code after arr initialization to be absolutely sure. Since huge, but we can scan visually for lines not starting with # and not variable assignments? The actual mutation lines are easy to spot. Let's list all lines that start with arr or t or apply or bump or arr2:
+- arr = [...]
+- t83 = ...
+- arr[1] = int(t83) % 97
+- t601 = ...
+- arr[1] = int(t601) % 97
+- arr2 = arr
+- arr2[6] += 1
+- arr.reverse()
+- arr[4], arr[7] = arr[7], arr[4]
+- arr[6:9] = sorted(arr[6:9])
+- arr[4] *= 2
+- bump_all(arr, 2)
+- arr.reverse()
+- arr[1], arr[3] = arr[3], arr[1]
+- arr[4] *= 2
+- t185 = ...
+- arr[6] = int(t185) % 97
+- arr[4] = acc(arr, 6) % 100
+- arr[5] *= 2
+- arr.reverse()
+- bump_all(arr, 3)
+- arr[4] += 2
+- t972 = ...
+- arr[3] = int(t972) % 97
+- apply_twice(arr, 9, 4)
+
+Are there any other lines starting with "arr" in comments? Comments start #. Good.
+
+Need check if there is a line "arr[4] *= 2" before "bump_all(arr, 2)" and after slice sort. Yes.
+
+Potential hidden: There is a line "arr[1] = int(t83) % 97" after t83, but before that there are many variable assignments. Good.
+
+Potential hidden: There is a line "arr[1] = int(t601) % 97" after t601. Good.
+
+Potential hidden: There is a line "arr2[6] += 1" after arr2=arr. Good.
+
+Potential hidden: There is a line "arr.reverse()" after many comments following arr2[6]+=1. Good.
+
+Potential hidden: There is a line "arr[4], arr[7] = arr[7], arr[4]" after reverse. Good.
+
+Potential hidden: There is a line "arr[6:9] = sorted(arr[6:9])" after swap. Good.
+
+Potential hidden: There is a line "arr[4] *= 2" after slice. Good.
+
+Potential hidden: There is a line "bump_all(arr, 2)" after arr[4]*=2. Good.
+
+Potential hidden: There is a line "arr.reverse()" after bump_all. Good.
+
+Potential hidden: There is a line "arr[1], arr[3] = arr[3], arr[1]" after reverse. Good.
+
+Potential hidden: There is a line "arr[4] *= 2" after swap. Good.
+
+Potential hidden: There is a line "t185 = ..." after arr[4]*=2. Good.
+
+Potential hidden: There is a line "arr[6] = ..." after t185. Good.
+
+Potential hidden: There is a line "arr[4] = acc..." after arr[6]. Good.
+
+Potential hidden: There is a line "arr[5] *= 2" after acc. Good.
+
+Potential hidden: There is a line "arr.reverse()" after arr[5]*=2. Good.
+
+Potential hidden: There is a line "bump_all(arr, 3)" after reverse. Good.
+
+Potential hidden: There is a line "arr[4] += 2" after bump_all. Good.
+
+Potential hidden: There is a line "t972 = ..." after arr[4]+=2. Good.
+
+Potential hidden: There is a line "arr[3] = ..." after t972. Good.
+
+Potential hidden: There is a line "apply_twice(arr, 9, 4)" after arr[3]. Good.
+
+Now let's consider if any of the variable assignments before t83 could have side effects due to re.sub? re.sub returns string, no. str(arr[i]) no. int? no. No function calls that mutate arr except maybe acc? Not called before. Good.
+
+Need maybe check Python modulo with negative? All positive. Good.
+
+Let's verify arithmetic of t83: 145 % 97 = 48 yes.
+t601: 1614 % 97. 97*16=1552, rem 62. yes.
+t185: 1946 % 97. 97*20=1940 rem 6. yes.
+acc sum first 6 after arr[6]=6: [19,16,28,64,32,46] sum 205 rem 5. yes.
+t972: 628 % 97. 97*6=582 rem 46. yes.
+apply_twice +8. yes.
+
+Let's maybe recompute final sum another way: [10,27,12,46,97,5,67,28,19,27]
+Group: 10+27=37; 12+46=58 ->95; 97+5=102 ->197; 67+28=95 ->292; 19+27=46 ->338. yes.
+
+Need output strictly as requested. Could include no extra text. Ensure format exactly:
+ARRAY: [10, 27, 12, 46, 97, 5, 67, 28, 19, 27]
+SUM: 338
+
+Need consider if they expect array name? "назвать массив и сумму" maybe "name the array and sum" but answer format given. Good.
+
+Double-check if there is any possibility that the code's many variable assignments like "copy_5 = arr[3]" create references? For ints immutable, no. "arr2 = arr" alias. No other aliases. Good.
+
+Potential issue: In Python, augmented assignment arr2[6] += 1 mutates list element, yes. If arr2 is alias, arr changes. Good.
+
+Potential issue: apply_twice defined as bump(a,i,v); bump(a,i,v). bump does a[i] += v. For list of ints, a[i] += v mutates list element. Good.
+
+Potential issue: bump_all uses for i in range(0, len

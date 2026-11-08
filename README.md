@@ -102,10 +102,9 @@ run more than once shows the mean over its valid runs, so a cell can be fraction
 | Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN · T default | 165m59s · 35% err | 4099 | 14m06s 13/17 | 13m30s 10/17 | 16m44s 12/17 | 20m11s 13/24 | 121m39s 11/20 |
 | Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN · T default · guard | 146m44s · 33% err | 4100 | 14m14s 11/17 | 14m45s 10/17 | 17m43s 11.5/17 | 15m10s 13/24 | 100m03s 15/20 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · ctx 1M · YaRN · T 0.3 · pen 0.3 · guard | 137m55s · 38% err | 4899 | 24m51s 12/17 | 30m21s 10/17 | 31m10s 11/17 | 13m15s 15/24 | 51m33s 11/20 |
-| Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · T default · pen 0.2 · guard | 131m06s · 31% err | 4627 | 31m20s 11.5/17 | 27m22s 11/17 | 24m52s 12.5/17 | 18m21s 15.5/24 | 47m32s 14/20 |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · T default · pen 0.2 · guard | 133m26s · 29% err | 5408 | 31m20s 11.5/17 | 27m22s 11/17 | 24m52s 12.5/17 | 18m21s 15.5/24 | 49m52s 15.5/20 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · T default · pen 0.2 · guard · 2 runs averaged | 155m06s · 27% err | 5211 | 34m18s 12.5/17 | 28m21s 11/17 | 33m41s 13.5/17 | 24m28s 15.5/24 | 58m46s 15/20 |
-| Ripple-65B-Preview-Q6_K · ctx 175k · no YaRN · T default · pen 0.3 · guard · stopped at 7 of 20: 162.8k prompt tokens leave only ~12.2k of output inside a 175k window | — | — | — | — | — | — | 121m49s 0/7 of 20 run |
-| Ripple-65B-Preview-Q6_K · ctx 175k · no YaRN · T default · pen mixed (0 / 0.3) · guard · chains: 12 tasks at 16k pen 0, 5 at 32k pen 0.3; programs all at 32k pen 0.3 | 120m57s · 29% err | 4684 | 120m57s 12/17 | — | — | — | — |
+| Ripple-65B-Preview-Q6_K · ctx 175k · no YaRN · T default · pen mixed (0 / 0.3) · guard · chains: 12 tasks at 16k pen 0, 5 at 32k pen 0.3; programs all at 32k pen 0.3 | 120m57s · 29% err | 4684 | 120m57s 12/17 | — | — | — | 121m49s 0/7 of 20 run |
 | deepseek-v4.1-flash · ctx 1M · no YaRN · T default | 16m48s · 30% err | — | 7m04s 12/17 | — | — | — | 9m44s 14/20 |
 | gemma-4-31B-it-UD-Q8_K_XL · ctx 262k · no YaRN · T default · guard | 168m44s · 58% err | 1601 | 11m40s 9/17 | 7m24s 10/17 | 8m22s 11/17 | 11m17s 14/24 | 141m18s 0/20 |
 <!-- summary:end -->
