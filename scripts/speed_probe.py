@@ -14,7 +14,23 @@ ASK = ("Расскажи историю о рыбаке и море, приме�
        "Затем ниже идёт технический документ, который к истории отношения не имеет.\n\n")
 
 
-CHARS_PER_TOKEN = float(os.environ.get("CHAIN_BENCH_CHARS_PER_TOKEN", "6.2"))
+CHARS_PER_TOKEN = float(os.environ.get("CHAIN_BENCH_CHARS_PER_TOKEN", "4.8"))
+
+
+def unique_filler(chars):
+    """Filler whose every sentence carries a distinct number, so the server's prompt
+    cache cannot serve it and the measured prefill is the real one."""
+    out = []
+    n = 0
+    size = 0
+    while size < chars:
+        n += 1
+        line = ("Record %d was processed with value %d; general notes on approval order, "
+                "preparation timelines and participants follow. Some records refer to "
+                "earlier periods and do not affect current calculations. " % (n, n * 7 + 13))
+        out.append(line)
+        size += len(line)
+    return "".join(out)
 
 
 def build_prompt(target_tokens, reserve):
@@ -24,8 +40,7 @@ def build_prompt(target_tokens, reserve):
     token on this tokenizer; the measured prompt_n is printed for verification.
     """
     body = int(max(0, (target_tokens - reserve) * CHARS_PER_TOKEN))
-    reps = max(1, body // len(FILLER))
-    return ASK + FILLER * reps
+    return ASK + unique_filler(body)
 
 
 def main():

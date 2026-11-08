@@ -63,7 +63,7 @@ def main():
                     break
 
     probes = {}
-    for p in glob.glob("results/_speed/*.json"):
+    for p in glob.glob("results/_speed_uniq/*.json") + glob.glob("results/_speed/*.json"):
         name = os.path.basename(p)[:-5]
         try:
             probes[name] = json.load(open(p))
