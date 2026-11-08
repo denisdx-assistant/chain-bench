@@ -60,3 +60,15 @@ Two things are specific to this model:
 - `local-only` is disabled, so the runner addresses the model by its own id
   (`qwen3.8-flash-next-abiray-coder-iq1_m`); the provider is
   `local_qwen3.8-flash-next-abiray-coder-iq1_m`.
+
+### Parallel run planned: Chinese chains with three clients
+
+This provider batches up to three requests, so after the sequential series the Chinese
+chains are repeated with `scripts/run_chains_parallel.py --workers 3` (plus one more of
+`--temp -1`). Nothing in the tasks changes; only the arrival pattern does.
+
+The result is a separate file, `chains_zh_20k_32k_par3.json`, and it answers a different
+question than the sequential run: how far per-request generation falls when three streams
+share the GPU, and whether aggregate throughput rises despite that. Rows carry
+`start_ts`/`end_ts` and `concurrent_peers`, so batched and unbatched rows can be told apart
+without guessing.
