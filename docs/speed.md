@@ -44,7 +44,9 @@ separate synthetic probe (`scripts/speed_probe.py`):
   couple of lines and does not invite an echo of the whole document;
 - the sizes are calibrated on a 5k-token request before the big ones, so `prompt_n` lands
   within about half a percent of the target;
-- a point is accepted only with `cache_n = 0` and an actual prompt within 5% of the target.
+- a point is accepted only with `cache_n = 0` and an actual prompt within 5% of the target;
+- the 1M column is probed at 900k: a full 1M prompt leaves no room for an answer inside
+  the 1 000 000-token window, so 900k plus a 64k budget is the largest honest point;
 
 **Read them as an upper bound, not as a task expectation.** Generation there is uniform
 prose, which is the friendliest case for draft/MTP decoding; on real tasks the model
