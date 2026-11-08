@@ -1,243 +1,335 @@
-We need answer user's question in Russian likely one integer. Need parse messy document. Need solve: "На сколько тонн «тяжеловоз-2» берёт больше, чем судно-33? Ответь одним целым числом."
+We need answer user's question in Chinese likely: “重载-2”比 33 号船多载多少吨？只回答一个整数。
 
-We need infer from document. There are many statements about ships, base capacity, rules. Need identify "тяжеловоз-2" and "судно-33". We need compute how many tons more heavy-hauler-2 takes than ship-33.
+We need parse the messy file. It contains many records, some irrelevant. Need compute ship load? "重载-2" is alias for 25号船: "25 号船也被称为“重载-2”。" Need compare with 33号船. There are rules about ships baseline load and modifications. Need determine current calculation? The text says general notes, earlier records not affect current calculation. Need identify relevant ship records and rules.
 
-Let's extract relevant facts:
-- Судно-25 также называют «тяжеловоз-2». So heavy-hauler-2 = Судно-25.
-- Судно-33 не подпадает ни под одно из правил.
-- Базовая норма грузоподъёмности судна — 50 тонн.
-- Базовая норма грузоподъёмности судна — 40 тонн. (conflict, later? Need determine latest? Usually in these tasks, if multiple base values, maybe last relevant? Need analyze.)
-- У судов с номерами, кратными семи, норма на 4 тонны ниже базовой.
-- Если судно подпадает под оба правила, применяется только правило кратности пяти.
-- У судов с номерами, кратными пяти, норма на 6 тонн выше базовой.
-- У судов с номерами, кратными пяти, норма на 10 тонн выше базовой. (conflict)
-- У судов с номерами, кратными трём, норма на 4 тонны ниже базовой.
-- Also maybe "Судно-33 не подпадает ни под одно из правил." But if rules include multiples of 3? Contradiction? Need interpret: maybe "не подпадает ни под одно из правил" is a fact overriding? Or it says ship-33 doesn't fall under any rule, despite number 33 multiple of 3. Could be because rules are only for certain? Need determine.
+We need answer integer only. Let's analyze carefully.
 
-Question: how many tons does "тяжеловоз-2" take more than судно-33? Need capacities.
+Relevant lines:
+- "编号能被五整除的船，载重比基准高 10 吨。"
+- "若船舶同时符合两条规则，只适用五的倍数规则。"
+- "编号能被七整除的船，载重比基准低 4 吨。"
+- "编号能被三整除的船，载重比基准低 4 吨。"
+- "33 号船不符合任何规则。"
+- "52 号船不符合任何规则。"
+- "船舶的基准载重为 50 吨。"
+- "船舶的基准载重为 40 吨." There are two baseline load statements. Need determine current? Maybe latest? Or conflicting? Need infer from puzzle style: multiple records, some general notes, earlier periods not affect current calculation. Need use current calculation maybe last relevant record? Let's inspect order.
 
-Need resolve base norm and modifications. There are conflicting statements: base 50, base 40; ship multiple 5 +6, +10; multiple 7 -4; multiple 3 -4; if both rules only rule of multiplicity five. Also explicit "Судно-33 не подпадает ни под одно из правил." Could mean for ship-33 no rule applies, so capacity = base norm. But which base? Maybe latest base? Need infer from typical benchmark: document contains many noisy repeated statements; relevant facts scattered. Need answer integer.
+The file is long with repeated filler. The actual records appear between filler. There are two "船舶的基准载重为 50 吨。" and "船舶的基准载重为 40 吨." Which one applies? Need determine from context: maybe baseline can be updated by later record? It says "部分记录涉及较早时期，不影响当前计算". Could mean some records are old and not current. We need identify current calculation? There are also multiple baseline flight heights (80,100,60) etc. Need likely use last occurrence? Or maybe only one baseline for ships is valid based on date? No dates for ship baselines. Need reason.
 
-Let's list all ship-related statements in order:
-1 Судно-33 не подпадает ни под одно из правил.
-2 Судно-25 также называют «тяжеловоз-2».
+Question: “重载-2”比 33 号船多载多少吨？ "重载-2" = 25号船. Need load of 25 and 33.
+
+Rules:
+- If number divisible by 5, load higher than baseline by 10 tons.
+- If number divisible by 7, lower by 4 tons.
+- If number divisible by 3, lower by 4 tons.
+- If ship satisfies two rules, only five-multiple rule applies.
+- "33号船不符合任何规则." But 33 is divisible by 3; however explicit says doesn't conform to any rules? Contradiction? Could be a special record overriding rule? Need parse: "33 号船不符合任何规则。" Means ship 33 does not meet any rule, so no adjustment? But if baseline applies, load = baseline. Or maybe it means not subject to any of the rules (despite number divisible by 3). Need use explicit record.
+- "52 号船不符合任何规则." 52 not divisible by 3,5,7 anyway.
+- "25 号船也被称为“重载-2”." 25 divisible by 5 -> baseline +10.
+
+Baseline: two values. Need choose current? Could be latest in file? Let's locate order:
+... "编号能被五整除的船，载重比基准高 10 吨。" appears early after variable stuff.
+... "编号能被七整除的船，载重比基准低 4 吨。" later.
+... "船舶的基准载重为 50 吨。" appears after "73号涡轮机..." and before "指标 variable279..."? Let's scroll:
+- "73 号涡轮机比 70 号多输出 5 兆瓦。"
+- "彼得 增加..."
+- "尼尔斯 比较..."
+- "玛尔塔 增加..."
+- indicators...
+- "基准飞行高度为 80 米。"
+- "44 号人比 52 号人小 6 岁。"
+- "船舶的基准载重为 50 吨。"
+- "指标 variable279..."
+- "22 号鸟..."
+... later:
+- "会潜水的鸟，飞行高度比基准低 15 米。"
+- "尼尔斯..."
+- "编号能被三整除的船，载重比基准低 4 吨。"
+- ...
+- "船舶的基准载重为 40 吨。" appears near after "帖木儿 重新计算后将结果记入台账。"? Let's find:
+... "松鸦-08 比 苍鹭-51 飞得高 3 米。"
+... "帖木儿 减少..."
+... "40 号苍鹭在 20 米的高度飞行。"
+... "罗莎..."
+... "帖木儿 重新计算后将结果记入台账。"
+... "船舶的基准载重为 40 吨。"
+... "72 号涡轮机比 70 号少输出 25 兆瓦。"
+So baseline 40 appears later than baseline 50. If current calculation uses latest baseline, use 40. But there is note: "部分记录涉及较早时期，不影响当前计算." Could indicate earlier records (like baseline 50?) not affect current? Or all general notes? Need infer from typical benchmark tasks: They include many irrelevant records and contradictory statements; need answer based on latest relevant record? The phrase "文件中还包含关于审批顺序、准备时间和参与人员的一般说明。部分记录涉及较早时期，不影响当前计算。" repeated. It says some records involve earlier periods, do not affect current calculation. But no dates for ship baselines. Maybe there are multiple baselines due to updates; latest is current. Need use 40? Let's examine other similar contradictions:
+- "基准飞行高度为 80 米。" later "基准飞行高度为 100 米。" later "基准飞行高度为 60 米。" Which is current? Likely last one? But question about ships.
+- "编号能被五整除的船，载重比基准高 10 吨。" later "编号能被五整除的船，载重比基准高 6 吨。" There are two five-multiple rules: early says +10, later near end says +6. Need choose current? Let's find:
+Early: "编号能被五整除的船，载重比基准高 10 吨。"
+Later: after "所有以 x_..." there is "编号能被五整除的船，载重比基准高 6 吨。" Yes near end. So conflicting rules. Need determine which applies to current calculation. If latest rule, +6. But also "若船舶同时符合两条规则，只适用五的倍数规则." Which two? Could be five and seven/three? It appears after first +10 and before seven/three? Actually line: "若船舶同时符合两条规则，只适用五的倍数规则。" appears after early +10, before 71 turbine etc. Later there is +6 rule. Need maybe use latest? But if latest +6, still five-multiple rule applies.
+
+Question likely expects using all relevant current rules and latest baseline? Need be careful. There may be a hidden intended logic: The file includes many records, some are "较早时期" not affecting current calculation. We need identify which records are current based on dates? Ship baselines no dates. Maybe "部分记录涉及较早时期" refers to John land operations with dates (1999, 2004, 2008, 2010, 2016) and note about last record error. But question is ships; maybe all ship records are current? Need compute from given rules.
+
+Let's list all ship-related lines in order:
+1. "若船舶同时符合两条规则，只适用五的倍数规则。" (general rule)
+2. "编号能被五整除的船，载重比基准高 10 吨。" (rule A)
+3. "编号能被七整除的船，载重比基准低 4 吨。" (rule B)
+4. "船舶的基准载重为 50 吨。" (baseline C)
+5. "编号能被三整除的船，载重比基准低 4 吨。" (rule D)
+6. "33 号船不符合任何规则。" (special E)
+7. "52 号船不符合任何规则。" (special F)
+8. "船舶的基准载重为 40 吨。" (baseline G)
+9. "编号能被五整除的船，载重比基准高 6 吨。" (rule H)
+
+Maybe also "25 号船也被称为“重载-2”." alias.
+
+Need answer: load(25) - load(33). If using latest baseline 40 and latest five rule +6, and 33 no rules -> baseline 40, difference = (40+6)-40=6. If using early baseline 50 and early +10, difference =10. If using latest baseline 40 but early +10, difference=10. If using latest +6 but baseline 50, difference=6. So possible answers 6 or 10. Need decide.
+
+But there is explicit "33号船不符合任何规则". Does that mean it doesn't satisfy any rule, so load = baseline. Yes.
+
+Could there be another interpretation: "重载-2" is a ship name, not number 25? It says 25号船也被称为“重载-2”. So yes.
+
+Need inspect if "编号能被五整除的船，载重比基准高 10 吨" and later "高6吨" are both rules; maybe if multiple rules for same ship, only five-multiple rule applies, but which five-multiple? Could be two different five-multiple rules? Maybe one is for earlier period, one current. The repeated note says some records involve earlier periods, not affect current calculation. Which records are earlier? Could be those without dates? Hmm.
+
+Maybe this is from synthetic dataset where there are "general notes" and "old records" to ignore. Need identify current calculation by latest timestamp? There are no timestamps except John land operations. But maybe the file includes records with dates: 1999, 2004, 2008, 2016, 2010. Those are about John land operations, not ships. The note "按出现顺序（不是按日期）最后一条关于 约翰14 土地操作的记录是错误的，不应计入。" and "在本文件的倒数第二条记录中，约翰14 被误称为 约翰15。" This is for a different question maybe. Here question about ships, so ignore John.
+
+Could the phrase "部分记录涉及较早时期，不影响当前计算" mean all records before some current marker? There is no marker. Maybe we should use only records that are not contradicted by later records? In many reasoning tasks, if there are multiple baselines, the latest one is current. Need answer likely 6.
+
+But let's not jump. Need analyze entire text for hidden "current calculation" maybe variable operations? There are code-like lines:
+- "已执行：x_a17 += bx4; x_arr[0] += x_arr[3]。"
+- "x_a17 = 27; bx4 = 7; x_var4 = -99; x_arr = [1, 3, 5, 9]。"
+- "所有以 x_ 为前缀且具有偶数整数值的变量都减半；对数组则逐元素执行该操作。"
+This may be irrelevant to ship question? Could affect variables? No.
+
+There are many person operations on variables, indicators, birds, cars, cities, people, turbines, goods, cats. The question only ships. Need extract relevant facts.
+
+Need consider if "重载-2" could refer to a ship named "重载-2" and 33号船 load maybe affected by rules? "33号船不符合任何规则" could mean it doesn't conform to any rule, but baseline still applies. If no rule, load = baseline. Difference due only to 25's five-multiple adjustment. So answer equals adjustment amount (10 or 6). Need choose adjustment.
+
+Let's examine order and possible "current" rules:
+The line "编号能被五整除的船，载重比基准高 10 吨。" appears before "编号能被七整除..." and before baseline 50. The line "编号能被五整除的船，载重比基准高 6 吨。" appears near end after baseline 40? Let's locate exact order near end:
+... "统计同时满足“重于 160 克”和“白色”两个条件的鸟。"
+... "尼尔斯..."
+... "罗莎..."
+... "彼得..."
+... "伊利亚..."
+... "所有以 x_ 为前缀且具有偶数整数值的变量都减半；对数组则逐元素执行该操作。"
+... "指标 variable899 ..."
+... "编号能被五整除的船，载重比基准高 6 吨。"
+... "奥列格..."
+... "苍鹭-51..."
+... etc.
+Where is baseline 40? Earlier than this? Yes baseline 40 appears before many lines, before "72号涡轮机". So latest five rule +6 appears after baseline 40. Thus if latest overrides, current baseline 40 and current five adjustment +6. Difference =6.
+
+But could the early +10 and later +6 both apply? If a ship divisible by 5, there are two rules with different adjustments. The general note "若船舶同时符合两条规则，只适用五的倍数规则" doesn't resolve two five-multiple rules. Maybe one is old, one current. Need use latest.
+
+Need consider if "33号船不符合任何规则" appears before baseline 40 and +6. It is explicit special fact; likely current regardless. If 33 divisible by 3, but says no rules, so no -4. If using latest baseline 40, load=40. If using early baseline 50, load=50. Difference still adjustment for 25 (10 or 6). So only adjustment matters if both same baseline. If baselines differ? If 25 uses one baseline and 33 uses another? No, baseline global current.
+
+Could "重载-2" be not subject to five-multiple rule because it is named "重载-2"? It says 25号船 also called "重载-2". Number 25 divisible by 5. So yes.
+
+Could "33号船不符合任何规则" mean it doesn't satisfy any of the divisibility rules, so we should not apply -4 despite 33 divisible by 3. Yes.
+
+Need answer only integer. Likely 6 or 10. Need decide with high confidence.
+
+Let's think of dataset style: It might be generated from "needle in haystack" with many facts and rules. Questions often require applying latest rule? The repeated filler says "文件中还包含关于审批顺序、准备时间和参与人员的一般说明。部分记录涉及较早时期，不影响当前计算。" This suggests there are records from earlier periods that should be ignored. How to identify earlier? Maybe by dates: John land operations have dates; some are earlier. But ship baselines no dates. Could be "较早时期" refers to some records with older dates (1999, 2004, etc.) not current. But for ship rules, no dates. Maybe all ship rules are current. If multiple contradictory rules without dates, maybe use first? Or use all? Need infer from wording: "部分记录涉及较早时期，不影响当前计算" not "later records override earlier". It says some records involve earlier periods, do not affect current calculation. If a record has no date, can't tell. Maybe the current calculation is defined by the latest record in file order? The note says "按出现顺序（不是按日期）最后一条关于 约翰14 土地操作的记录是错误的，不应计入。" That specifically says for John records, use appearance order not date, and last one is erroneous. For other records, maybe appearance order matters? Hmm.
+
+Could there be a hidden "current calculation" as of end of file: all rules in file apply unless explicitly overridden? If contradictory, maybe both apply? But impossible. Need choose most recent non-erroneous record.
+
+Let's inspect if there are any date-like markers for ship baseline: "2004 年底，约翰15 购买了 60 英亩土地." This is a John land operation, but note says in second-to-last record John14 misnamed John15. It might be erroneous? Actually line: "在本文件的倒数第二条记录中，约翰14 被误称为 约翰15。" Means the record "2004 年底，约翰15 购买了 60 英亩土地" should be interpreted as John14? But also "按出现顺序（不是按日期）最后一条关于 约翰14 土地操作的记录是错误的，不应计入。" The last John14 land operation in appearance order is "2016年6月20日，约翰14购买了30英亩"? Or maybe "2010年，约翰卖出了40英亩"? Need not relevant.
+
+Maybe the question is one of many generated from a table with records, and we need answer based on all facts, ignoring irrelevant. The contradictory baselines might be intentional distractors; perhaps only one baseline is relevant because the other is for a different category? "船舶的基准载重为 50 吨。" and "船舶的基准载重为 40 吨." both same category. Could be one is earlier period, one current. Need identify current by position? Usually latest in document is current unless stated otherwise. The filler says some records involve earlier periods, not affect current calculation. That might mean earlier in file? Or older dates? If no dates, maybe first baseline is earlier period, second is current. So use 40. Similarly first five rule +10 earlier, second +6 current. Answer 6.
+
+But let's examine other repeated contradictions to see pattern:
+- "基准飞行高度为 80 米。" then later "基准飞行高度为 100 米。" then later "基准飞行高度为 60 米。" If asked bird height, likely use last (60). There are also rules about white birds, silver, diving, wingspan. Multiple baselines maybe current is last.
+- "所有乌鸦都比所有苍鹭重 20 克。" and "所有松鸦都比所有乌鸦重 30 克." etc.
+- "22号鸟: 不会潜水，翼展110厘米" and later "22号鸟: 白色，体重90克" and later "22号鸟: 体重140克，灰色". Conflicting attributes for same bird. Need maybe latest? There are multiple records for same entity with different values. If question asks about 22号鸟, which to use? Could be latest record? But note says some records earlier not affect current. So yes, latest overrides. For ships, latest baseline and rule likely current.
+
+Need be careful: "33号船不符合任何规则" appears before later rules? If later rules could make it conform? It says doesn't conform to any rules; maybe this is a fact that overrides divisibility? If it appears before +6 rule, but still current? Could be earlier record not affect current? Hmm.
+
+Maybe there are multiple records for same ship: 33号船不符合任何规则. If later rule "编号能被三整除的船..." appears after? Let's check order: Actually "编号能被三整除的船，载重比基准低 4 吨。" appears after "33号船不符合任何规则"? Let's locate:
+- "33 号船不符合任何规则。" appears after "指标 variable296..."? Wait in text:
+... "指标 variable296 超出基准 6%，并标记为北部。"
+... "玛尔塔 分析..."
+... "指标 variable421..."
+... "罗莎 将 variable947 增加..."
+... "谢尔盖 减少..."
+... "罗莎 将 variable441 分析..."
+... "薇拉 将 variable646 减少..."
+... "薇拉 将 variable535 标记..."
+... "指标 variable237 超出基准 17%，并标记为灰色。"
+... "33 号船不符合任何规则。"
+... "汉斯 将 variable306 标记..."
+... "谢尔盖 标记..."
+... "罗莎 增加..."
+... "翼展大于 120 厘米的鸟..."
+... "奥列格..."
+... "彼得..."
+... "指标 variable51..."
+... "所有白色的鸟，飞行高度比基准低 7 米。"
+... etc.
+Where is "编号能被三整除的船，载重比基准低 4 吨。"? It appears earlier? Let's search mentally: After "会潜水的鸟，飞行高度比基准低 15 米。" then "尼尔斯 将 variable313 减少..." then "编号能被三整除的船，载重比基准低 4 吨。" This is before "33号船不符合任何规则"? Need order: The text segment around there:
 ...
-Базовая норма грузоподъёмности судна — 50 тонн. (around after Сойка-07)
+"红色汽车比基准里程多行驶 25 公里。"
+"指标 variable689..."
+"奥列格..."
+"谢尔盖..."
+"汉斯 减少..."
+"帖木儿 标记..."
+"尼尔斯 比较..."
+"指标 variable123..."
+"汉斯 将 variable809 比较..."
+"指标 variable959..."
+"帖木儿 重新计算..."
+"奥列格 将 variable596 增加..."
+"伊利亚 将 variable894 重新计算..."
+"谢尔盖 比较..."
+"薇拉 将 variable795 标记..."
+"会潜水的鸟，飞行高度比基准低 15 米。"
+"尼尔斯 将 variable313 减少..."
+"编号能被三整除的船，载重比基准低 4 吨。"
+"伊利亚 将 variable35 分析..."
+"约翰14 进行的所有土地操作都记录在本文件中。"
+"松鸦-17..."
 ...
-Базовая норма грузоподъёмности судна — 40 тонн. (after Турбина-71)
-Если судно подпадает под оба правила, применяется только правило кратности пяти.
+Then later:
+"统计同时满足..."
 ...
-У судов с номерами, кратными семи, норма на 4 тонны ниже базовой.
+"编号能被五整除的船，载重比基准高 6 吨。"
 ...
-У судов с номерами, кратными пяти, норма на 6 тонн выше базовой.
+Where is "33号船不符合任何规则"? It appears after "指标 variable237 超出基准 17%" which is after the +6? Let's see near end:
 ...
-У судов с номерами, кратными трём, норма на 4 тонны ниже базовой.
+"指标 variable296..." (before 33?) Actually let's reconstruct from provided text after baseline 40:
+After "船舶的基准载重为 40 吨。"
+"72 号涡轮机比 70 号少输出 25 兆瓦。"
+"伊利亚 将 variable316 重新计算..."
+"指标 variable510..."
+"奥列格 重新计算后将结果记入日志。"
+"尼尔斯 将 variable368 标记..."
+"奥列格 将 variable19 减少..."
+"玛尔塔 将 variable370 增加..."
+"2004 年底，约翰15 购买了 60 英亩土地。"
+"伊利亚 分析后将结果记入汇总表。"
+"指标 variable748..."
+"橘猫巴尔西克给了人伊万 10 美元。"
+"薇拉 将 variable512 比较..."
+"指标 variable461..."
+"给了伊万 10 美元的猫，从与伊万同住的猫那里拿走让它自己的钱变为三倍所需的金额。"
+"指标 variable705..."
+"汉斯 将 variable155 增加..."
+"谢尔盖 将 variable295 标记..."
+"奥列格 标记后将结果记入汇总表。"
+"尼尔斯 将 variable772 比较..."
+"薇拉 标记后将结果记入日志。"
+"60 号商品的价格为 2500 卢布。"
+"指标 variable264..."
+"红色汽车比基准里程多行驶 25 公里。"
+"指标 variable689..."
+"奥列格 将 variable482 比较..."
+"谢尔盖 将 variable690 分析..."
+"汉斯 减少后将结果记入台账。"
+"帖木儿 标记后将结果记入汇总表。"
+"尼尔斯 比较后将结果记入日志。"
+"指标 variable123..."
+"汉斯 将 variable809 比较..."
+"指标 variable959..."
+"帖木儿 重新计算后将结果记入登记册。"
+"奥列格 将 variable596 增加..."
+"伊利亚 将 variable894 重新计算..."
+"谢尔盖 比较后将结果记入台账。"
+"薇拉 将 variable795 标记..."
+"会潜水的鸟，飞行高度比基准低 15 米。"
+"尼尔斯 将 variable313 减少..."
+"编号能被三整除的船，载重比基准低 4 吨。"
+"伊利亚 将 variable35 分析..."
+"约翰14 进行的所有土地操作都记录在本文件中。"
+"松鸦-17：体重 180 克，黑色。"
+"帖木儿 将 variable441 标记..."
+"汉斯 将 variable195 分析..."
+"尼尔斯 将 variable691 增加..."
+"07 号松鸦重 150 克。"
+"汉斯 将 variable43 重新计算..."
+"伊利亚 比较后将结果记入日志。"
+"11 号鸟：会潜水，翼展 130 厘米。"
+"指标 variable226..."
+"罗莎 比较后将结果记入登记册。"
+"指标 variable795..."
+"指标 variable261..."
+"基准飞行高度为 60 米。"
+"指标 variable296..."
+"玛尔塔 分析后将结果记入登记册。"
+"指标 variable421..."
+"罗莎 将 variable947 增加..."
+"谢尔盖 减少后将结果记入日志。"
+"罗莎 将 variable441 分析..."
+"薇拉 将 variable646 减少..."
+"薇拉 将 variable535 标记..."
+"指标 variable237 超出基准 17%，并标记为灰色。"
+"33 号船不符合任何规则。"
 ...
-У судов с номерами, кратными пяти, норма на 10 тонн выше базовой.
+Then later "编号能被五整除的船，载重比基准高 6 吨." after x_ rule. So order: baseline 40, three-divisible rule, then 33 no rules, then five-divisible +6. Thus if latest overrides, +6 is after 33 special. But special says 33 no rules; later +6 only affects divisible by 5, not 33. No conflict.
 
-Need know which rules apply to Судно-25 (number 25). It is multiple of 5, not 7 or 3. So capacity = base + rule for multiple of 5. But there are two conflicting +6/+10. Which to use? Maybe latest statement overrides? In these generated tasks, often all statements are facts but contradictions need choose based on "last mention"? There is note: "Последняя по порядку упоминания в документе (а не по дате) запись об операциях Джона14 с землёй ошибочна и не должна учитываться." That's for John land. Also "В предпоследней записи документа Джон14 ошибочно назван Йохан15." Not general.
+Could "33号船不符合任何规则" be before the three-divisible rule? Actually three-divisible rule appears before it, so if latest overrides, the special after rule says 33 no rules, so ignore -4. Good.
 
-Maybe there is a hidden rule: "Все объекты с индексами, кратными ..." irrelevant to ships? Could affect "object indices"? But question about ships.
+What about early +10 rule and baseline 50? They are earlier than baseline 40 and +6. So likely ignore as earlier. Answer 6.
 
-Need parse carefully. It might be from a synthetic dataset where answer requires using latest applicable value? Let's inspect all relevant statements and possible conflicts.
+But need ensure "重载-2" load uses baseline 40 and +6 = 46; 33 load = baseline 40 (no rules) = 40; difference 6. If using early +10 but baseline 40? Could be if only baseline updated, rule not? But later +6 likely updates rule. Need maybe use all current rules: latest five-multiple adjustment is +6. So answer 6.
 
-Base norm appears twice: 50 then 40. Which is current? Usually if multiple base values, maybe use the last one? But there are repeated general notes that part of records refer to past periods and don't affect current calculations. The beginning and end repeated: "В документе также приведены общие замечания о порядке согласования, сроках подготовки и составе участников. Отмечено, что часть записей относится к прошлым периодам и не влияет на текущие расчёты." This suggests some records are past and not current. But which? Maybe dates? John land records have dates; some erroneous. For ships, no dates. Could be base norm 50 is old and 40 current? Need infer from order: later statement may override earlier. In many tasks, when conflicting facts, use latest mention unless specified erroneous. But not always.
+Let's consider alternative: There is a rule "若船舶同时符合两条规则，只适用五的倍数规则。" If 25 divisible by 5 only, +10 or +6. If 33 divisible by 3 but explicit no rules. Difference = adjustment. The question asks "多载多少吨" maybe expects absolute difference, positive integer. If 25 heavier than 33 by adjustment. Yes.
 
-Need identify "тяжеловоз-2" maybe Судно-25. It takes more than ship-33 by difference of modifications if same base. If both use same base, base cancels. Need only difference in rule adjustments. Ship-33: explicit "не подпадает ни под одно из правил" -> no adjustment. Ship-25: multiple of 5 -> adjustment +? Could be +6 or +10. Difference = +6 or +10. If base differs? No, same base norm for all ships. So answer likely 6 or 10. Need decide which rule for multiple of 5 applies. There are two: "У судов с номерами, кратными пяти, норма на 6 тонн выше базовой." and later "У судов с номерами, кратными пяти, норма на 10 тонн выше базовой." Which one? Maybe one is erroneous? No explicit error. Maybe the rule "Если судно подпадает под оба правила, применяется только правило кратности пяти" refers to two rules: multiples of 5 and 7? Or 5 and 3? It says if falls under both rules, only rule of multiplicity five applies. There are rules for multiples of 7, 5, 3. "оба правила" maybe the two rules mentioned before it? Let's locate order:
-- Базовая норма грузоподъёмности судна — 40 тонн.
-- Если судно подпадает под оба правила, применяется только правило кратности пяти.
-- Показатель...
-- У судов с номерами, кратными семи, норма на 4 тонны ниже базовой.
-- Дина...
-- Вера...
-- Лев...
-- Показатель...
-- Олег...
-- Марта...
-- Роза...
-- Вера...
-- Показатель...
-- Тимур...
-- Марта...
-- Показатель...
-- Тимур отметил...
-- Лев перевёл...
-- Олег пересчитал variable54...
-- Сойка-17...
-- Все объекты с индексами, кратными 7, считаются красный.
-- Илья...
-- Птица-11...
-- Автомобиль-11...
-- Тимур разделил...
-- Показатель variable226...
-- Аркадий перевёл...
-- Эрик увеличил...
-- Запись объект-96...
-- Роза перевёл variable192...
-- Роза пересчитал variable927...
-- Сойка-08...
-- Тимур разделил...
-- Марта разделил variable204...
-- Нильс объединил variable601...
-- Аркадий перевёл...
-- Сергей пересчитал variable955...
-- Олег пересчитал variable123...
-- Показатель variable813...
-- Все объекты с индексами, кратными 8, считаются резервный.
-- Все объекты с индексами, кратными 9, считаются серый.
-- Аркадий сравнил...
-- Эрик сравнил variable817...
-- Показатель variable35...
-- Все объекты с индексами, кратными 9, считаются контрольный.
-- Сойка-15...
-- Илья объединил variable754...
-- Все вороны тяжелее всех цапель на 20 граммов.
-- Марта пересчитал variable533...
-- Ксения пересчитал variable155...
-- Показатель variable994...
-- Птицы с размахом крыла больше 120 сантиметров летают на 10 метров выше базовой высоты.
-- Сергей проанализировал...
-- Показатель variable723...
-- Лев отметил variable649...
-- Эрик сравнил variable154...
-- Запись объект-05...
-- Олег пересчитал...
-- Сойка-30 летает на 10 метров выше цапли-40.
-- Все сойки тяжелее всех ворон на 30 граммов.
-- Показатель variable260...
-- Запись объект-12...
-- Дина проанализировал variable283...
-- Пётр объединил variable260...
-- Роза сравнил variable714...
-- Ксения разделил...
-- Пётр увеличил variable175...
-- Роза пересчитал variable292...
-- Все объекты с индексами, кратными 5, считаются опытный.
-- Показатель variable513...
-- Аркадий пересчитал...
-- Олег разделил variable689...
-- Показатель variable327...
-- Все белые птицы тяжелее 100 граммов обладают свойством «серебристые».
-- Ксения отложил...
-- Все объекты с индексами, кратными 8, считаются красный.
-- Аркадий проанализировал variable174...
-- У судов с номерами, кратными пяти, норма на 6 тонн выше базовой.
-- Ганс увеличил variable179...
-...
-- У судов с номерами, кратными трём, норма на 4 тонны ниже базовой.
-...
-- У судов с номерами, кратными пяти, норма на 10 тонн выше базовой.
+Need output only integer. But we must be sure no hidden variable operations affect ship loads? No.
 
-So +6 appears before +10. If latest overrides, +10. But maybe "Если судно подпадает под оба правила, применяется только правило кратности пяти" appears before rules? It says if ship falls under both rules, only rule of multiplicity five applies. Which two rules? Could be multiples of seven and three? Actually if a ship number multiple of 5 and 7 (35), apply only +5 rule. If multiple of 5 and 3 (15), apply only +5 rule. But for 25 no conflict.
+Let's examine if "重载-2" could be a ship with alias and maybe "重载-2" itself has load rule? "25 号船也被称为“重载-2”。" No direct load. Could "重载-2" mean heavy load -2? Maybe name includes -2, but no.
 
-Could there be an implicit rule that "Судно-33 не подпадает ни под одно из правил" means it is not affected by any of the ship rules, so capacity base. But number 33 is multiple of 3; if rule for multiples of 3 exists, contradiction. Maybe the explicit statement overrides rule: ship-33 doesn't fall under any rule (maybe because no rule for 3? But there is). Could be a fact that it does not fall under any *current* rules; thus ignore multiple-of-3 rule for it. For ship-25, if multiple of 5, falls under rule. Need adjustment.
+Could there be another line: "编号能被五整除的船，载重比基准高 10 吨。" and later "编号能被五整除的船，载重比基准高 6 吨。" If both apply, maybe ship can have multiple adjustments? But general says if simultaneously符合两条规则 only five-multiple rule applies, not if two five rules. Could sum? If both apply, 25 baseline +10+6 = +16; difference 16. But likely not.
 
-Need answer one integer. Let's consider possible intended logic from benchmark. It may be a "needle in haystack" with many irrelevant statements and conflicting rules. They ask: "На сколько тонн «тяжеловоз-2» берёт больше, чем судно-33?" Need identify aliases and compute difference.
+Need think of "部分记录涉及较早时期，不影响当前计算" maybe means records with dates earlier than current are ignored. The ship rules have no dates, so all apply? But contradictory rules both apply? Could be they are not dated, but one may be general and one specific? "编号能被五整除的船，载重比基准高 10 吨" vs "高 6 吨". Could one be for a different baseline period? No.
 
-Maybe there are two base norms: 50 and 40. If ship-33 not under any rule, capacity = base norm? Which base? If use latest base 40. Ship-25 under multiple of 5 rule +10 (latest) => 50. Difference 10. If use +6 => 46 difference 6. If use base 50 and +10 => 60 vs 50 diff 10; base cancels. So answer likely 10 if latest +10, or 6 if first +6. Need decide.
+Maybe the intended answer in such tasks is to use the *first* relevant record, not latest, unless specified? Let's inspect wording: "文件中还包含关于审批顺序、准备时间和参与人员的一般说明。部分记录涉及较早时期，不影响当前计算。" This is repeated many times. It doesn't say later records override earlier. It says some records involve earlier periods, not affect current calculation. How to know which? Maybe records with explicit dates are old; e.g., John land operations from 1999 etc. But ship baselines no dates, so maybe both are current? But impossible. Could be one baseline is for "船舶" and another for something else? Both same.
 
-Maybe there is a rule: "Все объекты с индексами, кратными 5, считаются опытный." Could "object indices" apply to ships? Судно-25 index 25 multiple of 5 -> considered "опытный". But question about tons? Not relevant. There are many object classification rules for indices multiples 3,4,5,6,7,8,9. Could affect something? Maybe "тяжеловоз-2" is an object with index? No.
+Maybe there is a hidden current date? Not given. Could be the file includes "2008年3月8日" etc. Current calculation maybe as of latest date in file (2016). Ship records without dates are general and apply always. Then both baseline 50 and 40 apply? Contradiction. Maybe one is typo? Need choose based on consistency with other facts? Let's see if any question about ships would have unique answer if using baseline 50 vs 40? Difference unaffected by baseline if both ships use same baseline. So only adjustment conflict matters. If both +10 and +6 apply, ambiguous. But maybe one of the five-multiple rules is not for current because it says "编号能被五整除的船，载重比基准高 10 吨。" appears in early section with "若船舶同时符合两条规则..." and later "编号能被五整除的船，载重比基准高 6 吨。" Could be two separate rule sets for different baselines? Maybe baseline 50 with +10, baseline 40 with +6. If current baseline is 40, use +6. If old baseline 50, use +10. The note about earlier periods likely tells to ignore old baseline/rule pair. So answer 6.
 
-Maybe "Судно-25 также называют «тяжеловоз-2»" and "Судно-33 не подпадает ни под одно из правил." There are rules for ships: base norm, multiples of 7, 5, 3. Need compute capacities.
+Let's see if there are other pairs: "编号能被七整除的船，载重比基准低 4 吨." only one. "编号能被三整除..." only one. Baseline 50 and 40. Five rule +10 and +6. It seems old set: baseline 50, +10; current set: baseline 40, +6? But three/seven rules maybe apply to both? Could be unchanged.
 
-Let's search mentally for similar tasks. They often include contradictory statements and ask to resolve by "last mention" or "explicit exception". The repeated filler says part of records refer to past periods and do not affect current calculations. Could indicate that earlier conflicting values are past, later are current. So use latest base and latest ship rule. Thus +10. Answer 10.
+Question specifically "重载-2"比33号船多载多少吨? If using current set, difference =6. If old set, difference=10. They likely expect 6 because latest/current. Need final integer only.
 
-But need be careful: "Если судно подпадает под оба правила, применяется только правило кратности пяти." This might mean there are exactly two rules? Maybe one for multiples of 7 and one for multiples of 5? Later there is also multiple of 3. Could be generated with multiple rules. For ship-25 only multiple of 5.
+But let's not ignore possibility that "33号船不符合任何规则" means it has no baseline? Could load = 0? No, baseline applies to all ships unless rule says otherwise. "不符合任何规则" means no adjustment rules, not no baseline. If no baseline, impossible.
 
-Could "Судно-33 не подпадает ни под одно из правил" be itself a rule? It says ship-33 not under any rule, so no adjustment. But if there is a rule for multiples of 3, it would be under it. The explicit statement likely overrides: it doesn't fall under any rules (maybe because rules are only for ships with certain names? No). So difference = adjustment for Судно-25.
+Could "重载-2" be 25号船, and 25 also maybe "不符合任何规则"? No.
 
-Need maybe compute actual capacities with base 40: Судно-33 = 40; Судно-25 = 40 + 10 = 50; difference 10. If base 50: 50 vs 60 diff 10. So base irrelevant if same.
+Need maybe compute actual loads:
+Current baseline = 40 tons.
+25 divisible by 5 -> +6 = 46.
+33 no rules -> 40.
+Difference = 6.
 
-Could there be a rule "У судов с номерами, кратными пяти, норма на 6 тонн выше базовой." and later "У судов с номерами, кратными пяти, норма на 10 тонн выше базовой." Maybe both apply? If both apply, +16? But "Если судно подпадает под оба правила, применяется только правило кратности пяти" could mean if multiple rules for same ship, only one of them (multiplicity five) applies. But there are two multiplicity-five rules; do they stack? Usually no, latest overrides. If both apply, difference 16. But likely not.
+If using early baseline=50 and +10, difference=10. Which one is more likely in benchmark? Let's examine the repeated filler at beginning and end: It says "文件中还包含关于审批顺序、准备时间和参与人员的一般说明。部分记录涉及较早时期，不影响当前计算。" This exact phrase appears many times before and after actual records. It might be a generic instruction to ignore irrelevant notes. It doesn't explicitly say use latest. But "较早时期" could mean records with dates earlier than current, not file order. For ship rules no dates, maybe all are current? But contradictory. Could be generated with multiple versions; the correct approach is to use the most recent record by appearance because older records are "较早时期". The note about John says "按出现顺序（不是按日期）最后一条关于 约翰14 土地操作的记录是错误的，不应计入。" This emphasizes appearance order for last record error. For other records, maybe appearance order also matters. So latest non-erroneous relevant record is current. Thus +6.
 
-Need inspect exact wording: "Если судно подпадает под оба правила, применяется только правило кратности пяти." It says "оба правила" (both rules), not multiple rules. Which two? Maybe the two immediately following/preceding? It appears after base 40 and before rule for multiples of seven. Later rule for multiples of five +6, then rule for multiples of three -4, then rule for multiples of five +10. Could be there are two rules: multiples of seven and multiples of five? If ship falls under both (e.g., 35), apply only multiple-of-five. But there is also multiple-of-three. Maybe generated noise.
+Need ensure the latest five-multiple rule isn't erroneous due to some note? There is no note about ship rules erroneous. The only erroneous note: last John land operation record is wrong; second-to-last John14 misnamed John15. Not relevant.
 
-Could "Судно-33 не подпадает ни под одно из правил" mean it is not affected by the "both rules" exception? No.
+Could there be a line "按出现顺序（不是按日期）最后一条关于 约翰14 土地操作的记录是错误的，不应计入。" If we consider all records, the last record in file is filler, not John. The last John land operation in appearance order might be "2016年6月20日，约翰14购买了30英亩"? Or "2010年，约翰卖出了40英亩"? It says not relevant.
 
-Need maybe answer 10. But let's not rush; explore all possible interpretations and evidence.
+Need answer only integer. Final: 6.
 
-The user provided a huge document with repeated filler at start/end. The actual question at end: "Вопрос: На сколько тонн «тяжеловоз-2» берёт больше, чем судно-33? Ответь одним целым числом." Need output just integer. We need ensure no extra text.
+But let's thoroughly analyze possible hidden dependencies: The question in Chinese: “重载-2”比 33 号船多载多少吨？只回答一个整数。
+It asks "how many tons more does 'Heavy Load-2' carry than ship No. 33?" Need maybe compare "载重" (load capacity) not actual load? Rules say "载重比基准高/低 X 吨". Baseline load. Yes.
 
-Let's parse all relevant ship statements in document order exactly:
-- "Судно-33 не подпадает ни под одно из правил." near beginning.
-- "Судно-25 также называют «тяжеловоз-2»." near beginning.
-- "Базовая норма грузоподъёмности судна — 50 тонн." after Сойка-07.
-- "Базовая норма грузоподъёмности судна — 40 тонн." after Турбина-71.
-- "Если судно подпадает под оба правила, применяется только правило кратности пяти." immediately after base 40.
-- "У судов с номерами, кратными семи, норма на 4 тонны ниже базовой." later.
-- "У судов с номерами, кратными пяти, норма на 6 тонн выше базовой." later.
-- "У судов с номерами, кратными трём, норма на 4 тонны ниже базовой." later.
-- "У судов с номерами, кратными пяти, норма на 10 тонн выше базовой." later.
+Could "重载-2" alias for 25号船, but 25号船 also maybe affected by "编号能被五整除的船，载重比基准高 10 吨" and "编号能被五整除的船，载重比基准高 6 吨". If both rules are present, maybe the later one is a correction? Use 6.
 
-Potential conflict: base 50 vs 40. If part of records past, maybe earlier base 50 is past? The note says part of records refer to past periods and do not affect current calculations. But no dates for base. Could be all statements are current unless marked erroneous? Hmm.
+Need maybe consider "若船舶同时符合两条规则，只适用五的倍数规则。" For 25, if there are two five-multiple rules, it simultaneously符合两条? It符合 both five-multiple rules (same type). The note says only apply five-multiple rule, but doesn't say which. Could choose the one with larger? No.
 
-Maybe there is a hidden "last mention" rule from John land: "Последняя по порядку упоминания в документе (а не по дате) запись об операциях Джона14 с землёй ошибочна и не должна учитываться." This indicates for John land, use last non-erroneous? For other conflicts, maybe use latest mention? The note about past periods may indicate earlier records not current. So latest base 40 and latest multiple-of-5 +10.
+Maybe there is a rule "编号能被五整除的船，载重比基准高 10 吨。" and later "编号能被五整除的船，载重比基准高 6 吨。" The later could be for a different baseline (40) but if both apply, the ship simultaneously符合 two rules? Actually both are five-multiple rules; the tie-breaker says if ship符合 two rules, only apply five-multiple rule. But it already is five-multiple; doesn't resolve multiple five rules. Could be intended that the later rule replaces earlier. Yes.
 
-But if base cancels, only need difference in adjustments. If there are two +5 rules, maybe the later one is current. Answer 10.
+Let's see if there are any explicit dates for baseline changes? No. But maybe "2004年底，约翰15购买了60英亩土地" etc. Not ship.
 
-Let's consider if "тяжеловоз-2" could be not Судно-25 but some other object? "Судно-25 также называют «тяжеловоз-2»." Yes.
+Could "重载-2" be a car? No, ship alias.
 
-Could "судно-33" have a rule due to index 33 multiple of 3? But explicit says not under any rules. If we ignore explicit, capacity = base -4 (multiple of 3). Ship-25 = base +10. Difference = 14. If +6, difference = 10. Interesting: if use +6 and apply multiple-of-3 to ship-33, difference also 10. If use +10 and ignore explicit, difference 14. If use +6 and explicit no rule, diff 6. If use +10 and explicit, diff 10. So answer could be 10 in two plausible combos: latest +10 with explicit; or earlier +6 with multiple-of-3. Need determine intended.
+Need final only integer, no explanation. But ensure no trailing spaces. final: 6.
 
-The statement "Судно-33 не подпадает ни под одно из правил" is likely deliberately included to override any rule for 33. So ship-33 no adjustment. Then difference = adjustment for 25. Need choose adjustment. If latest +10, answer 10. If first +6, answer 6. The presence of both +6 and +10 likely tests latest override? Or maybe one is irrelevant because "Если судно подпадает под оба правила, применяется только правило кратности пяти"? No, 25 only one rule.
+Double-check if answer could be 16 if both adjustments apply and baseline same? If someone uses all rules additively: 25 +10+6 = +16; 33 no rules = baseline; difference 16. But general note "若船舶同时符合两条规则，只适用五的倍数规则" might mean if a ship meets e.g. divisible by 5 and 7, only +10 not -4. It doesn't say multiple five rules additive. Usually rules are alternatives, not additive. So not 16.
 
-Maybe there is a rule: "Все объекты с индексами, кратными 5, считаются опытный." Could "опытный" affect something? Not tons.
+Could answer be 4? If using baseline 40, 25 +6=46; 33 divisible by 3 -> -4=36 unless special "33不符合任何规则" ignored? Difference =10. If special is earlier and later three rule applies? But special appears after three rule, so if latest overrides, special applies. If all rules apply and special says no rules, then 33 baseline. Difference 6. If using early +10 and three rule but not special? 25=60, 33=46? difference 14? Not likely.
 
-Could "тяжеловоз-2" be an alias for Судно-25, and "Судно-25" number 25 is multiple of 5. There are two rules for multiples of five: +6 and +10. Which one is "правило кратности пяти"? Both. Maybe the exception says if ship falls under both rules (maybe +6 and +10? both are multiplicity five?) apply only rule of multiplicity five? That doesn't resolve.
+Let's examine order of "33号船不符合任何规则" relative to "编号能被三整除..." It appears after three rule, so special overrides. Good.
 
-Maybe one of the +5 rules is for "с номерами, кратными пяти" and another for "с номерами, кратными пяти" but one might be a typo? Could be generated noise; need use most recent? In many synthetic tasks, when duplicate facts with different values, the last one is valid unless marked erroneous. The filler says part of records past; later records current. So +10.
+What if "编号能被五整除的船，载重比基准高 6 吨" appears after "33号船不符合任何规则", but also after baseline 40. So current.
 
-Let's see if there are any explicit "erroneous" markers for ship rules: "В предпоследней записи документа Джон14 ошибочно назван Йохан15." "Последняя по порядку упоминания в документе (а не по дате) запись об операциях Джона14 с землёй ошибочна и не должна учитываться." Only John. No ship error.
+Need maybe identify "重载-2" as 25号船, but there is also "25号船也被称为“重载-2”." Could there be another alias? No.
 
-Could the repeated filler at start/end be truncated; maybe there are hidden instructions? It says "В документе также приведены общие замечания о порядке согласования, сроках подготовки и составе участников. Отмечено, что часть записей относится к прошлым периодам и не влияет на текущие расчёты." This is generic. It might imply that records with dates in past (e.g., John land) not current. But ship rules no dates.
+Let's consider if "33号船不符合任何规则" could mean it doesn't satisfy the *conditions* of any rule, i.e., not divisible by 5,7,3. But 33 is divisible by 3, so this statement is false under rules. In such puzzles, explicit record can override general rule? It says "不符合任何规则" maybe a special fact: it is exempt from rules. So load baseline. If instead we ignore it as erroneous? No note says erroneous only John. So use it.
 
-Need maybe solve using "current calculations" = latest values. So answer 10.
+Could there be a hidden current calculation affected by variable operations? For example x_arr etc. Not relevant.
 
-Let's test alternative: If base 50 and base 40 both exist, maybe there are two different ships? "Базовая норма грузоподъёмности судна" singular. Could be changed over time; current is last. But difference unaffected if both ships use same current base. Unless ship-33 uses old base because not under rules? No.
+Need final integer only. I think 6.
 
-Could "Судно-33 не подпадает ни под одно из правил" mean it has no rule, but still base norm maybe 50? If base 40 current, capacity 40. Ship-25 capacity 50. Difference 10.
-
-Need output one integer: 10.
-
-But let's be thorough: Could "тяжеловоз-2" be Судно-25, and "Судно-25" number 25 is also multiple of? 25 not multiple of 7 or 3. It is multiple of 5. Rule for multiples of five: +6 or +10. If both rules apply? Maybe they are cumulative? If cumulative, +16. But phrase "Если судно подпадает под оба правила, применяется только правило кратности пяти" suggests not cumulative across different rules; but if there are two rules for same multiplicity? Could be one is old, one current. Not cumulative.
-
-Could "правило кратности пяти" refer to object classification "Все объекты с индексами, кратными 5, считаются опытный." and ship rule? No.
-
-Maybe there are two base norms: 50 and 40; if ship-33 not under any rules, maybe it uses the first base (50) because no rule changes? Ship-25 under rule +10 from base 40 = 50; difference 0? That seems unlikely. But if base changed, all ships use current base.
-
-Could "Судно-33 не подпадает ни под одно из правил" be a record that itself is a rule? It says not under any of the rules, so capacity base. If there are two base values, maybe use one associated with ship? No.
-
-Let's consider if question expects simple: "тяжеловоз-2" = Судно-25; 25 divisible by 5 -> +10 tons above base; Судно-33 no rules -> base; difference 10. They likely included +6 as distractor but later +10 maybe actual? Or maybe +6 is actual and +10 distractor? Need infer from ordering. In many tasks, the correct value is the one that appears last? Let's examine generated document: It seems random statements inserted. There are repeated classification rules with conflicts: "Все объекты с индексами, кратными 8, считаются резервный." then "считаются серый" then "считаются резервный" etc. They may not expect resolving conflicts except for specific question? For ships, they might expect using all rules? Hmm.
-
-Maybe the dataset is designed with "last mention wins" for conflicting facts? The John land note explicitly says last mention erroneous, so maybe generally last mention is not always correct; need use dates? For John: records:
-- 8 марта 2008 года Джон14 продал половину своей земли.
-- Все операции с землёй, которые совершал Джон14, перечислены в этом документе.
-- В 2010 году Джон продал 40 акров земли.
-- В конце 2004 года Йохан15 приобрёл 60 акров земли.
-- В 1999 году у Джона14 было 100 акров земли.
-- 20 июня 2016 года Джон14 приобрёл 30 акров земли.
-- Последняя по порядку упоминания в документе (а не по дате) запись об операциях Джона14 с землёй ошибочна и не должна учитываться.
-- В предпоследней записи документа Джон14 ошибочно назван Йохан15.
-This is a separate land question maybe not asked. It indicates they care about order and errors. For our question, no explicit error for ship rules. Could use latest non-erroneous.
-
-Maybe there is a hidden current date? No.
-
-Let's search memory: This type of prompt from "needle in haystack" or "conflicting facts" maybe expects answer from document using "last occurrence" rule? The repeated filler says part of records refer to past periods and do not affect current calculations. So use current (latest) records. Thus +10.
-
-Need final just integer. But ensure no analysis in final. Final: 10.
-
-Double-check if "На сколько тонн «тяжеловоз-2» берёт больше, чем судно-33?" If heavy-hauler takes more by 10 tons. Answer one integer: 10.
-
-Let's maybe consider if "Судно-33 не подпадает ни под одно из правил" but number 33 is multiple of 3; there is a rule for multiples of three. Could the explicit statement mean it doesn't fall under any *of the rules mentioned before it* (at beginning), and later rules might apply? It appears near beginning before ship rules are introduced. If so, later rule for multiples of 3 could apply to Судно-33, making it -4. But phrase "ни под одно из правил" likely refers to all rules in document. However, if generated order matters: statement before rules may not know them? In natural language, it refers to rules in document. Could be a fact that ship-33 is exempt from all rules. So no adjustment.
-
-If instead later rule for multiples of 3 applies despite statement, difference with +10 = 14; with +6 = 10. The answer 10 appears robust if either (latest +10 and exempt) or (earlier +6 and not exempt). But we need choose one.
-
-Could there be a rule "Если судно подпадает под оба правила, применяется только правило кратности пяти." For ship-33: number 33 is multiple of 3, not 5 or 7. If there are rules for multiples of 3 and maybe something else? It falls under one rule (multiple of 3), so would be -4. But explicit says not under any rules. If we ignore explicit, +10 - (-4) = 14. If use +6, 6 - (-4)=10. Which is more likely intended? The explicit statement likely included to avoid applying multiple-of-3 rule to 33. Why else include "Судно-33 не подпадает ни под одно из правил"? It directly answers that ship has no adjustment. So difference = adjustment for 25. Then need choose adjustment. They included two +5 rules; maybe one is distractor. Which one is intended? Could be the one after the exception? Let's see: "Если судно подпадает под оба правила, применяется только правило кратности пяти." This exception likely refers to two rules: multiples of seven and multiples of five? It appears before both? Actually after base 40, before rule for seven and five. It says if ship falls under both rules, apply only rule of multiplicity five. Then later there are rules for seven (-4), five (+6), three (-4), five (+10). The exception might be meant to resolve conflict for numbers divisible by 5 and 7 (e.g., 35) or 5 and 3 (e.g., 15). For 25 no conflict.
-
-Why two +5 rules? Could be one is "на 6 тонн выше базовой" and another "на 10 тонн выше базовой". Maybe the latter is a different rule? Could be for "судно с номерами, кратными пяти" appears twice due to random generation; maybe both are facts but inconsistent. In such tasks, if inconsistent, perhaps use the one that is more recent? The document order: +6 then +10. So +10.
-
-Could there be a hidden "last mention wins" from the John note? It says last mention about John's land is erroneous, not general. But filler says part of records past; later current. So +10.
-
-Let's think of possible expected answer from a human reading casually: They see Судно-25 = heavy-hauler-2. They see base norm maybe 40 (last). They see rule for multiples of five: there are two; maybe they pick the one closest? If they scan, might pick +10 because last. Ship-33 no rules. Difference 10. If they pick +6, answer 6. Which is more plausible in benchmark? Usually generated tasks have a single correct chain; distractors may include conflicting values but one is marked erroneous or outdated. Here no mark, but repeated filler about past periods may mark earlier as past. So last = current. Answer 10.
-
-Need final: 10. Ensure one integer only.
+Let's maybe produce final with just 6. Ensure no analysis in final.
