@@ -44,3 +44,21 @@ be run whenever a model is already loaded.
 ```
 python3 scripts/build_speed_table.py
 ```
+
+## Where the large-context figures come from
+
+Columns 250k, 500k and 1M are **not** measured on the benchmark tasks. They come from a
+separate synthetic probe (`scripts/speed_probe.py`):
+
+- the prompt is a stream of ordinary English words, about one token per word, generated
+  fresh for every run so the server's prompt cache cannot serve it;
+- the instruction comes first: count how often the marker word appears, then write a
+  story. A wrong count means the model did not read the whole prompt, so the figure can
+  be rejected instead of reported;
+- the sizes are calibrated on a 5k-token request before the big ones, so the reported
+  `prompt_n` lands within about half a percent of the target.
+
+**Read them as an upper bound, not as a task expectation.** Generation there is uniform
+prose, which is the friendliest case for draft/MTP decoding; on real tasks the model
+produces long structured reasoning and code, and the effective speed is lower. The 60k
+and 150k columns, by contrast, are measured on the actual test sets.

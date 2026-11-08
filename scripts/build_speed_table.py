@@ -103,6 +103,12 @@ def main():
         cells.append(note_for(folder, cfg))
         lines.append("| %s | %s |" % (folder, " | ".join(cells)))
     print("\n".join(lines))
+    print()
+    print("Columns 250k, 500k and 1M come from `scripts/speed_probe.py`, not from the benchmark "
+          "tasks: the prompt is a synthetic stream of English words with a count-the-marker "
+          "instruction, followed by a story request. Generation there is uniform prose, which is "
+          "the friendliest case for draft/MTP decoding, so treat those figures as an upper bound "
+          "rather than a task-level expectation.")
 
 
 if __name__ == "__main__":

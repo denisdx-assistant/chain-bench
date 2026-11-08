@@ -10,27 +10,93 @@ import argparse, json, os, re, time, urllib.request
 FILLER = ("The document also contains general notes on approval order, preparation timelines "
           "and participants. Some records refer to earlier periods and do not affect current "
           "calculations. ")
-ASK = ("Расскажи историю о рыбаке и море, примерно на 2000 слов. Начни сразу с истории. "
+ASK = ("Тебе дан большой массив английских слов. Сначала посчитай, сколько раз в нём встречается "
+       "слово `context`, и напиши это число. Затем расскажи историю о рыбаке и море, примерно на 2000 "
+       "слов. "
        "Затем ниже идёт технический документ, который к истории отношения не имеет.\n\n")
 
 
-CHARS_PER_TOKEN = float(os.environ.get("CHAIN_BENCH_CHARS_PER_TOKEN", "4.8"))
+CHARS_PER_TOKEN = float(os.environ.get("CHAIN_BENCH_CHARS_PER_TOKEN", "7.1"))
 
 
-def unique_filler(chars):
-    """Filler whose every sentence carries a distinct number, so the server's prompt
-    cache cannot serve it and the measured prefill is the real one."""
+WORDS = ("ability absence academy accent access accident account accuracy achievement acid action "
+         "activity actor addition address adjustment administration admission advantage adventure advice "
+         "affair affection afternoon agency agenda agent agreement agriculture aircraft airline airport "
+         "alarm album alcohol alley alliance allowance alternative ambition ambulance amendment amount "
+         "analysis ancestor anchor angel anger angle animal ankle anniversary answer anxiety apartment "
+         "apology apparatus appeal appearance appetite apple application appointment approval aquarium arch "
+         "architect architecture area argument arm army arrangement arrival arrow art article artist artwork "
+         "ash aspect assignment assistance assistant association assumption atmosphere atom attachment attack "
+         "attempt attention attitude audience author authority autumn avenue average award awareness axis baby "
+         "bachelor backbone background bacon badge bag baggage bakery balance balcony ball balloon ballot "
+         "bamboo banana band bandage bank banker banner banquet bargain bark barn barrel barrier base "
+         "basement basin basis basket basketball bath bathroom battery battle beach bean bear beard beast "
+         "beauty bedroom bee beef beetle beginning behavior belief bell belt bench benefit berry bicycle bid "
+         "bike bill biography biology bird birth birthday biscuit bishop bite blade blanket blast blend "
+         "blessing block blood blossom blouse board boat body boiler bolt bomb bond bone bonus book booking "
+         "booklet border bottle bottom boundary bowl brain branch brand brass bread breakfast breast breath "
+         "breeze brick bride bridge brief broadcast broccoli brother brush bubble bucket budget buffalo "
+         "building bulb bulk bull bullet bunch burden bureau burger burial bush business butter butterfly "
+         "button buyer cabbage cabin cabinet cable cafe cage cake calculation calendar camera camp campaign "
+         "campus canal candidate candle candy cannon canoe canvas canyon capability capacity capital captain "
+         "carbon card care career cargo carpet carriage carrier carrot cart cartoon case cash castle cat "
+         "catalog catch category cattle cause cave ceiling celebration celebrity cellar cement census center "
+         "century ceremony chain chair chairman chalk challenge chamber champion chance change channel "
+         "chapter character charge charity charm chart chase chat cheek cheese chef chemistry cherry chess "
+         "chest chicken chief childhood chimney chip chocolate choice choir church cinema circle circuit "
+         "citizen city claim class classroom clay cleaner clerk cliff climate clinic clock cloth cloud club "
+         "clue coach coal coast coat code coffee coin collection college colony color column combination "
+         "comfort command comment committee community companion company comparison compass competition "
+         "complaint complex component composer composition compound computer concept concern concert "
+         "conclusion concrete condition conference confidence conflict confusion connection conscience "
+         "consequence conservation consideration construction consultant contact container content contest "
+         "continent contract contrast contribution control convention conversation conversion cookie copper "
+         "copy coral cord core corn corner corporation correction corridor cost costume cottage cotton couch "
+         "council counselor count counter country countryside county couple courage course court cousin "
+         "cover cow crab crack craft crane crash cream creation creature credit creek crew cricket crime "
+         "crisis critic criticism crop cross crowd crown cruise crystal cube culture cup cupboard curiosity "
+         "currency curtain curve cushion customer custom cut cycle dad damage dance dancer danger darkness "
+         "data database date daughter dawn day deadline dealer death debate debt decade decision deck "
+         "declaration decline decoration deed deer defeat defense definition degree delay delegation "
+         "delight delivery demand democracy demonstration density dentist department departure dependence "
+         "deposit depression depth deputy description desert design designer desire desk destination detail "
+         "detective determination development device devil diagram dialogue diamond diary dictionary diet "
+         "difference difficulty dignity dimension dinner dinosaur direction director dirt disadvantage "
+         "disaster discipline discovery discussion disease dish disk display distance distribution district "
+         "diversity division dock doctor document dog doll dolphin domain donation donkey door doorway dose "
+         "doubt dough dove draft dragon drain drama drawer drawing dream dress drink drive driver drop "
+         "drought drum duck dust duty eagle ear earthquake ease east echo economy edge edition editor "
+         "education effect effort egg elbow elder election electricity electron element elephant elevator "
+         "emergency emotion emperor emphasis employee employer employment encounter encouragement end enemy "
+         "energy engine engineer engineering entertainment enthusiasm entrance entry envelope environment "
+         "episode equality equipment era error escape essay essence estate estimate evaluation evening event "
+         "evidence evolution examination example exception exchange excitement excuse execution exercise").split()
+
+
+def random_filler(words_target):
+    """A stream of ordinary English words, roughly one token each, seeded fresh every run.
+
+    One space-separated dictionary word costs about one token, so the word count is the
+    token count. A marker word is inserted every 100-200 words so the answer can be
+    verified: a model that did not read the whole prompt gets the count wrong.
+    """
+    import random
+    rnd = random.Random(int.from_bytes(os.urandom(16), "big"))
     out = []
-    n = 0
-    size = 0
-    while size < chars:
-        n += 1
-        line = ("Record %d was processed with value %d; general notes on approval order, "
-                "preparation timelines and participants follow. Some records refer to "
-                "earlier periods and do not affect current calculations. " % (n, n * 7 + 13))
-        out.append(line)
-        size += len(line)
-    return "".join(out)
+    marker = "context"
+    count = 0
+    since = 0
+    after = rnd.randint(100, 200)
+    for _ in range(words_target):
+        if since >= after:
+            out.append(marker)
+            count += 1
+            since = 0
+            after = rnd.randint(100, 200)
+        else:
+            out.append(rnd.choice(WORDS))
+            since += 1
+    return " ".join(out), count
 
 
 def build_prompt(target_tokens, reserve):
@@ -40,8 +106,8 @@ def build_prompt(target_tokens, reserve):
     token on this tokenizer; the measured prompt_n is printed for verification.
     """
     # target_tokens is the prompt size we want; the reserve only guards the window
-    body = int(max(0, target_tokens * CHARS_PER_TOKEN))
-    return ASK + unique_filler(body)
+    body, expected = random_filler(target_tokens)
+    return ASK + body, expected
 
 
 def main():
@@ -66,9 +132,9 @@ def main():
         sizes.append(int(float(s[:-1]) * mult) if s[-1] in "km" else int(s))
     os.makedirs(a.out_dir, exist_ok=True)
     out = os.path.join(a.out_dir, (a.label or a.model).replace("/", "_") + ".json")
-    def call(prompt):
+    def call(prompt, mt=None):
         body = json.dumps({"model": a.model, "messages": [{"role": "user", "content": prompt}],
-                           "max_tokens": a.max_tokens, "stream": False,
+                           "max_tokens": mt if mt is not None else a.max_tokens, "stream": False,
                            "temperature": 0.7}).encode()
         req = urllib.request.Request(base + "/v1/chat/completions", data=body, headers=hdr)
         t0 = time.time()
@@ -76,17 +142,29 @@ def main():
         return json.loads(r.read()), time.time() - t0
 
     global CHARS_PER_TOKEN
+    # cheap calibration first: one small request tells us the real chars-per-token,
+    # so the big prompts are sized correctly on the first attempt
+    try:
+        probe_prompt, _ = build_prompt(5000, a.max_tokens)
+        d0, _ = call(probe_prompt, mt=16)
+        st0 = d0.get("timings") or {}
+        if st0.get("prompt_n"):
+            CHARS_PER_TOKEN = len(probe_prompt) / float(st0["prompt_n"])
+            print("калибровка: %.2f символа на токен (проверочный промпт %d токенов, кэш %s)"
+                  % (CHARS_PER_TOKEN, st0["prompt_n"], st0.get("cache_n") or 0), flush=True)
+    except Exception as e:
+        print("калибровка не удалась: %s" % str(e)[:100], flush=True)
     recs = []
     for want in sizes:
         attempt = 0
         while True:
             attempt += 1
-            prompt = build_prompt(want, a.max_tokens)
+            prompt, expected = build_prompt(want, a.max_tokens)
             try:
                 d, wall = call(prompt)
             except Exception as e:
                 print("  %7s | ошибка: %s" % (want, str(e)[:120]), flush=True)
-                recs.append({"want": want, "error": str(e)[:160]})
+                recs.append({"want": want, "expected_markers": expected if "expected" in dir() else None, "error": str(e)[:160]})
                 break
             st = d.get("timings") or {}
             got = st.get("prompt_n") or 0
