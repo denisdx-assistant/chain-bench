@@ -40,13 +40,28 @@ made before the fields were captured show —.
 | Qwen3.8-27B-UD-Q8_K_XL · chains zh · 32k | rerun_8tasks | 8 | 56.2 | 53.4 | — | 0 | 1718 | 38141 | 32 s |
 | Qwen3.8-27B-UD-Q8_K_XL · programs · 16k · v4_16k | default | 20 | 44.1 | 40.3 | 722.9 | 2 | 4145 | 142558 | 103 s |
 | Qwen3.8-27B-UD-Q8_K_XL · programs · 32k · v4_32k_rerun | default | 20 | 41.5 | 40.2 | 723.8 | 7 | 4145 | 142558 | 103 s |
+| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · chains en · 64k | default | 17 | 101.7 | 86.6 | 1906.5 | 17 | 8121 | 14062 | 96 s |
+| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · chains en · 64k | 8tasks | 8 | 94.5 | 87.0 | 1888.3 | 8 | 3100 | 13735 | 37 s |
+| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · chains ru · 64k | default | 17 | 140.2 | 85.4 | 2057.1 | 1 | 13430 | 19260 | 162 s |
+| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · chains ru · 64k | 8tasks | 8 | 87.6 | 82.9 | 2054.1 | 1 | 3163 | 19112 | 38 s |
+| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · chains zh · 64k | default | 17 | 92.6 | 83.2 | 2411.8 | 1 | 8645 | 38359 | 103 s |
+| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · chains zh · 64k | 8tasks | 8 | 88.9 | 83.2 | 2409.9 | 1 | 2575 | 38141 | 31 s |
+| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · chains zh · 64k | par2 | 17 | 88.8 | 59.2 | 7107037.0 | 11 | 7389 | 38359 | 0 s |
+| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · programs · 64k · v4_64k | default | 20 | 98.9 | 86.0 | 2725.9 | 20 | 64000 | 142558 | 723 s |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · chains en · 32k | guarded | 17 | 102.1 | 90.7 | 1510.7 | 16 | 4596 | 14062 | 57 s |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · chains en · 32k | guarded_8tasks | 8 | 107.3 | 94.1 | 1503.2 | 8 | 1059 | 13735 | 11 s |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · chains en · 64k | rep2 | 17 | 153.2 | 89.3 | 1516.3 | 9 | 7337 | 14062 | 84 s |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · chains en · 64k | rep2_8tasks | 8 | 99.2 | 93.3 | 1507.0 | 8 | 601 | 13735 | 6 s |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · chains ru · 32k | guarded | 17 | — | — | — | 0 | — | — | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · chains ru · 32k | guarded_8tasks | 8 | 87.0 | 83.7 | 1655.2 | 1 | 2121 | 19112 | 26 s |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · chains ru · 64k | rep2 | 17 | 93.8 | 86.4 | 1605.2 | 1 | 4696 | 19260 | 59 s |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · chains ru · 64k | rep2_8tasks | 8 | 90.9 | 86.2 | 1670.3 | 1 | 1271 | 19112 | 14 s |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · chains zh · 32k | guarded | 17 | 97.4 | 88.9 | — | 0 | 5600 | 38359 | 65 s |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · chains zh · 32k | guarded_8tasks | 8 | 98.5 | 89.4 | 2084.9 | 1 | 1976 | 38141 | 21 s |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · chains zh · 64k | rep2 | 17 | 96.8 | 88.4 | 2078.3 | 1 | 6852 | 38359 | 85 s |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · chains zh · 64k | rep2_8tasks | 8 | 103.1 | 93.5 | 2077.6 | 1 | 1392 | 38141 | 14 s |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · programs · 32k · v4_32k_guarded | guarded | 20 | 99.4 | 97.6 | 2456.1 | 20 | 6688 | 142558 | 70 s |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · programs · 64k · v4_64k_rep2 | default | 20 | 105.2 | 96.8 | 2457.9 | 20 | 6490 | 142558 | 67 s |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · chains en · 16k | default | 17 | 102.2 | 89.9 | 1495.4 | 17 | 5469 | 14062 | 57 s |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · chains en · 16k | 8tasks | 8 | 94.5 | 90.0 | 1471.5 | 8 | 1379 | 13735 | 15 s |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · chains en · 64k | rerun | 17 | 117.4 | 87.0 | 1490.7 | 16 | 6572 | 14062 | 75 s |
@@ -60,7 +75,7 @@ made before the fields were captured show —.
 | Qwen3.8-Flash-Next-UD-IQ4_XS · chains zh · 64k | rerun | 17 | 96.1 | 85.9 | 2028.6 | 1 | 3116 | 38359 | 36 s |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · chains zh · 64k | rerun_8tasks | 8 | 94.9 | 89.0 | 2027.1 | 1 | 1784 | 38141 | 20 s |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · programs · 16k · v4_16k | default | 20 | 98.2 | 95.7 | 2405.4 | 20 | 6905 | 142558 | 72 s |
-| Qwen3.8-Flash-Next-UD-IQ4_XS · programs · 64k · v4_64k_rerun | default | 20 | 97.0 | 95.0 | 2395.6 | 18 | 7361 | 142558 | 79 s |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · programs · 64k · v4_64k_rerun | default | 20 | 107.5 | 95.6 | 2395.6 | 20 | 7406 | 142558 | 79 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains en · 16k | default | 17 | 88.9 | 78.0 | 1140.0 | 17 | 4112 | 14062 | 54 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains en · 16k | 8tasks | 8 | 87.6 | 81.6 | 1121.3 | 8 | 920 | 13735 | 11 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains en · 32k | rerun | 17 | 90.5 | 79.5 | 1136.6 | 16 | 5425 | 14062 | 74 s |
