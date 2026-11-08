@@ -62,7 +62,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-27B-UD-Q8_K_XL · zh · 32k · rerun_8tasks | 67s ✓ | 10s ✓ | 8s ✓ | 8s ✓ | 43s ✗ | 30s ✗ | 83s ✗ | 79s ✓ | 5/8 |
 | Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · en · 64k · 8tasks | 47s ✓ | 14s ✓ | 10s ✓ | 11s ✓ | 41s ✗ | 84s ✗ | 119s ✗ | 175s ✗ | 4/8 |
 | Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · ru · 64k · 8tasks | 67s ✓ | 16s ✓ | 9s ✓ | 10s ✓ | 49s ✗ | 118s ✗ | 31s ✗ | 161s ✓ | 5/8 |
-| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · zh · 64k · 8tasks | 26s ✓ | 10s ✓ | 10s ✓ | 16s ✓ | 54s ✗ | · | · | · | 4/5 (partial 5/8) |
+| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · zh · 64k · 8tasks | 26s ✓ | 10s ✓ | 10s ✓ | 16s ✓ | 54s ✗ | 92s ✓ | 90s ✗ | 110s ✓ | 6/8 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · en · 32k · guarded_8tasks | 21s ✓ | 12s ✓ | 11s ✓ | 12s ✓ | 30s ✗ | 19s ✓ | 45s ✗ | 71s ✗ | 5/8 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · ru · 32k · guarded_8tasks | 26s ✓ | 10s ✓ | 7s ✓ | 8s ✓ | 41s ✗ | 52s ✗ | 47s ✗ | 109s ✓ | 5/8 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · zh · 32k · guarded_8tasks | 31s ✓ | 13s ✓ | 9s ✓ | 8s ✓ | 56s ✗ | 35s ✗ | 43s ✗ | 79s ✓ | 5/8 |
