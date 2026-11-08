@@ -108,3 +108,20 @@ same probe while they are loaded.
 python3 scripts/build_speed_table.py
 python3 scripts/update_speed_doc.py
 ```
+
+## Continuous batching
+
+Flash-Next providers serve with continuous batching, so a new request's prompt processing
+can be interleaved with the decode steps of requests already in flight. When that happens
+the server's own `prompt_ms` and `predicted_ms` overlap instead of following each other:
+their sum exceeds the wall time, and neither number describes a clean measurement.
+
+The rule that follows is simple: **measure with one client, one request at a time.** These
+series do exactly that, and the additivity is checked rather than assumed — `wall / (prompt_ms
++ predicted_ms)` sits at 1.00-1.02 for every row of every run in this repository, which is
+request overhead and nothing more.
+
+`scripts/check_overlap.py` scans the results and reports any row where the sum exceeds the
+wall time, i.e. where prefill and generation really did overlap. Such rows must be kept out
+of speed tables: on a batched server the reported `prompt_per_second` is not the speed of
+reading the prompt, it is the speed of reading it while something else was being written.
