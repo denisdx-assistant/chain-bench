@@ -1,65 +1,115 @@
-We need answer user's question. Need parse document, likely noise repeated. Question: "By how many metres does bird-11 fly higher than bird-22? Answer with a single integer."
+We need answer user's Chinese question. Need parse long noisy file and compute "11号鸟比22号鸟飞得高多少米？只回答一个整数." We need infer flight height differences from records.
 
-We need compute altitude difference for Bird-11 and Bird-22 based on rules in document. Need be careful with conflicting base flight altitude? There are two statements:
-"The base flight altitude is 80 metres." early, later "The base flight altitude is 100 metres." Which applies? Need infer from puzzle type? It might have multiple records, some refer earlier periods and do not affect current calculations. The repeated general notes says some records refer to earlier periods and do not affect current calculations. We need determine current calculation perhaps latest values override earlier? Or relevant rules near end? Need inspect all bird data and rules.
+We have many records: general noise. Key facts about birds, heights relative to baseline, comparisons, attributes (weight, color, diving, wingspan). Need calculate height of bird 11 vs bird 22? Let's extract relevant statements.
 
-Document contains many irrelevant operations/indicators. Relevant:
-- Birds with a wingspan greater than 120 centimetres fly 10 metres above the base altitude.
-- All white birds fly 7 metres below the base altitude.
-- Birds that can dive fly 15 metres below the base altitude.
-- All birds heavier than 150 grams fly 12 metres above the base altitude.
-- The base flight altitude is 80 metres.
-- The base flight altitude is 100 metres. (later)
-- Bird records:
-Jay-08 flies 3 metres higher than heron-51.
-Heron-51 is also called "super-flyer-1".
-Crow-33 flies 4 metres higher than jay-08.
-Falcon-14 flies 6 metres higher than crow-33.
-Bird-11: mass 180 grams, colour white.
-Bird-11: can dive, wingspan 130 centimetres.
-Bird-22: cannot dive, wingspan 110 centimetres.
-Bird-22: mass 140 grams, colour grey.
-Jay-15: mass 160 grams, colour white.
-Jay-17: mass 180 grams, colour black.
-Jay-13: mass 170 grams, colour white.
-Jay-14: mass 190 grams, colour grey.
-Jay-12: mass 200 grams, colour white.
-Jay-16: mass 150 grams, colour white.
+Relevant lines:
+- "11 号鸟：会潜水，翼展 130 厘米。"
+- "22 号鸟：体重 140 克，灰色。"
+- "22 号鸟：不会潜水，翼展 110 厘米。" (later)
+- "11 号鸟：体重 180 克，白色。" (later)
+Maybe multiple records about same bird? Need consider all? Also rules: 
+- "所有白色的鸟，飞行高度比基准低 7 米."
+- "会潜水的鸟，飞行高度比基准低 15 米."
+- "翼展大于 120 厘米的鸟，飞行高度比基准高 10 米."
+- "所有重于 150 克的鸟，飞行高度比基准高 12 米."
+- "编号能被七整除的船..." irrelevant.
+- "33 号船不符合任何规则" irrelevant.
+Comparisons:
+- "猎鹰-14 比 乌鸦-33 飞得高 6 米." Not our birds? maybe names? 
+- "松鸦-08 比 苍鹭-51 飞得高 3 米." not numeric bird IDs? But could aliases? 
+- "苍鹭-51 也被称为“超级飞行者-1”." irrelevant.
+Question: "11 号鸟比 22 号鸟飞得高多少米？" Need absolute height difference between numbered birds 11 and 22, using rules/attributes.
 
-Question specifically bird-11 vs bird-22. Need compute altitudes using attributes and rules. Need resolve if multiple conditions apply and how combine? Usually these tasks: each object has attributes; rules describe absolute offsets from base altitude depending on properties. If multiple rules apply, maybe sum offsets? Or priority? Need infer from language: "Birds with a wingspan greater than 120 centimetres fly 10 metres above the base altitude." "All white birds fly 7 metres below the base altitude." "Birds that can dive fly 15 metres below the base altitude." "All birds heavier than 150 grams fly 12 metres above the base altitude." These could be independent modifiers? In such generated puzzles, final height = base + sum of applicable rule offsets, unless contradictory? Need test with known relative statements maybe.
+We need decide baseline? There are two baseline flight height statements: "基准飞行高度为 80 米." and later "基准飞行高度为 100 米." Which applies? Possibly current calculation uses latest? Need inspect text ordering and notes: "部分记录涉及较早时期，不影响当前计算." There are contradictory baseline heights. Could be a puzzle where records include approvals order, preparation times; some earlier period not affect current calculation. Need determine which baseline is current? It says "文件中还包含关于审批顺序、准备时间和参与人员的一般说明。部分记录涉及较早时期，不影响当前计算." That likely means ignore earlier period records? But no dates for rules except John land dates. For bird heights, two baselines: 80 and 100. Which is current? Need maybe last one? The line "基准飞行高度为 100 米." appears later after many lines; "基准飞行高度为 80 米." appears earlier before some records. Could be current baseline = latest? But there are notes about earlier period not affecting current calculation, maybe use latest values? However question asks compare heights, if both birds share same baseline, difference independent of baseline unless rules adjust differently. Baseline value doesn't matter for difference if both computed relative to same baseline. Unless one bird's attributes changed over time? Need consider records at different times? The file includes dates only for John14 land operations; irrelevant except note about last record error. Bird records no dates. So baseline cancels in difference.
 
-We have explicit relative flights:
-- Jay-08 flies 3 metres higher than heron-51.
-- Heron-51 also called super-flyer-1 (maybe irrelevant alias)
-- Crow-33 flies 4 metres higher than jay-08.
-- Falcon-14 flies 6 metres higher than crow-33.
-These could be used to infer if rule-based offsets produce consistent relative differences? But no attributes for Jay-08, Heron-51, Crow-33, Falcon-14 except names? Maybe not needed.
+Need compute height offset for bird 11 and bird 22 based on all applicable rules/attributes. But there are multiple attribute records for same bird: bird 11 has diving, wingspan 130; later weight 180, white. Bird 22 has weight 140 gray; later not diving, wingspan 110. Are these cumulative? Likely yes: each bird's properties are listed across records; combine all known attributes. Rules apply to birds satisfying conditions:
+- All white birds: height = baseline - 7
+- Diving birds: height = baseline - 15
+- Wingspan > 120 cm: height = baseline + 10
+- Weight > 150 g: height = baseline + 12
 
-For bird-11: mass 180 (>150) -> +12; colour white -> -7; can dive -> -15; wingspan 130 >120 -> +10. Sum = base + (12 -7 -15 +10)=base+0. If base=100 (latest?) altitude 100. If base=80 altitude 80.
+Question asks how much higher bird 11 than bird 22. If multiple rules apply, need combine offsets? Usually such puzzles: each condition independently modifies flight height relative to baseline; if multiple conditions apply, sum offsets? Need infer. Could be "所有白色...低7", "会潜水...低15", etc. A bird can satisfy multiple; likely cumulative (add/subtract all applicable). But maybe rules conflict and need precedence? Need examine phrasing: "所有白色的鸟，飞行高度比基准低 7 米。" Could mean if white, height is baseline - 7, overriding other rules? But then if also diving, which one? They might be independent adjustments. Need compute difference maybe by applying all constraints that match each bird. Let's test both possibilities.
 
-Bird-22: cannot dive (no effect? rule only can dive), wingspan 110 not >120; mass 140 not >150; colour grey not white. No applicable rules -> base altitude. If base=100, altitude 100. Difference bird-11 - bird-22 = 0. If base=80 also 0. So answer likely 0 independent of base if sum offsets for bird-11 is zero and bird-22 no offsets. But need check if rules are not additive but priority? Could be last applicable rule determines? Then Bird-11: multiple attributes; order of mention? Rules appear in document order:
-Birds with wingspan >120 fly 10 above base (appears before white? Let's locate): "Birds with a wingspan greater than 120 centimetres fly 10 metres above the base altitude." occurs later after Nils decreased... Then "All white birds fly 7 metres below the base altitude." occurs after Marta marked result... Then "Birds that can dive fly 15 metres below the base altitude." occurs after Indicator variable105... Then "All birds heavier than 150 grams fly 12 metres above the base altitude." occurs near end. If last applicable rule for Bird-11 is heavier -> +12, Bird-22 none -> base, difference +12. But typical puzzle likely additive? Need infer from generated structure.
+Bird 11 attributes:
+- 会潜水 (diving) => offset -15
+- 翼展 130 (>120) => +10
+- 体重 180 (>150) => +12
+- 白色 (white) => -7
+Sum = -15+10+12-7 = 0. So height = baseline. If overriding, ambiguous; maybe last matching rule? Order of rules in text: white low7 appears before diving low15, wingspan high10, weight high12? Actually lines order: "所有白色的鸟，飞行高度比基准低 7 米." early; later "会潜水的鸟..." near end; "翼展大于..." near end; "所有重于 150 克的..." earlier. If last rule overrides, bird 11 matches white (early), diving (near end), wingspan (near end), weight (earlier). Last applicable maybe wingspan +10 or diving? Need not.
 
-Question: "By how many metres does bird-11 fly higher than bird-22?" They give attributes and rules. In many synthetic tasks (e.g., from benchmark?) they expect apply all relevant rules as modifications to base? Need know format. The document has lots of irrelevant records; some refer earlier periods do not affect current calculations. There are multiple values for base flight altitude: 80 and 100. Maybe latest is current, but difference unaffected if both same base. For bird-11 vs bird-22, if additive offsets sum to zero, answer 0. If priority last rule, answer 12. Need determine intended semantics.
+Bird 22 attributes:
+- 体重 140 (not >150)
+- 灰色 (not white)
+- 不会潜水 (no diving)
+- 翼展 110 (not >120)
+No applicable rules => baseline. Difference if bird11 sum 0, bird22 0 -> 0.
 
-Let's analyze all statements carefully for hidden clues: "The document also contains general notes on approval order, preparation timelines and participants. Some records refer to earlier periods and do not affect current calculations." This is noise but suggests temporal order matters? For variables operations maybe last record overrides? But question only birds.
+But maybe there are comparison statements involving "猎鹰-14比乌鸦-33" etc and aliases? Could numbered birds have names/aliases? Need examine: "苍鹭-51 也被称为“超级飞行者-1”." "松鸦-15：体重..." "松鸦-16", "松鸦-08", "松鸦-12", "松鸦-13", "松鸦-14", "猎鹰-14", "乌鸦-33". The question asks "11 号鸟比 22 号鸟飞得高多少米？" There are records: "11 号鸟：会潜水，翼展 130 厘米." and later "11 号鸟：体重 180 克，白色." So numeric IDs exist. No direct comparison between 11 and 22 except rules.
 
-Rules are phrased as universal categories. If a bird has multiple properties, what's intended? In real world, all conditions could be true; height cannot be simultaneously +12 and -7 unless combined. Could be additive: base altitude plus all applicable offsets. Many generated datasets use "All X have property Y" and query relative differences by summing constraints? Need see examples: If multiple rules apply to same object, often they are independent attributes that modify value cumulatively. The problem likely from "textual QA with irrelevant records" where answer computed via applying rules sequentially/additively. Let's inspect wording: "Birds with a wingspan greater than 120 centimetres fly 10 metres above the base altitude." This could mean if wingspan condition, their flight altitude is base +10, not add to other rules. "All white birds fly 7 metres below the base altitude." If bird is both white and wingspan>120, conflict: one says +10, other -7. Maybe one rule overrides? But no priority specified. Could be they don't intend overlapping categories? Yet Bird-11 deliberately overlaps all four rules (white, dive, >150g, >120cm). So they expect some combination. The offsets are chosen to sum to 0: +10 -7 -15 +12 = 0. That seems intentional! Bird-22 has no applicable rules. Then difference 0. If priority, not as elegant? They likely designed Bird-11 attributes so total offset zero; answer 0 independent of base and order maybe if additive. Also note "All birds heavier than 150 grams fly 12 metres above the base altitude." appears after dive rule; sum zero exactly. This is a clue: they want combine all rules, because otherwise overlapping not meaningful? The question asks bird-11 higher than bird-22; Bird-11 has multiple features that cancel to base, Bird-22 also base, so answer 0. Likely.
+Need check if any record says "猎鹰-14比乌鸦-33飞得高6米" and aliases maybe super flyer? Not relevant to 11/22 unless bird names correspond to numbers? Could there be a hidden mapping: "苍鹭-51" etc with hyphen number, not "51号鸟"? The question uses "11 号鸟" (bird #11), not species name. So likely only numeric bird records.
 
-Need ensure "cannot dive" means no -15, yes. Wingspan 110 not >120, mass 140 not >150, colour grey not white. So bird-22 altitude = base (whatever current). Bird-11: can dive -15; wingspan 130 +10; white -7; heavier 180 +12; net 0. Difference = 0.
+Need consider "按出现顺序（不是按日期）最后一条关于 约翰14 土地操作的记录是错误的，不应计入." This is about land operations, irrelevant to bird height? But maybe included to distract; also "在本文件的倒数第二条记录中，约翰14 被误称为 约翰15." These notes may affect John land calculation but not current question. But we must ignore? The question only asks birds. Need answer integer.
 
-But let's consider if rules are not additive but each describes "fly X metres above/below base altitude" as absolute categories, and overlapping categories maybe need choose one based on order? The generated text says "The document also contains general notes on approval order..." Could be "approval order" means last rule overrides? But no explicit. Let's examine other possible relevant data: There are two base altitudes 80 and 100; if additive, both birds same base so difference unaffected. If absolute rules with priority, Bird-11 maybe +12 (last applicable) vs Bird-22 base (maybe latest 100) -> 12. Which answer more likely? Need infer from benchmark patterns.
+However need ensure if rules are cumulative or exclusive. Let's search memory: This type of generated puzzle from "file" with many records; questions ask e.g. compare heights, compute total land acreage, etc. There are facts and general rules. Usually attributes and rules: "所有白色的鸟，飞行高度比基准低 7米。" If multiple properties apply, maybe the height is determined by all applicable modifiers? Could be additive adjustments to baseline. Need infer from similar tasks: They often ask "X比Y飞得高多少米" where X and Y have attributes; rules are independent constraints that set relative offsets from base; if multiple apply, they add? Example: "所有重于150克的鸟，飞行高度比基准高12米。" "会潜水的鸟，飞行高度比基准低15米." If a bird is both >150 and dives, height could be baseline +12 -15 = baseline -3. They ask compare, likely sum offsets.
 
-This appears to be a synthetic "needle in haystack" task: many records irrelevant; question about one calculation. They include rules and facts scattered. Usually for such tasks, when multiple conditions apply, they sum all applicable offsets? Let's think of known datasets: There are prompts with variables operations, indicators, discounts, ships/turbines/birds. Questions ask e.g., "By how many metres does bird-11 fly higher than bird-22?" The document has general notes and noise. Rules like "Birds that can dive fly 15 metres below the base altitude." Facts: Bird-11: mass..., colour...; Bird-11: can dive, wingspan...; etc. In these tasks, they often model attributes as additive modifiers from a base value. Example ship capacity: base cargo capacity 40 tonnes. Rules: "Ships with numbers divisible by five have a capacity 6 tonnes above the base." "Ships with numbers divisible by seven have a capacity 4 tonnes below the base." Ship-25 is also called heavylift-2; Ship-33 matches neither rule. For ship questions, if number divisible by both? maybe additive? They include aliases. Turbines: relative MW differences. Discounts: price item-60 2500 roubles, 12% discount, after first discount another 20% discount applies. Land operations John14 with erroneous last record and penultimate mistaken name. These are all typical arithmetic reasoning tasks where multiple applicable rules may combine? Need see if "matches neither rule" suggests ship capacity: base plus modifiers if divisible by five/7; Ship-33 no modifiers -> 40. If a ship divisible by both, maybe +6 -4 = +2? Likely additive.
+But need check if any direct comparisons override? There are no direct 11 vs 22. Need calculate difference.
 
-For birds, likely additive. They also include relative statements for other birds (Falcon etc.) but not relevant.
+Let's list all relevant bird facts in order:
+1. "11 号鸟：会潜水，翼展 130 厘米." -> diving, wingspan 130.
+2. "松鸦-15：体重 160 克，白色." not numeric.
+3. "所有白色的鸟，飞行高度比基准低 7米." rule.
+4. "统计同时满足“重于 160 克”和“白色”两个条件的鸟." query irrelevant.
+5. "编号能被七整除的船..." irrelevant.
+6. "所有重于 150 克的鸟，飞行高度比基准高 12米." rule.
+7. "22 号鸟：体重 140 克，灰色." -> weight 140, gray.
+8. "会潜水的鸟，飞行高度比基准低 15米." rule (appears near later after松鸦-17)
+9. "11 号鸟：体重 180 克，白色." -> bird 11 weight 180, white.
+10. "22 号鸟：不会潜水，翼展 110 厘米." -> bird 22 not diving, wingspan 110.
+11. "松鸦-08比苍鹭-51飞得高3米" etc irrelevant maybe aliases? Actually "松鸦-08 比 苍鹭-51 飞得高 3 米." Could be named birds with numbers after dash; not #08? But question uses "11号鸟", not "松鸦-08".
+12. "乌鸦-33比松鸦-08飞得高4米" etc.
+13. "翼展大于 120厘米的鸟，飞行高度比基准高10米." rule.
+14. Baselines: 80, 100.
 
-Need final single integer only. But ensure no need mention analysis. Final: 0.
+Potential issue: For bird 22, first record says weight 140 gray; later says not diving wingspan 110. No white, no >150, no >120, no diving. So baseline. Bird 11 has diving + wingspan >120 + weight >150 + white. Sum = -15+10+12-7=0. Difference 0. If rules are not additive but each gives a constraint that might conflict: bird 11 would have height baseline-7, baseline-15, baseline+10, baseline+12 simultaneously impossible unless constraints combine? In natural language, "all white birds fly 7m lower than base" and "all diving birds fly 15m lower" can both be true if a white diving bird is e.g. 22m lower? No: If base=80, white => height=73; diving => height=65; conflict unless one means relative to another baseline or adjustments. In puzzles, they often define rules as independent conditions whose effects are summed (e.g., "if condition, add/subtract from base"). The wording "比基准低" singular suggests absolute relation, but with multiple conditions impossible if not additive. Could be each rule is a separate adjustment applied cumulatively to baseline: yes.
 
-Double-check if "heavier than 150 grams" includes mass >150; Bird-11 180 yes. Bird-22 140 no. "wingspan greater than 120 centimetres" Bird-11 130 yes, Bird-22 110 no. "white birds" Bird-11 white yes, Bird-22 grey no. "can dive" Bird-11 can dive yes; Bird-22 cannot dive. Sum +10 -7 -15 +12 = 0. Difference bird-11 higher than bird-22 = 0.
+Need maybe consider "所有白色的鸟，飞行高度比基准低 7米." applies to all white birds, including bird11. If also diving, could height satisfy both? No unless baseline changes per condition? But likely additive.
 
-Potential issue: The base flight altitude is stated twice, first 80 then later 100. If some records refer to earlier periods and do not affect current calculations, maybe latest base applies for current; but difference zero anyway if both use same base. Unless Bird-22 no rule means it flies at "base flight altitude" but which base? Both birds in same question should use current base 100. Difference still 0.
+Let's consider if there are aliases that map bird names to numbers and direct comparisons affect numeric IDs: "苍鹭-51 也被称为“超级飞行者-1”." Could "超级飞行者-1" be #1 bird? Not relevant. "猎鹰-14比乌鸦-33飞得高6米." If question asks 11号 vs 22号, no.
 
-Potential issue: "All white birds fly 7 metres below the base altitude." If bird-11 is white and can dive, maybe if multiple rules apply, they don't add; instead they could be alternatives and the most specific? But no. The cancellation seems intentional.
+But there are many records about birds with names and numbers after dash:松鸦-15, -16, -12, -14, -17, -13; 苍鹭-51; 猎鹰-14; 乌鸦-33. Could these be same as "编号"? E.g., "猎鹰-14" might mean bird #14? But question says "11 号鸟比 22 号鸟". There are records "11 号鸟：..." and "22 号鸟：...". So no.
 
-Need final answer with single integer. Ensure no extra text.
+Need also consider note: "部分记录涉及较早时期，不影响当前计算." Which records involve earlier period? Bird facts may have timestamps? None except land dates. But maybe baseline changed from 80 to 100; one is earlier? It says part records involving earlier period not affect current calculation. Could imply use latest baseline (100) but difference unaffected. However if rules and attributes are time-dependent? There are no dates for bird records. Could be all current except land operations? The note generic repeated. We can ignore.
+
+Need maybe compute using direct comparisons among named birds that indirectly link to numbered birds via aliases? Let's examine all bird-related statements:
+- "11 号鸟：会潜水，翼展 130 厘米."
+- "指标 ..." not bird.
+- "苍鹭-51 也被称为“超级飞行者-1”."
+- "猎鹰-14 比 乌鸦-33 飞得高 6 米."
+- "松鸦-15：体重 160 克，白色."
+- "所有白色的鸟..."
+- "松鸦-16：体重 150 克，白色." (not >150 if exactly 150? condition "重于150" means >150, so not)
+- "松鸦-12：体重 200 克，白色."
+- "松鸦-14：体重 190 克，灰色."
+- "松鸦-17：体重 180 克，黑色."
+- "会潜水的鸟..."
+- "11 号鸟：体重 180 克，白色."
+- "22 号鸟：不会潜水，翼展 110 厘米."
+- "松鸦-08比苍鹭-51飞得高3米"
+- "乌鸦-33比松鸦-08飞得高4米"
+- "翼展大于..."
+No direct numeric comparisons.
+
+Could there be hidden rule: bird names with hyphen numbers correspond to IDs? E.g., "松鸦-15" is bird #15? If question asks 11 and 22, maybe records for "松鸦-?" not relevant except attributes for named birds; but if "猎鹰-14比乌鸦-33" could be #14 vs #33. But numeric IDs in question likely refer to "编号". There are explicit "11号鸟", "22号鸟".
+
+Need think if answer should include only integer, no explanation. Final: 0 likely.
+
+But let's thoroughly verify with possible alternative interpretations:
+Alternative: Rules apply as constraints and height of bird determined by sum of offsets from base. Bird 11 offset = white (-7) + diving (-15) + wingspan >120 (+10) + weight >150 (+12)=0. Bird22 offset=0. Difference=0.
+Alternative: If each property individually sets height to baseline +/-, and multiple properties create conflicts; maybe choose most specific? Or average? Not likely.
+Alternative: If only last record for each bird counts (updates replace earlier attributes): Bird 11 last record "体重 180克，白色" (not diving/wingspan) -> offset white -7 + weight +12 = +5. Bird22 last record "不会潜水,翼展110" -> no rules? also gray/weight first maybe replaced? If replace all attributes, bird22 has not diving wingspan 110 -> offset 0. Difference=5. But records are usually additive facts, not updates unless dates indicate changes. There is note about "按出现顺序...最后一条关于约翰14 land operations record is erroneous" suggests for land operations use order and errors; but for bird attributes maybe all known facts valid. Need examine if there are duplicate attribute records that might conflict? Bird 11: first says diving, wingspan; later says weight, white. No conflict. Bird22: first says weight gray; later says not diving, wingspan. No conflict. So additive facts likely combine.
+
+Alternative: If rule "所有重于 150克的鸟" applies to bird 11 (180) yes; "所有白色" applies; "会潜水" applies; "翼展大于120" applies. Sum zero. Nice puzzle likely designed for cancellation? Bird 11 offset zero, bird22 baseline, answer 0. That seems plausible: they intentionally gave four rules summing to zero for #11 to make question answer simple? Let's check numbers: -7-15+10+12=0 exactly. Yes! This is strong evidence intended cumulative and designed cancellation. Bird 22 has none of conditions (weight 140 not >150, gray, not diving, wingspan 110) so baseline. Difference = 0. Nice.
+
+Need consider "重于" means strictly greater; bird 16 weight 150 white but not >150; irrelevant. Bird 22 weight 140 not >150. Good.
+
+Now final should only integer: 0. Need ensure no extra text because user says only answer an integer. Final: 0.
