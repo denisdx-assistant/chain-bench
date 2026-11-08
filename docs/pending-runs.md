@@ -71,3 +71,11 @@ question than the sequential run: how far per-request generation falls when two 
 share the GPU, and whether aggregate throughput rises despite that. Rows carry
 `start_ts`/`end_ts` and `concurrent_peers`, so batched and unbatched rows can be told apart
 without guessing.
+
+**Result.** Two clients made it worse, not better: per-stream generation fell from 83.2 to
+59.2 t/s and aggregate throughput from 78.3 to 72.3 tok/s, with the series 8% longer. All 17
+rows of the two-client run genuinely overlapped another request. One stream already
+saturates memory bandwidth, so the provider's batch of two buys nothing for this model.
+
+Programs finished at 0/20 with 12 length cuts and 1.04M tokens written: the IQ1_M quant is
+not usable for code at this task size.
