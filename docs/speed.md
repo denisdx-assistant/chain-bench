@@ -30,18 +30,3 @@ request reports the speed of the few uncached tokens, which is not comparable.
 | Qwen3.8-Flash-Next-UD-Q4_K_XL | — | 1132 t/s | 1530 t/s | 1796 t/s | — | — | — | — | 78 t/s | 79 t/s | 83 t/s | — | — | — | 5211 | host A (2xV100) |
 | Ripple-65B-Preview-Q6_K | — | 482 t/s | — | 372 t/s | — | — | — | — | 20 t/s | — | 14 t/s | — | — | — | 10428 | host A (2xV100) |
 | gemma-4-31B-it-UD-Q8_K_XL | — | 1041 t/s | — | 494 t/s | — | — | — | — | 71 t/s | 60 t/s | 43 t/s | — | — | — | 1601 | host A (2xV100) |
-
-## Averaging the probe runs
-
-Every distinct run at a size is kept, not just the last one: a retry with a different output
-budget or a different prompt text is a separate measurement, keyed by target size, budget
-and prompt hash.
-
-- **Prefill** is averaged only over runs with an empty prompt cache, because a cached
-  request reports just the uncached remainder.
-- **Generation** is averaged over every run of that size, including cached ones: a cache
-  hit affects the prefill, not the writing.
-
-The earlier deterministic-filler runs do not qualify on either count. They hit the cache,
-and they also missed their target size -- 181k, 425k and 815k tokens of prompt against
-250k, 500k and 1M, because the character-per-token ratio was guessed rather than measured.

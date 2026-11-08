@@ -82,7 +82,7 @@ def main():
             if rec.get("want") != want or rec.get("error"):
                 continue
             pn, cache = rec.get("prompt_n") or 0, rec.get("cache_n") or 0
-            if pn + cache < want * 0.9:
+            if pn + cache < want * 0.95:
                 continue
             if want_kind == "pre":
                 if cache == 0 and rec.get("prompt_tps"):
