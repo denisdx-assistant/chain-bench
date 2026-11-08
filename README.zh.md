@@ -167,3 +167,8 @@ scripts/             生成器、运行器、循环检测、表格构建
 两者都靠规则而非记录得出。它们被有意保留在题集中——见
 [docs/methodology.md](docs/methodology.md#provocative-tasks-frozen-in-the-dataset)。
 第 12 题因预算被截断并不表示出现循环，英语或中文得分低也不表示测试环境坏了。
+
+### 速度
+
+汇总表中容易混淆两件事：「每任务 token 数」表示模型写了多少，而不是写得多快。按提示长度
+分组的预填充与生成速度（仅取自服务器计时）见 [docs/speed.md](docs/speed.md)。

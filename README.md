@@ -205,3 +205,9 @@ records. They are frozen in the set on purpose — see
 [docs/methodology.md](docs/methodology.md#provocative-tasks-frozen-in-the-dataset).
 A budget cut on chain 12 is not a repetition loop, and a low English or Chinese
 score there is not a broken harness.
+
+### Speed
+
+The summary mixes two numbers that are easy to confuse: *tokens per task* is how much a
+model writes, not how fast. Measured prefill and generation speed, split by prompt size
+and taken from server timings only, are in [docs/speed.md](docs/speed.md).
