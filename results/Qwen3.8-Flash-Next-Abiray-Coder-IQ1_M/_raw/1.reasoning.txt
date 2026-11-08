@@ -1,29 +1,69 @@
-We need answer user's question in Chinese likely. Need parse huge text, find relevant records. Question: "猎鹰-14 比 苍鹭-51 高多少米？只回答一个整数。" Means How many meters higher is Falcon-14 than Heron-51? Need infer from records involving flight heights relative to baseline or comparisons.
+We need answer user's question in Chinese likely: "猎鹰-14 比 苍鹭-51 高多少米？只回答一个整数。" Need parse long messy log. Need compute relative heights? We need identify relevant records about flight heights, birds, aliases, rules, baseline maybe conflicting baselines? Need careful.
 
-We need extract relevant info from provided file. There are many noise lines, but core data:
-- "猎鹰-14 比 乌鸦-33 飞得高 6 米。" Falcon-14 compared to Crow-33 flies higher by 6 m.
-- "苍鹭-51 也被称为“超级飞行者-1”。" Heron-51 also called Super Flyer-1? Maybe alias.
-- "松鸦-08 比 苍鹭-51 飞得高 3 米." Jay-08 higher than Heron-51 by 3 m.
-- "乌鸦-33 比 松鸦-08 飞得高 4 米." Crow-33 higher than Jay-08 by 4 m.
-Need compute Falcon-14 vs Heron-51: Falcon - Crow = +6, Crow - Jay = +4, Jay - Heron = +3 => Falcon - Heron = 6+4+3=13? Check direction: "猎鹰-14 比 乌鸦-33 飞得高 6 米" means Falcon flies higher than Crow by 6. "乌鸦-33 比 松鸦-08 飞得高 4 米" means Crow higher than Jay by 4. "松鸦-08 比 苍鹭-51 飞得高 3 米" means Jay higher than Heron by 3. So Falcon higher than Heron by 13. But need verify aliases? Heron-51 also called Super Flyer-1 maybe not relevant. Need consider "部分记录涉及较早时期，不影响当前计算." Also there are general notes about approval order etc irrelevant.
+We have huge text with many records. Need answer integer. Let's extract relevant facts.
 
-Need ensure no conflicting rules: There are baseline flight height statements:
-"基准飞行高度为 80 米。"
-"基准飞行高度为 100 米。" There are two baselines? Need maybe current calculation uses last baseline? Or question asks relative difference, not absolute, so baseline irrelevant unless derived from rules like all white birds lower than baseline etc. But comparisons directly give differences among birds.
+Question: 猎鹰-14 比 苍鹭-51 高多少米? Means how many meters higher is Falcon-14 than Heron-51? Need compute from records.
 
-Need check if there are any records about diving/weights that affect flight height relative to baseline, maybe need compute heights and compare. But direct chain enough.
+Relevant records:
+- "猎鹰-14 比 乌鸦-33 飞得高 6 米。"
+- "乌鸦-33 比 松鸦-08 飞得高 4 米。"
+- "松鸦-08 比 苍鹭-51 飞得高 3 米。"
+- "苍鹭-51 也被称为“超级飞行者-1”。"
+- "40 号苍鹭在 20 米的高度飞行。"
+- Many rules: baseline flight height records: "基准飞行高度为 80 米。", "基准飞行高度为 60 米。", "基准飞行高度为 100 米。" Need determine current baseline? Also rules about birds: all heavier than 150g flight height 12m above baseline; all white birds 7m below baseline; silver birds 5m above baseline; diving birds 15m below baseline; wingspan >120cm 10m above baseline; maybe species relations? Need compute absolute heights for 猎鹰-14 and 苍鹭-51? But question asks difference between 猎鹰-14 and 苍鹭-51. Could use relative chain: 猎鹰-14 > 乌鸦-33 by 6; 乌鸦-33 > 松鸦-08 by 4; 松鸦-08 > 苍鹭-51 by 3 => 猎鹰-14 is 13m higher than 苍鹭-51. But need check if there are conflicting records, corrections? "按出现顺序（不是按日期）最后一条关于 约翰14 土地操作的记录是错误的，不应计入." Not about birds. "在本文件的倒数第二条记录中，约翰14 被误称为 约翰15." Not relevant. There may be multiple baselines and rules; maybe need calculate from attributes. But direct relative chain gives 13. Need verify if 猎鹰-14 exists? Record: "松鸦-14：体重 190 克，灰色." and "猎鹰-14 比 乌鸦-33 飞得高 6 米." Yes. 苍鹭-51 alias. Chain: 猎鹰-14 vs crow-33; crow-33 vs jay-08; jay-08 vs heron-51. So difference = 6+4+3=13. Need ensure no record says 猎鹰-14? no other.
 
-However possible trick: "苍鹭-51 也被称为“超级飞行者-1”." Could alias mean in other statements? No other mentions super flyer. There is "11 号鸟：会潜水，翼展 130 厘米." etc. Need not.
+But there may be rules for relative heights overriding? Let's inspect all bird records:
+- 松鸦-13：体重 170 克，白色.
+- 乌鸦-33 比 松鸦-08 飞得高 4 米.
+- 30 号松鸦比 40 号苍鹭飞得高 10 米.
+- 22 号鸟：不会潜水，翼展 110 厘米.
+- 22 号鸟：体重 140 克, gray.
+- 11 号鸟：白色, weight 120g.
+- 33 号鸟：weight 180g, gray.
+- 11 号鸟：white, weight 120g? Actually duplicate: "11 号鸟：白色，体重 120 克." Later "11 号鸟：体重 180 克，白色." conflict? There are multiple records about 11号鸟: first white weight 120, later weight 180 white, later diving wingspan 130. Could affect if computing 11号鸟. Not relevant.
+- 07 号松鸦重 150 克.
+- 松鸦-12: 200g white.
+- 松鸦-16: 150g white.
+- 松鸦-15: 160g white.
+- 松鸦-17: 180g black.
+- 松鸦-14: 190g gray.
+- 猎鹰-14 比 乌鸦-33 飞得高 6 米.
+- 苍鹭-51 也被称为“超级飞行者-1".
+- 松鸦-08 比 苍鹭-51 飞得高 3 米.
+- 40 号苍鹭 in 20m height.
+- 21 号乌鸦比 30 号松鸦飞得高 30 米.
+- all heavier than 150g flight height 12m above baseline.
+- all white birds 7m below baseline.
+- all heavier than 100g white birds have silver attribute.
+- silver bird flight height 5m above baseline.
+- diving bird flight height 15m below baseline.
+- wingspan >120cm flight height 10m above baseline.
+- all crows heavier than all herons by 20g.
+- all jays heavier than all crows by 30g.
+- baseline flight height multiple: 80, 100, 60. Which is current? Maybe latest baseline? The file says some records earlier not affect current calculation. Need determine if direct relation enough. If asked "猎鹰-14 比 苍鹭-51 高多少米？" Could be solved by transitive direct relations independent of baseline: 13. But need consider if 猎鹰-14 and 苍鹭-51 have attributes causing absolute heights that might contradict chain? Maybe need use rules and baseline? Let's analyze if there are enough attributes for 猎鹰-14 and 苍鹭-51.
 
-Need answer integer only: 13.
+猎鹰-14: only relative to crow-33. No species? 猎鹰 (falcon) not covered by all crows/jays/herons rules? Maybe no attributes. So cannot compute absolute except relative chain. 苍鹭-51: alias superflyer-1, relative to jay-08. No attributes. So direct relative chain is intended.
 
-But let's analyze thoroughly to ensure no hidden condition about "按出现顺序（不是按日期）最后一条关于 约翰14 土地操作的记录是错误的，不应计入." That is for land question, irrelevant. Also "在本文件的倒数第二条记录中，约翰14 被误称为 约翰15." Irrelevant.
+Potential issue: "按出现顺序（不是按日期）最后一条关于 约翰14 土地操作的记录是错误的，不应计入." Not relevant. "部分记录涉及较早时期，不影响当前计算." Might be red herrings.
 
-Need maybe question asks "猎鹰-14 比 苍鹭-51 高多少米？" Could be from chain:
-猎鹰-14 >乌鸦-33 by 6;乌鸦-33 >松鸦-08 by 4;松鸦-08 >苍鹭-51 by 3. Sum 13. Yes.
+Question asks only integer. Need output 13.
 
-Need final only integer? User says only answer an integer. So final: 13.
+But let's be thorough. Could there be a record "猎鹰-14 比 乌鸦-33 飞得高 6 米" and "乌鸦-33 比 松鸦-08 飞得高 4 米" and "松鸦-08 比 苍鹭-51 飞得高 3 米". Yes chain. The wording "比 ... 飞得高 X 米" means A flies X meters higher than B. So 猎鹰-14 higher than 乌鸦-33 by 6, crow higher than jay by 4, jay higher than heron by 3. So 猎鹰 higher than heron by 13.
 
-Double-check if "比" maybe means difference in height not necessarily higher? It says "飞得高 X米" likely flies higher by X meters. In Chinese, "A 比 B 飞得高 6 米" = A flies 6 m higher than B. Good.
+Need ensure no negative? "猎鹰-14 比 乌鸦-33 飞得高 6 米" yes higher. "乌鸦-33 比 松鸦-08 飞得高 4 米" yes. "松鸦-08 比 苍鹭-51 飞得高 3 米" yes. Sum positive.
 
-Need no extra text.
+Need final only integer. Could include no explanation. The user explicitly: 只回答一个整数. So final: 13.
+
+Double-check if there are any conflicting records involving 猎鹰-14 or 苍鹭-51? Search mentally:
+- "猎鹰-14 比 乌鸦-33 飞得高 6 米."
+- "松鸦-14：体重 190 克，灰色." Different prefix 松鸦-14 not 猎鹰-14.
+- "苍鹭-51 也被称为“超级飞行者-1”." no height.
+- "40 号苍鹭在 20 米的高度飞行." Not 51.
+- "30 号松鸦比 40 号苍鹭飞得高 10 米." Not 08/51.
+- "松鸦-08 比 苍鹭-51 飞得高 3 米." relevant.
+
+Could there be record "乌鸦-33 比 松鸦-08 飞得高 4 米" and maybe "21 号乌鸦比 30 号松鸦飞得高 30 米" irrelevant.
+
+Thus final 13.
+
+Need consider Chinese output only integer. final no punctuation? "13".
