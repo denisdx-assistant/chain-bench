@@ -72,7 +72,13 @@ def main():
 
     def probe_cell(folder, want_kind, want):
         for rec in probes.get(folder) or []:
-            if rec.get("want") == want:
+            if rec.get("want") != want or rec.get("error"):
+                continue
+            # stale/broken pass: a "250k" record whose prompt was 5 tokens is not a measurement
+            pn, cache = rec.get("prompt_n") or 0, rec.get("cache_n") or 0
+            # a probe point is only comparable with an empty cache and a prompt of the asked size
+            if cache != 0 or pn < want * 0.9:
+                continue
                 if want_kind == "pre" and rec.get("prompt_tps"):
                     return "%d t/s" % round(rec["prompt_tps"])
                 if want_kind == "gen" and rec.get("gen_tps"):
@@ -105,8 +111,9 @@ def main():
     print("\n".join(lines))
     print()
     print("Columns 250k, 500k and 1M come from `scripts/speed_probe.py`, not from the benchmark "
-          "tasks: the prompt is a synthetic stream of English words with a count-the-marker "
-          "instruction, followed by a story request. Generation there is uniform prose, which is "
+          "tasks: the prompt is a synthetic stream of English words followed by a story request; "
+          "the model must first repeat the last ten words of the prompt, which is how a run "
+          "proves it actually read to the end. Generation there is uniform prose, which is "
           "the friendliest case for draft/MTP decoding, so treat those figures as an upper bound "
           "rather than a task-level expectation.")
 
