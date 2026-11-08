@@ -1,137 +1,143 @@
-We need answer user's question in Russian likely. Need parse huge noisy document. Need find relevant facts about bird-11 and bird-22 flight heights. Need compute difference "птица-11 минус птица-22" in meters, integer.
+We need answer user's question in Chinese likely. Need solve puzzle from noisy text. Need parse relevant records. User asks: "11 号鸟比 22 号鸟飞得低多少米？只回答一个整数，按“11 号鸟减 22 号鸟”计算。" Means How many meters lower does bird #11 fly than bird #22? Answer integer, calculate as bird11 minus bird22. Need infer flight heights from records.
 
-We need analyze all statements. There are many irrelevant repeated lines and variable operations. Need identify rules for bird flight heights.
+We have a long file with many irrelevant records. Need identify birds and rules affecting flight height. There are statements:
+- 11 号鸟：会潜水，翼展 130 厘米。
+- 22 号鸟：体重 140 克，灰色。
+- 33 号鸟：体重 180 克，灰色。
+- 松鸦-15：体重 160 克，白色。
+- 松鸦-16：体重 150 克，白色。
+- 松鸦-12：体重 200 克，白色。
+- 松鸦-14：体重 190 克，灰色。
+- 松鸦-17：体重 180 克，黑色。
+- 松鸦-13：体重 170 克，白色。
+- 11 号鸟：体重 180 克，白色。 (later)
+- 22 号鸟：不会潜水，翼展 110 厘米。 (later)
+Also:
+- 苍鹭-51 也被称为“超级飞行者-1”。
+- 猎鹰-14 比 乌鸦-33 飞得高 6 米。
+- 所有白色的鸟，飞行高度比基准低 7 米。
+- 所有重于 150 克的鸟，飞行高度比基准高 12 米。
+- 会潜水的鸟，飞行高度比基准低 15 米。
+- 翼展大于 120 厘米的鸟，飞行高度比基准高 10 米。
+- 基准飞行高度为 80 米。
+- 基准飞行高度为 100 米。
+- 松鸦-08 比 苍鹭-51 飞得高 3 米。
+- 乌鸦-33 比 松鸦-08 飞得高 4 米。
+Maybe need compute heights for bird #11 and #22 based on attributes and rules. There are conflicting baseline heights (80 and 100). Need determine which applies? Maybe latest? Or general notes? Need inspect text: "文件中还包含关于审批顺序、准备时间和参与人员的一般说明。部分记录涉及较早时期，不影响当前计算。" repeated. Could indicate some records are old and not affect current calculation. But no explicit dates for baseline? There are two baseline statements: "基准飞行高度为 80 米。" and later "基准飞行高度为 100 米。" Which is current? Need infer from order? It says part records earlier period do not affect current calculation. Maybe the first baseline 80 is earlier, second 100 current? Or maybe need use last occurrence? Need analyze.
 
-Relevant statements:
-- "Цаплю-51 также называют «супер-летун-1»." maybe alias.
-- "Ворона-33 летает выше сойки-08 на 4 метра."
-- "Сойка-08 летает выше цапли-51 на 3 метра."
-- "Все белые птицы летают на 7 метров ниже базовой высоты."
-- "Птица-11: умеет нырять, размах крыла 130 сантиметров."
-- "Турбина..." irrelevant.
-- "Базовая высота полёта — 100 метров."
-- "Базовая высота полёта — 80 метров." conflict? Need determine current? Maybe later overrides? Need inspect order. There are two base height statements: first "Базовая высота полёта — 100 метров." later "Базовая высота полёта — 80 метров." Which to use? Need infer from puzzle style: document contains contradictory records, some past periods not affect current calculations? The repeated preamble says part of records refer to past periods and do not affect current calculations. But no explicit which are past. Maybe latest base height is current? Need be careful.
-- "Птицы с размахом крыла больше 120 сантиметров летают на 10 метров выше базовой высоты."
-- "Птицы, умеющие нырять, летают на 15 метров ниже базовой высоты."
-- "Все птицы тяжелее 150 граммов летают на 12 метров выше базовой высоты."
-- "Считаются птицы, которые одновременно тяжелее 160 граммов и имеют белый окрас." maybe filter? Not directly.
-- Bird data:
-  - "Птица-11: умеет нырять, размах крыла 130 сантиметров."
-  - "Птица-22: не умеет нырять, размах крыла 110 сантиметров."
-  - "Птица-33: масса 180 граммов, окрас серый."
-  - "Сойка-14: масса 190 граммов, окрас серый."
-  - "Птица-22: масса 140 граммов, окрас серый." (second record for bird-22)
-  - "Сойка-13: масса 170 граммов, окрас белый."
-  - "Сойка-17: масса 180 граммов, окрас чёрный."
-  - "Сойка-15: масса 160 граммов, окрас белый."
-  - "Сойка-16: масса 150 граммов, окрас белый."
-  - "Сойка-12: масса 200 граммов, окрас белый."
-  - "Птица-11: масса 180 граммов, окрас белый." (second record for bird-11)
-Need combine attributes for each bird? There are multiple records with different attributes. Need determine if all apply? Usually these tasks: facts scattered, need aggregate properties. For bird-11: has diving true, wingspan 130 cm, mass 180 g, color white. Bird-22: not diving, wingspan 110 cm, mass 140 g, color gray. Need compute flight height relative to base using rules.
+Question: "11 号鸟比 22 号鸟飞得低多少米？只回答一个整数，按“11 号鸟减 22 号鸟”计算。" If bird11 lower than bird22, bird11 - bird22 negative? They ask how many meters lower, but says calculate as 11 minus 22. Need output integer maybe negative if lower? Let's parse: "比 ... 飞得低多少米？只回答一个整数，按“11 号鸟减 22 号鸟”计算。" Means answer integer, computed by bird11 minus bird22. If bird11 is lower, difference negative. But phrase "低多少米" expects positive? They explicitly says by "11 minus 22", so if 11 lower, result negative. Need see.
+
+Need compute heights.
+
+Entities:
+Bird 11 attributes:
+- "11 号鸟：会潜水，翼展 130 厘米。"
+- "11 号鸟：体重 180 克，白色。"
+So bird11: dives, wingspan 130 cm, weight 180 g, white.
+Bird22 attributes:
+- "22 号鸟：体重 140 克，灰色。"
+- "22 号鸟：不会潜水，翼展 110 厘米。"
+So bird22: weight 140 g, gray, not dive, wingspan 110 cm.
 
 Rules:
-- Base height: either 100 or 80. Need decide.
-- All white birds fly 7 m below base.
-- Birds with wingspan >120 cm fly 10 m above base.
-- Birds that can dive fly 15 m below base.
-- All birds heavier than 150 g fly 12 m above base.
-Potential multiple applicable modifiers? Need combine? Usually additive? Need infer. For bird-11: white, wingspan 130 (>120), dives, mass 180 (>150). So modifiers: -7, +10, -15, +12 = 0 relative to base? Sum = 0. If additive, height = base. Bird-22: not white (gray), wingspan 110 not >120, not dive, mass 140 not >150. No modifiers => base. Difference bird-11 - bird-22 = 0. If base cancels. But if rules not additive? Need consider priority? Could be each rule sets height? Need examine wording: "летают на X метров ниже/выше базовой высоты" could be independent conditions; if multiple apply, maybe all adjustments sum? In such generated tasks, likely additive modifiers. But need verify with other statements? There are relative statements involving named birds (ворона-33, сойка-08, цапля-51, сокол-14) maybe to determine aliases and heights? But question only bird-11 and bird-22. Could be need use all rules.
+Baseline flight height: two values. Need choose one. Maybe current baseline is 100? Let's inspect order:
+... "所有白色的鸟，飞行高度比基准低 7 米。" appears after some records.
+... "所有重于 150 克的鸟，飞行高度比基准高 12 米。"
+... "会潜水的鸟，飞行高度比基准低 15 米。"
+... "翼展大于 120 厘米的鸟，飞行高度比基准高 10 米。"
+... "基准飞行高度为 80 米。" appears before "约翰14..."? Let's locate:
+After "在第一层折扣之后，还有 20% 的折扣。" then "彼得 比较..." then "罗莎..." then "指标..." then "基准飞行高度为 80 米。" then indicators, then "2008..." etc. Later near end: after "指标 variable514..." then "基准飞行高度为 100 米。" So two baselines. Which is current? The repeated note says some records involve earlier period, do not affect current calculation. Could be baseline 80 is earlier, baseline 100 current? But no dates. Maybe use latest in file? Usually if conflicting general statements, later overrides earlier? Need infer from puzzle style. There are also "按出现顺序（不是按日期）最后一条关于 约翰14 土地操作的记录是错误的，不应计入。" and "在本文件的倒数第二条记录中，约翰14 被误称为 约翰15。" These are red herrings for land calculation, not birds. But they indicate order matters and some records erroneous. For birds, maybe need use all relevant rules? There may be conflicting baseline; perhaps one is earlier period and not current. The note at top: "文件中还包含关于审批顺序、准备时间和参与人员的一般说明。部分记录涉及较早时期，不影响当前计算。" repeated. Could mean ignore records about earlier periods? But baseline statements no dates. Maybe the first baseline 80 is old, second 100 current because later? Need decide.
 
-But there may be conflicting records: "Птица-11: умеет нырять, размах крыла 130 сантиметров." and "Птица-11: масса 180 граммов, окрас белый." Both true? likely yes. "Птица-22: не умеет нырять, размах крыла 110 сантиметров." and "Птица-22: масса 140 граммов, окрас серый." Both true.
+Also rules may stack additively relative to baseline. Need compute:
+Bird11: white => -7; weight >150 (180) => +12; dives => -15; wingspan >120 (130) => +10. Net relative baseline = 0? -7+12-15+10 = 0. So height = baseline.
+Bird22: gray, weight 140 not >150, not dive, wingspan 110 not >120. No rules apply. Height = baseline.
+Then difference bird11 - bird22 = 0 regardless of baseline. Ah! Nice. So conflicting baseline irrelevant if both equal baseline. But wait bird22 maybe has no attributes triggering rules; yes weight 140 not >150, gray not white, not dive, wingspan 110 not >120. Bird11 net 0. So difference 0. If rules stack? Yes likely. If some rules override? Need check if "所有白色的鸟，飞行高度比基准低 7 米" and "所有重于 150 克的鸟，飞行高度比基准高 12 米" etc. Could be multiple conditions apply, additive? Usually these puzzles: each condition modifies height relative to baseline, sum adjustments. If bird11 has white (-7), >150 (+12), diving (-15), wingspan >120 (+10) = 0. Bird22 baseline. Difference 0. If rules not additive but maybe last applicable? Need examine wording: "飞行高度比基准低/高 X 米" for categories. If multiple categories, likely combine? Could be ambiguous. Need infer from other bird relations: "猎鹰-14 比 乌鸦-33 飞得高 6 米", "松鸦-08 比 苍鹭-51 飞得高 3 米", "乌鸦-33 比 松鸦-08 飞得高 4 米". These create relative constraints maybe inconsistent? Let's see:
+Falcon-14 = Crow-33 +6.
+Jay-08 = Heron-51 +3.
+Crow-33 = Jay-08 +4.
+Thus Crow-33 = Heron-51 +7, Falcon = Heron +13. But no baseline for these named birds? Maybe attributes? Heron-51 also "超级飞行者-1" maybe no numeric. Could be irrelevant.
 
-Need answer one integer as difference «птица-11 минус птица-22». If additive, 0. But let's not rush. Need consider base height conflict: two base heights. If bird-11 and bird-22 both use same base, difference unaffected if modifiers sum equal? Bird-11 modifiers sum 0, bird-22 0 => 0 regardless base. If non-additive or priority, maybe different.
+For numbered birds, attributes and rules enough. Need ensure bird 11 and 22 have all attributes from two records each. There is also "统计同时满足“重于 160 克”和“白色”两个条件的鸟。" irrelevant. "编号能被七整除的船..." irrelevant.
 
-Need examine possible hidden trick: "Все белые птицы летают на 7 метров ниже базовой высоты." Bird-11 white. "Птицы с размахом крыла больше 120 сантиметров летают на 10 метров выше базовой высоты." Bird-11 wingspan 130. "Птицы, умеющие нырять, летают на 15 метров ниже базовой высоты." Bird-11 dives. "Все птицы тяжелее 150 граммов летают на 12 метров выше базовой высоты." Bird-11 mass 180. Sum = 0. Bird-22: gray, wingspan 110, not dive, mass 140 => no modifiers. So difference 0.
+Potential issue: "所有白色的鸟，飞行高度比基准低 7 米。" Bird11 white. "所有重于 150 克的鸟，飞行高度比基准高 12 米。" Bird11 weight 180. "会潜水的鸟，飞行高度比基准低 15 米。" Bird11 dives. "翼展大于 120 厘米的鸟，飞行高度比基准高 10 米。" Bird11 wingspan 130. Sum = 0. If adjustments are not additive but maybe each rule sets height to baseline +/-? Then conflict. But typical arithmetic word problems: multiple conditions add/subtract. Need maybe use "比基准" means relative to baseline, can combine? If a bird satisfies multiple, do we sum? Could be yes.
 
-But maybe "Считаются птицы, которые одновременно тяжелее 160 граммов и имеют белый окрас." This could be a filter for counting? Not relevant to height? It says "Считаются птицы, которые одновременно тяжелее 160 граммов и имеют белый окрас." Maybe means only birds satisfying both are considered? But question asks bird-11 and bird-22. If only birds heavier than 160 and white are counted? Bird-11 qualifies (180 white), bird-22 not (140 gray). But height rules still? Hmm.
+But let's not rush. Need consider if bird22 has any rule due to "不会潜水"? No rule for not diving. Gray no. Weight 140 not >150. Wingspan 110 not >120. So baseline.
 
-Could be a generated benchmark with many irrelevant facts, need answer based on relevant. The phrase "Считаются птицы, которые одновременно тяжелее 160 граммов и имеют белый окрас." might define a set for some other question, not here.
+Question asks "11 号鸟比 22 号鸟飞得低多少米？" If both same height, answer 0. "按“11 号鸟减 22 号鸟”计算" = 0. Need output only integer. Final should be 0.
 
-Need ensure no alias: "Цаплю-51 также называют «супер-летун-1»." Not bird-11? "Птица-11" vs "Цаплю-51" no. "Сойка-08", "Ворона-33", "Сокол-14" maybe relative heights. Could affect base? There are relative statements:
-- Ворона-33 летает выше сойки-08 на 4 метра.
-- Сойка-08 летает выше цапли-51 на 3 метра.
-- Сокол-14 летает выше вороны-33 на 6 метров.
-These could be used to derive heights of named birds, but not bird-11/22 unless aliases? "Цаплю-51 также называют «супер-летун-1»." Not relevant. Maybe "Птица-11" could be "Цапля-51"? No.
+Need ensure no hidden record: "11 号鸟：会潜水，翼展 130 厘米。" and later "11 号鸟：体重 180 克，白色。" Could there be "22 号鸟：体重 140 克，灰色。" and "22 号鸟：不会潜水，翼展 110 厘米。" Yes.
 
-Need consider if base height statements conflict and one is erroneous due to "В предпоследней записи документа Джон14 ошибочно назван Йохан15." and "Последняя по порядку упоминания в документе (а не по дате) запись об операциях Джона14 с землёй ошибочна и не должна учитываться." These are about John land, not birds. But they indicate some records erroneous. Could base height 80 be erroneous? Need identify if any statement says part of records past periods not affect current calculations. The repeated preamble: "В документе также приведены общие замечания о порядке согласования, сроках подготовки и составе участников. Отмечено, что часть записей относится к прошлым периодам и не влияет на текущие расчёты." This is generic noise. It might mean some records are past and not current. Which? Maybe base height 100 vs 80: one could be past? Need determine current base height? But difference may still 0 if both birds same base. Unless bird-22 has no modifiers and bird-11 modifiers sum not zero due to only some rules apply? If base cancels anyway if both use same base. If one uses different base? No, base global.
+Could there be rule "所有白色的鸟，飞行高度比基准低 7 米。" appears before baseline? It says all white birds lower than baseline by 7. If baseline changes, still relative.
 
-Could there be rule that if multiple conditions apply, choose one (e.g., most specific or last)? Need infer from generated tasks. Usually in these synthetic documents, facts are independent and can combine additively? Let's examine wording: "Все белые птицы летают на 7 метров ниже базовой высоты." "Птицы с размахом крыла больше 120 сантиметров летают на 10 метров выше базовой высоты." If a bird is both white and wingspan >120, does it fly 7 below and 10 above? Natural language could be contradictory unless adjustments stack. In such puzzles, they likely expect sum of all applicable modifiers. The numbers chosen for bird-11: -7 +10 -15 +12 = 0, nice. Bird-22 no modifiers. Difference 0. That seems intentional. If priority, maybe last rule? Let's see order of rules in document:
-- "Все белые птицы летают на 7 метров ниже базовой высоты." appears early after relative birds.
-- "Птицы с размахом крыла больше 120 сантиметров летают на 10 метров выше базовой высоты." appears later.
-- "Птицы, умеющие нырять, летают на 15 метров ниже базовой высоты." appears after that.
-- "Все птицы тяжелее 150 граммов летают на 12 метров выше базовой высоты." appears later.
-If last applicable overrides? Bird-11 mass >150 => +12, bird-22 none => base, difference +12. If first applicable? white => -7, difference -7. If most specific? maybe diving? -15. But the nice sum zero suggests additive.
+Could there be "会潜水的鸟，飞行高度比基准低 15 米。" and "翼展大于 120 厘米的鸟，飞行高度比基准高 10 米。" yes.
 
-Need also consider "Птица-11: масса 180 граммов, окрас белый." and "Птица-22: масса 140 граммов, окрас серый." There is also "Считаются птицы, которые одновременно тяжелее 160 граммов и имеют белый окрас." Could mean for some calculation only birds >160 and white are considered; bird-11 considered, bird-22 not. But question asks height difference; if bird-22 not counted? Maybe its height undefined? But likely not.
+Need maybe account for "所有重于 150 克的鸟" includes >150, bird11 180, bird22 140 no. What about "重于 160 克" statistic? Not a height rule.
 
-Need answer one integer. Should be 0.
+Potential alternative: If adjustments are applied sequentially to current height, not baseline? E.g. white: baseline -7; >150: (current?) +12; dive: -15; wingspan: +10 => baseline +0 anyway if additive. If multiplicative? no.
 
-But let's thoroughly parse to ensure no hidden alias or data conflict for bird-11/22.
+Potential issue with "基准飞行高度为 80 米" and "基准飞行高度为 100 米". If bird11 net 0 and bird22 net 0, difference 0. If bird22 maybe affected by baseline? no.
 
-List all bird-related statements in order (approx):
-1. Цаплю-51 также называют «супер-летун-1».
-2. Ворона-33 летает выше сойки-08 на 4 метра.
-3. Сойка-08 летает выше цапли-51 на 3 метра.
-4. Все белые птицы летают на 7 метров ниже базовой высоты.
-5. Птица-11: умеет нырять, размах крыла 130 сантиметров.
-6. Базовая высота полёта — 100 метров.
-7. Базовая высота полёта — 80 метров. (later)
-8. Птицы с размахом крыла больше 120 сантиметров летают на 10 метров выше базовой высоты.
-9. Птицы, умеющие нырять, летают на 15 метров ниже базовой высоты.
-10. Сойка-14: масса 190 граммов, окрас серый.
-11. Все птицы тяжелее 150 граммов летают на 12 метров выше базовой высоты.
-12. Сойка-13: масса 170 граммов, окрас белый.
-13. Сойка-17: масса 180 граммов, окрас чёрный.
-14. Сойка-15: масса 160 граммов, окрас белый.
-15. Сойка-16: масса 150 граммов, окрас белый.
-16. Птица-22: не умеет нырять, размах крыла 110 сантиметров.
-17. Птица-22: масса 140 граммов, окрас серый.
-18. Птица-33: масса 180 граммов, окрас серый.
-19. Сойка-12: масса 200 граммов, окрас белый.
-20. Птица-11: масса 180 граммов, окрас белый.
-21. Сокол-14 летает выше вороны-33 на 6 метров.
-22. Судно-33 не подпадает ни под одно из правил. (irrelevant)
-Maybe "Считаются птицы, которые одновременно тяжелее 160 граммов и имеют белый окрас." appears before bird data? It is in early part: after "После первой скидки..."? Let's locate: "Считаются птицы, которые одновременно тяжелее 160 граммов и имеют белый окрас." Yes.
+Need final only integer. But ensure no need explanation. User says only answer integer. Final: 0.
 
-Could there be rule for birds with wingspan >120 and diving etc. Need combine.
+Double-check if "11 号鸟比 22 号鸟飞得低多少米？" If bird11 lower by negative? They say calculate as 11 minus 22. If equal, 0. Good.
 
-Potential issue: "размах крыла больше 120 сантиметров" strictly greater. Bird-11 130 qualifies. Bird-22 110 not.
-"тяжелее 150 граммов" strictly greater. Bird-11 180 qualifies. Bird-22 140 not.
-"белые" bird-11 white, bird-22 gray.
-"умеющие нырять" bird-11 yes, bird-22 no.
+Let's think if there is any rule that applies to bird22 due to "编号能被七整除的船" no. "33 号鸟不符合任何规则"? Actually "33 号船不符合任何规则。" not bird. There is "33 号鸟：体重 180 克，灰色。" Could be relevant? no.
 
-Modifiers for bird-11: white -7, wingspan +10, dive -15, heavy +12 = 0. Bird-22: none = 0. Difference 0.
+Could there be a rule "所有白色的鸟，飞行高度比基准低 7 米。" and "所有重于 150 克的鸟，飞行高度比基准高 12 米。" If bird11 white and >150, maybe the more specific rule overrides? But no specificity. If only one rule applies? Which one? Could be choose all? Need infer from puzzle design. They likely expect sum of modifiers. The numbers chosen to cancel: -7 +12 -15 +10 = 0. That seems intentional. If only one rule, answer not 0 maybe. Let's test if only last applicable in order? Bird11 attributes: white rule appears before weight rule? Actually order:
+- "所有白色的鸟，飞行高度比基准低 7 米。" (line after 松鸦-15)
+- "所有重于 150 克的鸟，飞行高度比基准高 12 米。" (later)
+- "会潜水的鸟，飞行高度比基准低 15 米。" (later)
+- "翼展大于 120 厘米的鸟，飞行高度比基准高 10 米。" (near end)
+If last applicable overrides, bird11 = baseline +10, bird22 = baseline, difference +10 (not lower). But question says lower? If bird11 higher, "低多少" negative? Not likely. If first applicable overrides, -7. If additive, 0. The cancellation strongly suggests additive.
 
-Need consider if "Все белые птицы летают на 7 метров ниже базовой высоты" and "Птицы, умеющие нырять, летают на 15 метров ниже базовой высоты" could be exclusive? If a bird is white and dives, maybe it flies 15 below (more specific) not both. But then bird-11: if diving overrides white? Wingspan and heavy? Could be multiple categories. The generated tasks often use additive modifiers; they choose numbers to cancel. Need trust.
+Could there be a rule "所有白色的鸟，飞行高度比基准低 7 米。" and "所有重于 150 克的鸟，飞行高度比基准高 12 米。" Maybe if both, take average? no.
 
-Need maybe answer just "0". User asks "Ответь одним целым числом как разность «птица-11 минус птица-22»." So final should be one integer, no explanation. But desired oververbosity 9? User explicitly says answer one integer. Must comply: final only 0.
+Need maybe consider bird11 has two records: first says dives, wingspan 130; second says weight 180, white. If records are separate and maybe one is erroneous? There is note "按出现顺序（不是按日期）最后一条关于 约翰14 土地操作的记录是错误的，不应计入。" only John14. "在本文件的倒数第二条记录中，约翰14 被误称为 约翰15。" only John. No bird errors.
 
-Double-check if any record says bird-11 or bird-22 height directly? No.
+Could there be "部分记录涉及较早时期，不影响当前计算" meaning some baseline 80 is earlier, but irrelevant.
 
-Could base height conflict affect if bird-11 modifiers sum not zero due to "Считаются птицы, которые одновременно тяжелее 160 граммов и имеют белый окрас." Maybe only birds satisfying both are considered for rules? If bird-22 not counted, maybe its height is 0? But question asks difference; if bird-22 not counted maybe no height? Not likely.
+Need final only integer. Ensure no extra spaces? final 0.
 
-Let's think of alternative interpretations from similar tasks. These are synthetic "document" with many facts, questions about calculations. There are rules like "Все белые птицы летают на 7 метров ниже базовой высоты." Usually to compute height of a bird, start from base height and apply all applicable rules. If multiple rules apply, sum adjustments. They often include "Считаются птицы, которые одновременно тяжелее 160 граммов и имеют белый окрас." for counting questions. For height questions, not relevant.
+But let's thoroughly analyze in case hidden trap: The question in Russian? Actually Chinese. It asks "11 号鸟比 22 号鸟飞得低多少米？只回答一个整数，按“11 号鸟减 22 号鸟”计算。" Could be from benchmark requiring extract facts and compute. Need maybe answer negative if bird11 lower. But if equal, 0.
 
-Need ensure no erroneous records about bird-11/22. The document says "В предпоследней записи документа Джон14 ошибочно назван Йохан15." and "Последняя по порядку упоминания в документе (а не по дате) запись об операциях Джона14 с землёй ошибочна и не должна учитываться." These only affect John land. There is no statement that bird records erroneous. The repeated preamble says part of records past periods not affect current calculations, but not specific. Could base height 100 be past and 80 current? But difference unaffected if both birds use same current base. Unless one bird's height relative to base uses different base due to time? No.
+Let's list all bird-related facts in order to ensure no missing attributes:
+- "11 号鸟：会潜水，翼展 130 厘米。"
+- "苍鹭-51 也被称为“超级飞行者-1”。"
+- "猎鹰-14 比 乌鸦-33 飞得高 6 米。"
+- "松鸦-15：体重 160 克，白色。"
+- "所有白色的鸟，飞行高度比基准低 7 米。"
+- "统计同时满足“重于 160 克”和“白色”两个条件的鸟。"
+- "所有重于 150 克的鸟，飞行高度比基准高 12 米。"
+- "22 号鸟：体重 140 克，灰色。"
+- "33 号鸟：体重 180 克，灰色。"
+- "松鸦-16：体重 150 克，白色。"
+- "松鸦-12：体重 200 克，白色。"
+- "松鸦-14：体重 190 克，灰色。"
+- "松鸦-17：体重 180 克，黑色。"
+- "会潜水的鸟，飞行高度比基准低 15 米。"
+- "11 号鸟：体重 180 克，白色。"
+- "22 号鸟：不会潜水，翼展 110 厘米。"
+- "松鸦-08 比 苍鹭-51 飞得高 3 米。"
+- "乌鸦-33 比 松鸦-08 飞得高 4 米。"
+- "翼展大于 120 厘米的鸟，飞行高度比基准高 10 米。"
+- "基准飞行高度为 80 米。"
+- "基准飞行高度为 100 米。"
+Maybe also "所有白色的鸟..." before baseline. Good.
 
-Could there be two base heights and rules apply to different periods? If bird-11 and bird-22 maybe from different periods? No dates.
+If baseline is 80 or 100, bird11 = baseline + (-7+12-15+10)=baseline. Bird22 = baseline. Difference 0.
 
-Let's compute if additive but base 100: bird-11 = 100 + (-7+10-15+12)=100; bird-22=100; diff 0. Base 80: both 80; diff 0.
+Could there be rule "所有重于 150 克的鸟" includes exactly >150, not >=. Bird11 180 yes. Bird22 140 no. If "重于 160" statistic not height.
 
-If modifiers not additive but each rule defines absolute height? E.g., white birds fly at base-7, wingspan>120 at base+10, divers at base-15, heavy at base+12. If multiple, maybe last applicable in document order? Bird-11 last applicable heavy => base+12; bird-22 none => base; diff 12. If first applicable white => -7. If most restrictive? Could be min? Not likely. The problem likely expects arithmetic sum because they ask difference and numbers cancel.
+Could there be rule "会潜水的鸟" applies to bird11 yes; bird22 explicitly not dive no.
 
-Need maybe consider "Птица-11: умеет нырять, размах крыла 130 сантиметров." and later "Птица-11: масса 180 граммов, окрас белый." If records are separate, maybe not all attributes combine? In database, each record may be a snapshot; if conflicting? No conflict. Combine.
+Could there be rule "翼展大于 120" applies bird11 130 yes; bird22 110 no.
 
-What about "Считаются птицы, которые одновременно тяжелее 160 граммов и имеют белый окрас." Could mean for any calculation involving birds, only those birds are considered. Then bird-22 is not counted, maybe its height is 0? But question asks bird-22 explicitly; if not counted, maybe ignore? No.
+Could there be rule "白色" applies bird11 yes; bird22 gray no.
 
-Could "Птица-22: масса 140 граммов, окрас серый." and "Птица-22: не умеет нырять, размах крыла 110 сантиметров." If only birds >160 and white are counted, bird-22 not counted; but height rules still apply to all birds? The phrase "Считаются птицы..." likely for counting birds in some query, not global.
+Sum: -7 + 12 = +5; +5 -15 = -10; -10 +10 = 0. Yes.
 
-Need final: 0.
+Need maybe if adjustments are applied to baseline but order of rules could matter if "比基准" always baseline, additive. If sequential relative to current, still additive because each says compared to baseline? Actually if sequential: start baseline. White: height = baseline -7. Weight: height = baseline +12? Or current +12? Wording "比基准高 12" suggests set relative to baseline, not current. But if multiple, maybe sum of deviations. If sequential current: baseline -7 +12 -15 +10 = baseline. Same.
 
-But let's be absolutely certain by exploring possible hidden relation: "Цаплю-51 также называют «супер-летун-1»." Could "Птица-11" be "Цапля-51"? No, names differ. "Птица-22" maybe "Ворона-33"? No.
+What if rules are not cumulative but each category defines height independently and conflicts resolved by priority? No priority given. The puzzle likely expects cumulative because numbers cancel.
 
-Relative statements could determine base height if not given? But base given. They might be irrelevant noise.
-
-Could there be a rule: "Все белые птицы летают на 7 метров ниже базовой высоты." If bird-11 white, but also "Птицы, умеющие нырять, летают на 15 метров ниже базовой высоты." If both, maybe the lower of the two? Natural language: if a bird is white and dives, it flies 7 below and 15 below; inconsistent. In real world, could be additive? The puzzle likely uses additive modifiers. The numbers: -7 +10 -15 +12 = 0 exactly. That seems designed. Bird-22 no modifiers. Answer 0.
-
-Need output only integer. Ensure no extra spaces? final "0".
+Need final only integer. Done.
