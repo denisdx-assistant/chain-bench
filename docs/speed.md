@@ -28,8 +28,8 @@ depend on the cache, so every run of the right size counts there.
 | Qwen3.8-27B-UD-Q8_K_XL | — | 1327 t/s | — | 721 t/s | — | — | — | — | 58 t/s | 53 t/s | 40 t/s | — | — | — | 4100 | host A |
 | Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M | — | 1899 t/s | 2412 t/s | 2723 t/s | — | — | — | — | 85 t/s | 81 t/s | 86 t/s | — | — | — | 8743 | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S | — | 1496 t/s | 2085 t/s | 2438 t/s | — | — | — | — | 90 t/s | 89 t/s | 98 t/s | — | — | — | 4899 | host A |
-| Qwen3.8-Flash-Next-UD-IQ4_XS | — | 1480 t/s | 2029 t/s | 2389 t/s | 2427 t/s | 2278 t/s | 2058 t/s | — | 86 t/s | 88 t/s | 96 t/s | 119 t/s | 111 t/s | 50 t/s | 5511 | host A (2xV100) |
-| Qwen3.8-Flash-Next-UD-Q4_K_XL | — | 1132 t/s | 1530 t/s | 1796 t/s | — | — | — | — | 78 t/s | 79 t/s | 83 t/s | — | — | — | 5211 | host A (2xV100) |
+| Qwen3.8-Flash-Next-UD-IQ4_XS | — | 1480 t/s | 2029 t/s | 2389 t/s | 2427 t/s | 2278 t/s | 2058 t/s | — | 86 t/s | 88 t/s | 96 t/s | 84 t/s | 111 t/s | 50 t/s | 5511 | host A (2xV100) |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL | — | 1132 t/s | 1530 t/s | 1796 t/s | 1836 t/s | 1748 t/s | 1615 t/s | — | 78 t/s | 79 t/s | 83 t/s | 72 t/s | — | 80 t/s | 5211 | host A (2xV100) |
 | Ripple-65B-Preview-Q6_K | — | 482 t/s | — | 372 t/s | — | — | — | — | 20 t/s | — | 14 t/s | — | — | — | 10428 | host A (2xV100) |
 | gemma-4-31B-it-UD-Q8_K_XL | — | 1041 t/s | — | 494 t/s | — | — | — | — | 71 t/s | 60 t/s | 43 t/s | — | — | — | 1601 | host A (2xV100) |
 
@@ -144,3 +144,20 @@ batching was real and not just queued.
 aggregate throughput fell too, from 78 to 72 tok/s, while the series took 8% longer. One
 stream already saturates memory bandwidth on this GPU pair, so a second stream only adds
 switching cost. For this model, one client per GPU is the faster arrangement.
+
+### Where a point is dropped, and where only half of it is
+
+On this model the 500k point came back as the source quoted verbatim: no story, output cut
+at the budget, `story_head` empty. Quoting text the model has just read is nearly free for
+draft/MTP decoding, so the reported 155 t/s is not writing speed — roughly double the 72 t/s
+it produced when it actually wrote a story.
+
+The point is kept for what it measured honestly and dropped for what it did not:
+
+- **prefill 1748 t/s stays**: it was measured before the first output token, so quoting
+  cannot inflate it;
+- **generation is left blank** and kept out of the column average.
+
+Detection is automatic (`scripts/flag_echo.py`): the instruction asks for a story in Russian
+while the filler is a stream of English words, so a reply with almost no Cyrillic is the
+source coming back. A reply that opens with the ten tail words counts as genuine.
