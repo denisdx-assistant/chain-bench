@@ -10,7 +10,7 @@ import argparse, json, os, re, time, urllib.request
 FILLER = ("The document also contains general notes on approval order, preparation timelines "
           "and participants. Some records refer to earlier periods and do not affect current "
           "calculations. ")
-ASK = ("Расскажи историю о рыбаке и море, примерно на 600 слов. Начни сразу с истории. "
+ASK = ("Расскажи историю о рыбаке и море, примерно на 2000 слов. Начни сразу с истории. "
        "Затем ниже идёт технический документ, который к истории отношения не имеет.\n\n")
 
 
@@ -27,7 +27,7 @@ def main():
     ap.add_argument("--sizes", default="250k,500k,1000k")
     ap.add_argument("--label", default="")
     ap.add_argument("--out-dir", default="results/_speed")
-    ap.add_argument("--max-tokens", type=int, default=1500)
+    ap.add_argument("--max-tokens", type=int, default=64000)
     a = ap.parse_args()
     base = os.environ.get("CHAIN_BENCH_ENDPOINT") or open("config/endpoint").read().strip()
     key = os.environ.get("CHAIN_BENCH_API_KEY")
