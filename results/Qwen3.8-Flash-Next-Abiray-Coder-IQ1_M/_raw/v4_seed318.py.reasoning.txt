@@ -1,0 +1,646 @@
+We need answer user's request. They provided a large Python program with many comments/traps. Need execute mentally? They ask "Тест 2 v4: исполницх program, name array and sum." Need final arr and sum. We must analyze code. Need be careful: Many variables assigned but not affecting arr except specific statements. Comments are traps, not executed. Need simulate program exactly? It's Python code with imports, functions, many assignments to variables like note_0 etc that read arr but don't modify. Then some actual modifications to arr interspersed among comments? We need parse all executable lines (not comments). The huge text includes many comment lines starting #. Also variable assignments. Need identify all statements that mutate arr: initial arr list, then several direct assignments/operations:
+- arr[3:6] = sorted(arr[3:6])
+- arr[6:9] = sorted(arr[6:9])
+- arr[0], arr[6] = arr[6], arr[0]
+- arr[2] = len(re.findall(r'\d', s879)) % 50   (s879 defined from current arr)
+- t928 = str(arr[5]) + str(arr[8])
+- arr[2] = int(t928) % 97
+- arr[8] = acc(arr, 9) % 100
+- arr[2] = acc(arr, 5) % 100
+- t473 = str(arr[3]) + str(arr[9])
+- arr[8] = int(t473) % 97
+- arr[5] = len(re.findall(r'\d', s886)) % 50 (s886 defined earlier? yes just before? Need locate: s886 = ''.join(str(x) for x in arr) near after many comments. Then arr[5] = ... later)
+- arr[2:5] = sorted(arr[2:5])
+- arr[4] += 7
+- arr[9] += 7
+- apply_twice(arr, 7, 5) -> bump twice at index 7 +10 total? apply_twice calls bump(a,i,v) twice; bump does a[i]+=v. So arr[7]+=10.
+- arr2 = arr (alias)
+- arr2[4] += 5 => arr[4]+=5
+- bump_all(arr, 1) => add v=1 to even indices 0,2,4,6,8.
+- bump_all(arr, 2) => add 2 to even indices 0,2,4,6,8.
+- arr[7], arr[3] = arr[3], arr[7] (near end? Actually after bump_all(1)? Let's scan: There is line "arr[7], arr[3] = arr[3], arr[7]" after many comments before apply_twice? Need order.
+- arr[5] -= 7
+- bump_all(arr, 1)
+- bump_all(arr, 2)
+- arr[7], arr[3] = arr[3], arr[7] (again?) Need identify all executable statements in sequence. There are two assignments swap? One line near end: "arr[7], arr[3] = arr[3], arr[7]" after bump_all(2)? Let's scan carefully.
+- arr[7] -= 3
+- if __name__: print ARRAY and SUM.
+
+Need simulate exact sequence. The program is huge but only few executable non-comment lines. Need ensure all assignments to variables don't mutate arr except functions? Functions acc/bump etc not called until apply_twice, bump_all. But there are many tmp/copy/note/code reading arr; they do not modify. Also some direct assignment lines hidden among comments:
+Initial:
+arr = [23, 21, 2, 15, 13, 25, 14, 6, 20, 27]
+
+Then many variable assignments note_0 ... up to note_799? All read arr only. Need check any assignment like arr[...] = ... among those? There are comments/traps with arr[2]= etc but as string variables TRAP_n not executed? Actually TRAP_0 = "arr[2] = 435" is string, no effect.
+
+Then:
+arr[3:6] = sorted(arr[3:6])
+# comments ...
+arr[6:9] = sorted(arr[6:9])
+# comments...
+arr[0], arr[6] = arr[6], arr[0]
+# comments...
+s879 = ''.join(str(x) for x in arr)
+# comments...
+arr[2] = len(re.findall(r'\d', s879)) % 50
+# comments...
+t928 = str(arr[5]) + str(arr[8])
+# comments...
+arr[2] = int(t928) % 97
+# comments...
+arr[8] = acc(arr, 9) % 100
+# comments...
+arr[2] = acc(arr, 5) % 100
+# comments...
+t473 = str(arr[3]) + str(arr[9])
+# comments...
+arr[8] = int(t473) % 97
+# comments...
+s886 = ''.join(str(x) for x in arr)
+# comments...
+arr[5] = len(re.findall(r'\d', s886)) % 50
+# comments...
+arr[2:5] = sorted(arr[2:5])
+# comments...
+arr[4] += 7
+# comments...
+arr[9] += 7
+# comments...
+apply_twice(arr, 7, 5)
+# comments...
+arr2 = arr
+# comments...
+arr2[4] += 5
+# comments...
+bump_all(arr, 1)
+# comments...
+bump_all(arr, 2)
+# comments...
+arr[7], arr[3] = arr[3], arr[7]
+# comments...
+arr[5] -= 7
+# comments...
+bump_all(arr, 1)
+# comments...
+bump_all(arr, 2)
+# comments...
+arr[7], arr[3] = arr[3], arr[7]
+# comments...
+arr[7] -= 3
+
+Need verify if any other executable lines: "MANUAL" string not executed. Many TRAP strings assigned. Functions defined. Variables note/code/tmp/copy/label assignments are executable but only read. Also line "code_6 = re.sub..." reads arr[3], no modify. All good.
+
+Need simulate from initial through all mutations in order, with values affected by previous mutations and variable assignments (s879/t928 etc). Need careful about Python tuple assignment semantics: RHS evaluated left-to-right? For arr[0], arr[6] = arr[6], arr[0] swap. OK.
+Slice assignments sorted: arr[3:6] = sorted(arr[3:6]) sorts elements indices 3,4,5 (since slice length 3). Then later arr[6:9]=sorted indices 6,7,8.
+
+Need simulate step by step. Let's create table. Initial arr length 10:
+index:0 23
+1 21
+2 2
+3 15
+4 13
+5 25
+6 14
+7 6
+8 20
+9 27
+
+Step A: arr[3:6] = sorted(arr[3:6]) -> indices 3,4,5 values [15,13,25] sorted [13,15,25]. Assign to positions 3,4,5. Arr becomes:
+0 23
+1 21
+2 2
+3 13
+4 15
+5 25
+6 14
+7 6
+8 20
+9 27
+
+Step B: arr[6:9] = sorted(arr[6:9]) -> indices 6,7,8 values [14,6,20] sorted [6,14,20]. Arr:
+0 23
+1 21
+2 2
+3 13
+4 15
+5 25
+6 6
+7 14
+8 20
+9 27
+
+Step C: arr[0], arr[6] = arr[6], arr[0]. RHS current [6,23]? Actually arr[6]=6, arr[0]=23. Assign index0=6, index6=23. Arr:
+0 6
+1 21
+2 2
+3 13
+4 15
+5 25
+6 23
+7 14
+8 20
+9 27
+
+Step D: s879 = ''.join(str(x) for x in arr). Need digits count later. Current arr strings: '6','21','2','13','15','25','23','14','20','27'. Concatenate: "6" + "21" = "621"; +"2"="6212"; +"13"="621213"; +"15"="62121315"; +"25"="6212131525"; +"23"="621213152523"; +"14"="...62121315252314"; +"20" -> ...; +"27". s879 = "621213152523142027"? Let's concatenate carefully:
+6
+21 => 621
+2 => 6212
+13 => 621213
+15 => 62121315
+25 => 6212131525
+23 => 621213152523
+14 => 62121315252314
+20 => 6212131525231420
+27 => 621213152523142027. Count digits: each element digit length: 1+2+1+2+2+2+2+2+2+2 = 18? Sum lengths: [6]=1, [21]=2 (3), [2]=1 (4), [13]=2 (6), [15]=2 (8), [25]=2 (10), [23]=2 (12), [14]=2 (14), [20]=2 (16), [27]=2 (18). All digits. len(re.findall(r'\d', s879)) = 18. Step E: arr[2] = 18 % 50 = 18. Arr:
+0 6,1 21,2 18,3 13,4 15,5 25,6 23,7 14,8 20,9 27
+
+Step F: t928 = str(arr[5]) + str(arr[8]) = "25" + "20" = "2520". Step G: arr[2] = int(t928) % 97. 2520 mod 97? Need compute. 97*25=2425, remainder 95. 97*26=2522 too high. So arr[2]=95. Arr:
+0 6
+1 21
+2 95
+3 13
+4 15
+5 25
+6 23
+7 14
+8 20
+9 27
+
+Step H: arr[8] = acc(arr,9) % 100. Need acc(a,n) recursively sums first n elements? if n<=0 return 0; return a[n-1]+acc(a,n-1). So sum of indices 0..n-1 inclusive (first n). For n=9 sum arr[0:9]. Current before assignment: [6,21,95,13,15,25,23,14,20? Wait index8 old 20 but acc includes index8? n=9 includes indices 0-8. Yes arr[8] is old 20. Sum first 9 = 6+21+95+13+15+25+23+14+20 = let's add: 6+21=27; +95=122; +13=135; +15=150; +25=175; +23=198; +14=212; +20=232. 232 % 100 = 32. So arr[8]=32. Arr:
+0 6,1 21,2 95,3 13,4 15,5 25,6 23,7 14,8 32,9 27
+
+Step I: arr[2] = acc(arr,5) % 100. Current first 5 indices 0-4: [6,21,95,13,15]. Sum = 6+21=27; +95=122; +13=135; +15=150. acc returns a[4]+... = 150. %100=50. arr[2]=50. Arr:
+0 6,1 21,2 50,3 13,4 15,5 25,6 23,7 14,8 32,9 27
+
+Step J: t473 = str(arr[3]) + str(arr[9]) = "13" + "27" = "1327". Step K: arr[8] = int(t473) % 97. 1327 mod 97? 97*13=1261, remainder 66; *14=1358 too high. arr[8]=66. Arr:
+0 6,1 21,2 50,3 13,4 15,5 25,6 23,7 14,8 66,9 27
+
+Step L: s886 = ''.join(str(x) for x in arr). Current digits lengths: values [6 (1),21(2),50(2),13(2),15(2),25(2),23(2),14(2),66(2),27(2)] total 19? 1+9*2=19. String: "6" + "21"="621"; +"50"="62150"; +"13"="6215013"; +"15"="621501315"; +"25"="62150131525"; +"23"="...6215013152523"; +"14"; +"66"; +"27". Count digits = 19. Step M: arr[5] = len(re.findall(r'\d', s886)) % 50 = 19. Arr index5 was 25 -> 19. Arr:
+0 6,1 21,2 50,3 13,4 15,5 19,6 23,7 14,8 66,9 27
+
+Step N: arr[2:5] = sorted(arr[2:5]) -> indices 2,3,4 values [50,13,15] sorted [13,15,50]. Assign to positions 2=13,3=15,4=50. Arr:
+0 6
+1 21
+2 13
+3 15
+4 50
+5 19
+6 23
+7 14
+8 66
+9 27
+
+Step O: arr[4] += 7 -> index4=57. Arr: [6,21,13,15,57,19,23,14,66,27]
+
+Step P: arr[9] += 7 -> 34. Arr: [6,21,13,15,57,19,23,14,66,34]
+
+Step Q: apply_twice(arr,7,5): bump twice index 7 +5 each => arr[7]+=10. Current 14 -> 24. Arr: [6,21,13,15,57,19,23,24,66,34]
+
+Step R: arr2 = arr alias.
+Step S: arr2[4] += 5 -> index4 +5 => 62. Arr: [6,21,13,15,62,19,23,24,66,34]
+
+Step T: bump_all(arr,1): for i range(0,len(a),2) indices 0,2,4,6,8 add 1. Arr before: [6,21,13,15,62,19,23,24,66,34]
+After + even indices:
+idx0=7
+idx2=14
+idx4=63
+idx6=24
+idx8=67
+others same: idx1 21, idx3 15, idx5 19, idx7 24, idx9 34. Arr: [7,21,14,15,63,19,24,24,67,34]
+
+Step U: bump_all(arr,2): even indices add 2.
+idx0=9
+idx2=16
+idx4=65
+idx6=26
+idx8=69
+Arr: [9,21,16,15,65,19,26,24,69,34]
+
+Step V: arr[7], arr[3] = arr[3], arr[7]. Current idx7=24, idx3=15. Swap -> idx7=15, idx3=24. Arr: [9,21,16,24,65,19,26,15,69,34]
+
+Step W: arr[5] -= 7 -> idx5 19->12. Arr: [9,21,16,24,65,12,26,15,69,34]
+
+Step X: bump_all(arr,1): even indices add 1.
+idx0=10
+idx2=17
+idx4=66
+idx6=27
+idx8=70
+Arr: [10,21,17,24,66,12,27,15,70,34]
+
+Step Y: bump_all(arr,2): even indices add 2.
+idx0=12
+idx2=19
+idx4=68
+idx6=29
+idx8=72
+Arr: [12,21,19,24,68,12,29,15,72,34]
+
+Step Z: arr[7], arr[3] = arr[3], arr[7]. Current idx7=15, idx3=24. Swap -> idx7=24, idx3=15. Arr: [12,21,19,15,68,12,29,24,72,34]
+
+Step AA: arr[7] -= 3 -> idx7 24->21. Arr final: [12,21,19,15,68,12,29,21,72,34]
+
+Need sum = let's add carefully:
+0 12 +1=33? Wait list: [12,21,19,15,68,12,29,21,72,34]
+Sum: 12+21=33; +19=52; +15=67; +68=135; +12=147; +29=176; +21=197; +72=269; +34=303. Sum 303.
+
+Need ensure no missed executable lines or order. Let's thoroughly scan provided text for all non-comment statements after initial arr. Could be "MANUAL" string, traps, variables. Need check if any line like "arr[3:6] = sorted(arr[3:6])" yes. Comments with # not executed. The code includes many assignments to variables named note_ etc; these are executable but don't affect arr. But some may use re.sub on str(arr[x]); no side effects. Need check for functions definitions and calls? apply_twice, bump_all called as noted. acc called in lines. Any other calls like re.findall executed at those assignment lines; ok.
+
+Need double-check s879 line: It appears after many comments before arr[2]=len... There is also earlier variable "s879 = ''.join(str(x) for x in arr)" just before a comment and then arr[2] = len(re.findall(r'\d', s879)) % 50. Good.
+
+Need verify all direct mutation lines sequence from the text exactly. Let's parse manually maybe there are more direct mutations hidden:
+- After initial arr, many variables up to note_799. Then line "arr[3:6] = sorted(arr[3:6])" yes.
+Then comments until line "arr[6:9] = sorted(arr[6:9])".
+Then comments until line "arr[0], arr[6] = arr[6], arr[0]" (there is one before s879). Need check if there are other executable lines between? The text after that includes many comments, then "s879 = ...", then comments, then "arr[2] = len(...)".
+Then comments until "t928 = str(arr[5]) + str(arr[8])" (line appears after a bunch). Then comments until "arr[2] = int(t928) % 97".
+Then comments until "arr[8] = acc(arr, 9) % 100". Need check there is no arr[?] assignment before that? There are comment lines with "archiv: arr..." not executed. The line appears after a long sequence. Good.
+Then comments until "arr[2] = acc(arr, 5) % 100". Good.
+Then comments until "t473 = str(arr[3]) + str(arr[9])".
+Then comments until "arr[8] = int(t473) % 97".
+Then comments until "s886 = ''.join(...)".
+Then comments until "arr[5] = len(re.findall(r'\d', s886)) % 50".
+Then comments until "arr[2:5] = sorted(arr[2:5])".
+Then comments until "arr[4] += 7".
+Then comments until "arr[9] += 7".
+Then comments until "apply_twice(arr, 7, 5)".
+Then many comments until "arr2 = arr". Then comments until "arr2[4] += 5". Then comments until "bump_all(arr, 1)". Then many comments until "bump_all(arr, 2)". Then comments until "arr[7], arr[3] = arr[3], arr[7]"? Need check: In text after bump_all(2), there is line "arr[7], arr[3] = arr[3], arr[7]" near before arr[5]-=7. Yes.
+Then comments until "arr[5] -= 7". Then comments until "bump_all(arr, 1)"? There is a bump_all(1) after many comments following arr[5]-=7? Let's scan: After line arr[5] -= 7, there are comments, then "bump_all(arr, 1)", then comments, then "bump_all(arr, 2)", then comments, then "arr[7], arr[3] = arr[3], arr[7]", then comments, then "arr[7] -= 3", then final if. Need verify there isn't a swap earlier after apply_twice before arr2? The line "arr[7], arr[3] = arr[3], arr[7]" appears twice? Let's search mentally:
+I saw near end:
+```
+bump_all(arr, 1)
+# ... many comments ...
+bump_all(arr, 2)
+# ... comments ...
+arr[7], arr[3] = arr[3], arr[7]
+# ... comments ...
+arr[5] -= 7
+# ... comments ...
+bump_all(arr, 1)
+# ... comments ...
+bump_all(arr, 2)
+# ... comments ...
+arr[7], arr[3] = arr[3], arr[7]
+# ... comments ...
+arr[7] -= 3
+
+if __name__...
+```
+Yes two swaps: first before arr[5]-=7, second after second bump_all. We included both. Good.
+
+Need verify order of "bump_all(arr, 1)" and "bump_all(arr, 2)": There are three bump_all calls? Let's scan earlier: after apply_twice and arr2 alias and arr2[4]+=5, there is bump_all(arr, 1), then later bump_all(arr, 2). Then after arr[5]-=7, bump_all(arr,1) and bump_all(arr,2). Total four calls? Let's search text: I recall lines:
+- `bump_all(arr, 1)` appears after many comments near before line "arr[7], arr[3] = arr[3], arr[7]" maybe once.
+- `bump_all(arr, 2)` appears later before swap? Wait exact sequence in text around end:
+
+...
+```
+# отладка: arr[1] += 88 — не executes? no comment
+arr[5] -= 7
+# comments...
+bump_all(arr, 1)
+# comments...
+bump_all(arr, 2)
+# comments...
+arr[7], arr[3] = arr[3], arr[7]
+# comments...
+arr[7] -= 3
+```
+
+But earlier after apply_twice:
+```
+apply_twice(arr, 7, 5)
+# comments...
+arr2 = arr
+# comments...
+arr2[4] += 5
+# comments...
+bump_all(arr, 1)
+# comments...
+bump_all(arr, 2)
+# comments...
+arr[7], arr[3] = arr[3], arr[7]
+```
+
+Need check if there is a `bump_all(arr, 1)` before `arr2=arr`? The text has after apply_twice many comments then `arr2 = arr`. Then later after huge comments there's `bump_all(arr, 1)`, then `bump_all(arr, 2)`, then swap. Good.
+
+Could there be a line `bump_all(arr, 1)` before apply_twice? Search: In provided code near end:
+```
+# отладка: arr[9] = 7 — не executes
+arr[5] -= 7
+...
+bump_all(arr, 1)
+...
+bump_all(arr, 2)
+...
+arr[7], arr[3] = arr[3], arr[7]
+...
+```
+No other.
+
+Need ensure functions definitions before use: acc uses recursion; Python default recursion limit? n=9/5 fine. bump_all range(0,len(a),2). OK.
+
+Potential issue: The variable assignments before modifications use arr values but not mutate. However there are variables named `code_6 = re.sub(...)` etc that could be executed after some modifications? They appear before first slice assignment, reading initial arr only; no effect. Some assignments like `note_149` etc all before modifications. No problem.
+
+Need maybe consider Python's augmented assignment to list element: arr[4] += 7 modifies integer and assigns. Good.
+
+Need final format exactly:
+ARRAY: [numbers, comma separated]
+SUM: number
+User says answer strictly as: ARRAY: ... SUM: ... So no extra explanation. But desired oververbosity? They demand strict. Final should only two lines. Need ensure numbers comma separated with spaces after commas? Example "ARRAY: [numbers, comma separated]" likely `[12, 21, ...]`. Use Python list style. Sum line `SUM: 303`.
+
+Before final, let's re-simulate using independent method maybe check all arithmetic and counts.
+
+Let's reconstruct with a compact state and verify each operation with possible hidden effects from variables s879/t928/s886. We'll recalc maybe using exact strings count digits.
+
+Initial:
+A0 = [23,21,2,15,13,25,14,6,20,27]
+1) sort arr[3:6]: positions 3-5 values 15,13,25 -> 13,15,25. State S1 = [23,21,2,13,15,25,14,6,20,27].
+2) sort arr[6:9]: positions 6-8 values 14,6,20 -> 6,14,20. S2 = [23,21,2,13,15,25,6,14,20,27].
+3) swap arr[0],arr[6]: S3 = [6,21,2? Wait index 2 still 2? Did we forget index2 initial 2. Yes after first operations: index2=2. S3 = [6,21,2,13,15,25,23,14,20,27]. But earlier I had arr[2]=? I initially set after swap [6,21,2,...], then s879 before arr[2] assignment. Yes s879 included index2=2 not 18? Wait I earlier after swap wrote arr: 0 6,1 21,2 2,3 13... Then s879 string had "6212..." yes includes 2. Good.
+4) s879 digits count: S3 values [6,21,2,13,15,25,23,14,20,27]. Lengths 1+2+1+2*7? There are seven two-digit? Values: 6(1),21(2),2(1),13(2),15(2),25(2),23(2),14(2),20(2),27(2) = 1+2+1 + seven*2? Count two-digit values: 21,13,15,25,23,14,20,27 = 8 two-digit. Total 1+1+8*2=18. arr[2]=18. S4 [6,21,18,13,15,25,23,14,20,27].
+5) t928 = str(arr[5]) + str(arr[8]) = "25"+"20" = 2520. arr[2]=95. S5 [6,21,95,13,15,25,23,14,20,27].
+6) acc(arr,9): sum indices 0..8 = 6+21+95+13+15+25+23+14+20=232; mod100=32. S6 [6,21,95,13,15,25,23,14,32,27].
+7) acc(arr,5): sum 0..4 = 6+21+95+13+15=150; mod100=50. S7 [6,21,50,13,15,25,23,14,32,27].
+8) t473 = str(arr[3]) + str(arr[9]) = "13"+"27"=1327; mod97? 97*13=1261 rem66. S8 [6,21,50,13,15,25,23,14,66,27].
+9) s886 digits count: values [6(1),21(2),50(2),13(2),15(2),25(2),23(2),14(2),66(2),27(2)] = 1+9*2=19. arr[5]=19. S9 [6,21,50,13,15,19,23,14,66,27].
+10) sort arr[2:5]: indices 2-4 values [50,13,15] sorted [13,15,50]. S10 [6,21,13,15,50,19,23,14,66,27].
+11) arr[4]+=7 => 57. S11 [6,21,13,15,57,19,23,14,66,27].
+12) arr[9]+=7=>34. S12 [6,21,13,15,57,19,23,14,66,34].
+13) apply_twice(7,5): +10 -> 24. S13 [6,21,13,15,57,19,23,24,66,34].
+14) arr2[4]+=5: index4 57->62. S14 [6,21,13,15,62,19,23,24,66,34].
+15) bump_all +1 even idx 0,2,4,6,8:
+idx0 7; idx2 14; idx4 63; idx6 24; idx8 67. S15 [7,21,14,15,63,19,24,24,67,34].
+16) bump_all +2:
+idx0 9; idx2 16; idx4 65; idx6 26; idx8 69. S16 [9,21,16,15,65,19,26,24,69,34]. Wait index7 remains 24. Yes.
+17) swap arr[7],arr[3]: before idx7=24, idx3=15 -> after idx7=15, idx3=24. S17 [9,21,16,24,65,19,26,15,69,34].
+18) arr[5]-=7: 19->12. S18 [9,21,16,24,65,12,26,15,69,34].
+19) bump_all +1 even:
+idx0 10; idx2 17; idx4 66; idx6 27; idx8 70. S19 [10,21,17,24,66,12,27,15,70,34].
+20) bump_all +2 even:
+idx0 12; idx2 19; idx4 68; idx6 29; idx8 72. S20 [12,21,19,24,68,12,29,15,72,34].
+21) swap arr[7],arr[3]: before idx7=15 idx3=24 -> after idx7=24 idx3=15. S21 [12,21,19,15,68,12,29,24,72,34].
+22) arr[7]-=3: 24->21. Final [12,21,19,15,68,12,29,21,72,34]. Sum as before 303.
+
+Need check if line "arr[7], arr[3] = arr[3], arr[7]" after second bump_all may be executed before or after `arr[5]-=7`? We assumed first swap then arr5-=7 then bumps then second swap then arr7-=3. Let's verify exact order from text around final:
+After `bump_all(arr, 2)` there is a huge block of comments, then line `arr[7], arr[3] = arr[3], arr[7]`. Then comments ... then line `arr[5] -= 7`? Wait in my earlier sequence I placed first swap before arr5-=7. But let's look at the actual snippet near end:
+
+I recall from text:
+```
+bump_all(arr, 1)
+# ... many comments ...
+bump_all(arr, 2)
+# ... comments ...
+arr[7], arr[3] = arr[3], arr[7]
+# ... comments ...
+arr[5] -= 7
+# ... comments ...
+bump_all(arr, 1)
+# ... comments ...
+bump_all(arr, 2)
+# ... comments ...
+arr[7], arr[3] = arr[3], arr[7]
+# ... comments ...
+arr[7] -= 3
+
+if __name__ == "__main__":
+```
+
+Actually need verify if there is a `bump_all(arr,1)` before first swap? Let's search memory from user text: It includes near very end:
+```
+# отладка: arr[9] = 7 — не executes
+arr[5] -= 7
+# ... many comments ...
+bump_all(arr, 1)
+# ... many comments ...
+bump_all(arr, 2)
+# ... many comments ...
+arr[7], arr[3] = arr[3], arr[7]
+# ... many comments ...
+arr[7] -= 3
+
+if __name__ == "__main__":
+```
+
+And earlier:
+```
+bump_all(arr, 1)
+# ... many comments ...
+bump_all(arr, 2)
+# ... many comments ...
+arr[7], arr[3] = arr[3], arr[7]
+```
+
+Wait there may be only one pair of bump_all before first swap? Let's re-read from provided text after apply_twice and arr2. It is enormous but line order:
+- apply_twice(arr, 7, 5)
+- comments ...
+- arr2 = arr
+- comments ...
+- arr2[4] += 5
+- comments ...
+- bump_all(arr, 1)
+- comments ... (long)
+- bump_all(arr, 2)
+- comments ... (long)
+- arr[7], arr[3] = arr[3], arr[7]
+- comments ... (long)
+- arr[5] -= 7
+- comments ... (long)
+- bump_all(arr, 1)
+- comments ... (long)
+- bump_all(arr, 2)
+- comments ... (long)
+- arr[7], arr[3] = arr[3], arr[7]
+- comments ...
+- arr[7] -= 3
+
+Need verify if `arr[5] -= 7` occurs before first swap or after? In text I saw line `arr[5] -= 7` near after many comments and before second bump_all. Let's inspect from the given user content: After `bump_all(arr, 2)` there is a huge comment block, then line `arr[7], arr[3] = arr[3], arr[7]`. Then many comments. Then line `arr[5] -= 7`? I need scroll mentally in the problem text near the end. The segment:
+```
+bump_all(arr, 1)
+# ... (many comments)
+bump_all(arr, 2)
+# ... (many comments)
+arr[7], arr[3] = arr[3], arr[7]
+# ... (many comments)
+# отладка: arr[9] = 7 — не executes
+arr[5] -= 7
+# ... many comments
+bump_all(arr, 1)
+# ... many comments
+bump_all(arr, 2)
+# ... many comments
+arr[7], arr[3] = arr[3], arr[7]
+# ... many comments
+arr[7] -= 3
+
+if __name__...
+```
+Actually I recall seeing `arr[5] -= 7` after a line `# отладка: arr[9] = 7 — не executes`, which appears near end after first swap? Need identify all direct statements in order by scanning text from top to bottom. Let's do more rigorous parse of executable lines (non-comment) from the provided code. We can list them sequentially as they appear in user message, ignoring comments and blank lines. It starts with imports/functions/traps/vars. After initial arr and variable assignments, then:
+1 `arr[3:6] = sorted(arr[3:6])`
+2 many comments
+3 `arr[6:9] = sorted(arr[6:9])`
+4 many comments
+5 `arr[0], arr[6] = arr[6], arr[0]`
+6 many comments
+7 `s879 = ''.join(str(x) for x in arr)`
+8 comments... maybe line `# замеч...` etc
+9 `arr[2] = len(re.findall(r'\d', s879)) % 50`
+10 comments...
+11 `t928 = str(arr[5]) + str(arr[8])`
+12 comments...
+13 `arr[2] = int(t928) % 97`
+14 comments...
+15 `arr[8] = acc(arr, 9) % 100`
+16 comments...
+17 `arr[2] = acc(arr, 5) % 100`
+18 comments...
+19 `t473 = str(arr[3]) + str(arr[9])`
+20 comments...
+21 `arr[8] = int(t473) % 97`
+22 comments...
+23 `s886 = ''.join(str(x) for x in arr)`
+24 comments...
+25 `arr[5] = len(re.findall(r'\d', s886)) % 50`
+26 comments...
+27 `arr[2:5] = sorted(arr[2:5])`
+28 comments...
+29 `arr[4] += 7`
+30 comments...
+31 `arr[9] += 7`
+32 comments...
+33 `apply_twice(arr, 7, 5)`
+34 comments...
+35 `arr2 = arr`
+36 comments...
+37 `arr2[4] += 5`
+38 comments...
+39 `bump_all(arr, 1)`
+40 comments...
+41 `bump_all(arr, 2)`? Need check if there is a `bump_all(arr, 2)` before swap. In text after first bump_all(1) there are many comments and then maybe `arr[7], arr[3] = arr[3], arr[7]`? Let's search from user: I see near after `arr2[4] += 5`:
+```
+bump_all(arr, 1)
+# ... lots of comments ...
+# отладка: arr[8] *= 60 — не executes
+# пометka: запись 739 обработana... etc
+...
+bump_all(arr, 2)
+```
+Actually there is a `bump_all(arr, 1)` line then huge comments and then later `bump_all(arr, 2)`? Let's locate exact from message. It includes after apply_twice:
+```
+apply_twice(arr, 7, 5)
+# ... many comments ...
+arr2 = arr
+# ... many comments ...
+arr2[4] += 5
+# ... many comments ...
+bump_all(arr, 1)
+# ... many comments ...
+bump_all(arr, 2)
+# ... many comments ...
+arr[7], arr[3] = arr[3], arr[7]
+```
+
+But in the user text I saw around line before `arr[5] -= 7`:
+```
+bump_all(arr, 1)
+# ... many comments ...
+# отладka: arr2[0] = 48 — не executes
+# ... etc
+bump_all(arr, 2)
+# ... many comments ...
+arr[7], arr[3] = arr[3], arr[7]
+# ... many comments ...
+arr[5] -= 7
+```
+
+Let's parse from the end of the provided code by scanning visually in chunks. The final part after `apply_twice(arr, 7, 5)` (I can copy mentally): 
+```
+apply_twice(arr, 7, 5)
+# пометka: запись 303... etc
+...
+arr2 = arr
+# замch... many comments...
+arr2[4] += 5
+# ... many comments...
+bump_all(arr, 1)
+# ... very long comments ...
+bump_all(arr, 2)
+# ... long comments ...
+arr[7], arr[3] = arr[3], arr[7]
+# ... long comments ...
+arr[5] -= 7
+# ... long comments ...
+bump_all(arr, 1)
+# ... long comments ...
+bump_all(arr, 2)
+# ... long comments ...
+arr[7], arr[3] = arr[3], arr[7]
+# ... many comments...
+arr[7] -= 3
+
+if __name__ == "__main__":
+```
+
+Need confirm if `arr[5] -= 7` line exists only once? It appears near after first swap. Yes. Did we include it? We included after first swap and before second bump_all pair. Good. But in my sequence, I had: after first bump_all(1), first bump_all(2), first swap, arr[5]-=7, second bump_all(1), second bump_all(2), second swap, arr[7]-=3. That matches above if the line order is as I think. Need ensure there isn't an additional `bump_all(arr, 1)` before first swap? We included only one pair before first swap and one pair after arr5-=7. Good.
+
+But what about the line `bump_all(arr, 1)` appears in text just before the long comment block that ends with `arr[7], arr[3] = arr[3], arr[7]`? Yes. Then later `bump_all(arr, 2)` maybe before swap? Need order of bump_all(1) and bump_all(2) relative to first swap. If there is `bump_all(arr,1)` then comments then `arr[7],arr[3]=...` without `bump_all(arr,2)` in between? Let's inspect actual text around that area from user: It has after `bump_all(arr, 1)` a huge number of comment lines. Then line `bump_all(arr, 2)`. Then comments. Then `arr[7], arr[3] = arr[3], arr[7]`. I think yes because the text includes both bump_all(1) and bump_all(2) before swap? Let's search memory: In user content near end after `bump_all(arr, 1)` there is a sequence of comments starting with "# отладka: запись 536..." etc, then later "# пометka: arr[4] = 97 — не executes", then line `bump_all(arr, 2)`, then many comments, then line `arr[7], arr[3] = arr[3], arr[7]`. Yes.
+
+Need verify order of first swap and `arr[5]-=7`: In text after first swap there are comments including "# отладka: arr[9] = 7 — не executes" then line `arr[5] -= 7`. Yes we did.
+
+Potential hidden executable: `# пометka: arr[8] += 71 — не executes` no. All comment lines start with # after the variable assignment? Some lines like `label_31 = "запис..."` are assignments, no effect. OK.
+
+Need consider Python scoping and recursion: acc uses list a; if arr values large but fine.
+
+Potential issue: The line `arr[2] = len(re.findall(r'\d', s879)) % 50` uses regex count digits in string; all characters are digits because join of str ints. Count length. OK.
+
+Potential issue: Negative numbers? None until arr[5]-=7, still positive. If negative strings would include '-' not digit but no.
+
+Need maybe test final sum with alternative cumulative deltas to ensure no arithmetic mistakes. Let's compute using transformation from S10 etc in terms of indices. Could validate sum incremental:
+After S9 before sort [6,21,50,13,15,19,23,14,66,27] sum = 6+21=27; +50=77; +13=90; +15=105; +19=124; +23=147; +14=161; +66=227; +27=254.
+Sort [2:5] doesn't change sum -> 254. arr[4]+=7 -> 261. arr[9]+=7 -> 268. apply_twice idx7+10 -> 278. arr2[4]+=5 -> 283. bump_all +1 five elements => +5 = 288. bump_all +2 => +10 = 298. swap no sum change -> 298. arr[5]-=7 -> 291. bump_all +1 => +5=296. bump_all +2=>+10=306? Wait final sum expected 303, discrepancy! Let's recalc incremental: From S16 after first two bump_all we had [9,21,16,24,65,19,26,15? No before swap S16 = [9,21,16,15,65,19,26,24,69,34]. Sum: 9+21=30; +16=46; +15=61; +65=126; +19=145; +26=171; +24=195; +69=264; +34=298. Yes 298. Swap no change -> S17 [9,21,16,24,65,19,26,15,69,34] sum 298. arr[5]-=7 -> index5 from 19 to 12: sum 291. Second bump_all +1 even indices: five elements +1 => +5 = 296. Second bump_all +2 even: +10 = 306. Swap no change = 306. arr[7]-=3 -> -3 = 303. Ah I earlier after first pair sum was 298; second pair adds 15 then subtract 3 => final 303? Wait 291+5+10-3 = 303 yes. Good. But I mistakenly said from S16 after first bump_all? Let's recalc: After apply_twice etc sum before first bumps was 283; first +1 five=288, first +2 five=298. Then arr5-=7 => 291. second +1 five=296, second +2 five=306, final arr7-3=303. OK sum matches.
+
+Need check final individual values with sum: [12,21,19,15,68,12,29,21,72,34] sum 303. Good.
+
+Potential issue: `arr[7], arr[3] = arr[3], arr[7]` after first bump_all pair: At S16 before swap index3=15 index7=24. After swap index3=24 index7=15. Then second bumps don't affect odd indices 3,7 except later? Second swap swaps back -> index3=15, index7=24; then arr7-=3 -> 21. So final idx3=15, idx7=21. Good.
+
+Potential issue: `bump_all` range(0,len(a),2) includes index 8 but not index9. Yes.
+
+Need consider if `arr[6:9] = sorted(arr[6:9])` after first slice and before swap: We did. If initial arr index6=14, idx7=6, idx8=20 -> [6,14,20]. Then swap with idx0=23? Wait after first slice state before second slice: [23,21,2,13,15,25,14,6,20,27]. Slice 6:9 values positions 6=14,7=6,8=20 -> sorted [6,14,20], assign to positions 6=6,7=14,8=20. Then swap idx0 and idx6 -> idx0=6, idx6=23. Yes.
+
+Need check if `arr[3:6] = sorted(arr[3:6])` uses arr after initial variable assignments? No mutations before except none. Good.
+
+Potential issue: Some variable assignment line `code_6 = re.sub(r'[0-9]', '#', str(arr[3]))` may have side effect? re.sub doesn't modify list. OK.
+
+Need maybe run through all direct assignments to arr from text in order by regex mentally. Could there be a line `arr[2] = len(...)` before `s879`? No. Could there be a line `arr[5] = len(re.findall(r'\d', s886)) % 50` after many comments but before `arr[2:5]=...`; yes. Good.
+
+Need ensure final answer does not include quotes or explanation. Strictly two lines. Could include spaces after commas as Python list. The prompt says "Answer strictly as:
+ARRAY: [numbers, comma separated]
+SUM: number". So final:
+ARRAY: [12, 21, 19, 15, 68, 12, 29, 21, 72, 34]
+SUM: 303
+
+Double-check if they expect "наmez array and sum" maybe final output from program exactly includes "ARRAY:" and "SUM:"? They ask answer strictly as those lines. Good.
+
+Let's consider one more possible nuance: In Python, `arr[2:5] = sorted(arr[2:5])` when slice length same, no issue. `arr[3:6]` after previous sort includes index 2? No. OK.
+
+Potential hidden mutation: line `MANUAL = """..."""` is a string with arr commands but not executed. TRAP strings not executed. Comments in Russian "запис..." not executed. Good.
+
+Potential hidden variable assignment that mutates arr via alias? Before `arr2 = arr`, there are no other aliases except maybe `copy_11 = arr[6]` copies int, not list. Functions pass lists but only called later with arr. `acc(arr,9)` reads and returns; doesn't modify. `apply_twice` modifies. Good.
+
+Potential hidden call: `bump_all(arr, 1)` after alias? yes.
+
+Need maybe recalc acc sum if arr[8] assignment uses old arr[8]=20 or updated? The line is `arr[8] = acc(arr, 9) % 100`; RHS evaluated before assignment, so includes old arr[8]=20. We did. If it included new? no.
+`acc(arr,5)` after arr[8]=32 includes first five unaffected by arr[8]. OK.
+
+Potential hidden: `t928 = str(arr[5]) + str(arr[8])` executed after arr[2]=95 but before arr[8] assignment? Yes at that point arr[5]=25, arr[8]=20. Good.
+`t473 = str(arr[3])+str(arr[9])` executed after arr[2]=acc5 and before arr[8] int update; arr[3]=13, arr[9]=27. Good.
+
+Potential hidden: `s886 = ''.join(...)` executed after arr[8]=int(t473)%97 (66). Yes. Count digits includes 66. If we mistakenly used old 20? We updated to 66 first. Let's verify line order: In text after `arr[8] = int(t473) % 97`, many comments, then `s886 = ''.join(str(x) for x in arr)`, then later `arr[5] = len(re.findall(... s886))`. Yes. Good. Count digits if arr[8]=66 is 19; if old 20 also length 2 so count same. No issue.
+
+Potential hidden: `s879` before arr[2]=len uses initial after swap with index2=2, not modified yet. We did. Count digits = 18. If there were negative? no.
+
+Potential hidden: Values can be multi-digit; len(re.findall r'\d') counts each digit char, same as string length. Yes.
+
+Potential hidden: `int(t928) % 97`: t928="2520" -> 95. If arr[5] or arr[8] changed by previous variable assignments? No. Good.
+`int(t473)%97`: "1327" -> 66. Good.
+
+Let's maybe manually execute final code in head with Python semantics for tuple swap: `arr[0], arr[6] = arr[6], arr[0]` after slice assignments: RHS creates tuple (arr[6],arr[0]) using current values; then assigns left-to-right? In Python, assignment targets left-to-right after RHS evaluated. So idx0 gets old idx6=6, idx6 gets old idx0=23. Good.
+
+Now final answer only. Ensure no markdown code fences? Strict lines. Use comma separated with spaces. OK.
