@@ -5,7 +5,7 @@ The instruction comes FIRST and the filler after it: if the model loses the
 beginning of a huge prompt, it will not produce the story at all, and the number
 we read will be honest instead of a lucky continuation.
 """
-import argparse, json, os, re, time, urllib.request
+import argparse, hashlib, json, os, re, time, urllib.request
 
 FILLER = ("The document also contains general notes on approval order, preparation timelines "
           "and participants. Some records refer to earlier periods and do not affect current "
@@ -188,7 +188,9 @@ def main():
                "predicted_n": st.get("predicted_n"),
                "finish": ch.get("finish_reason"),
                "wall_s": round(wall, 1),
-               "story_head": (msg.get("content") or "")[:120].replace("\n", " ")}
+               "story_head": (msg.get("content") or "")[:120].replace("\n", " "),
+               "prompt_hash": hashlib.sha256(prompt.encode()).hexdigest()[:16],
+               "max_tokens": a.max_tokens}
         recs.append(rec)
         print("  цель %-7s | промпт %-8s | префилл %-5s t/s | генерация %-5s t/s (%s tok) | %s c"
               % (want, rec["prompt_n"], int(rec["prompt_tps"] or 0), int(rec["gen_tps"] or 0),
@@ -200,10 +202,15 @@ def main():
             prev = json.load(open(out))
         except Exception:
             prev = []
-        by_want = {r.get("want"): r for r in prev if isinstance(r, dict)}
+        # keep every distinct run so speeds can be averaged: same nominal size but a
+        # different prompt text (or a different output budget) is a separate measurement
+        def key(r):
+            return (r.get("want"), r.get("max_tokens"), r.get("prompt_hash"))
+        by_key = {key(r): r for r in prev if isinstance(r, dict)}
         for r in recs:
-            by_want[r.get("want")] = r
-        merged = [by_want[k] for k in sorted(by_want, key=lambda x: (x is None, x))]
+            by_key[key(r)] = r
+        merged = [by_key[k] for k in sorted(by_key, key=lambda x: (x[0] is None, x[0],
+                                                                  x[1] or 0, x[2] or ""))]
     json.dump(merged or recs, open(out, "w"), ensure_ascii=False, indent=1)
     print("записано:", out)
 

@@ -31,18 +31,17 @@ request reports the speed of the few uncached tokens, which is not comparable.
 | Ripple-65B-Preview-Q6_K | — | 482 t/s | — | 372 t/s | — | — | — | — | 20 t/s | — | 14 t/s | — | — | — | 10428 | host A (2xV100) |
 | gemma-4-31B-it-UD-Q8_K_XL | — | 1041 t/s | — | 494 t/s | — | — | — | — | 71 t/s | 60 t/s | 43 t/s | — | — | — | 1601 | host A (2xV100) |
 
-## The earlier probe was deterministic, and the cache proved it
+## Averaging the probe runs
 
-The first attempt at 250k/500k/900k tried to defeat the cache with filler whose every
-sentence carried a different number. That filler was **fully deterministic**: the same
-size produced byte-identical text on every run. So the second request at a given size was
-a prefix match of the first, and the server rightly served it from cache -- `cache_n` of
-114 688, 262 144 and 409 600 tokens against `prompt_n` of 66 789, 163 157 and 405 825.
-With most of the prompt cached, `prompt_per_second` covers only the uncached remainder and
-the points are not comparable. They are excluded from the table, not published.
+Every distinct run at a size is kept, not just the last one: a retry with a different output
+budget or a different prompt text is a separate measurement, keyed by target size, budget
+and prompt hash.
 
-A cache hit on a supposedly unique prompt is therefore a bug report, not a server
-artefact: it means the generated text repeated. The probe now draws its word stream from
-`os.urandom(16)` per run, and two separate processes were checked to produce different
-prompts. Every point is also accepted only with `cache_n = 0` and an actual `prompt_n`
-within 10% of the target.
+- **Prefill** is averaged only over runs with an empty prompt cache, because a cached
+  request reports just the uncached remainder.
+- **Generation** is averaged over every run of that size, including cached ones: a cache
+  hit affects the prefill, not the writing.
+
+The earlier deterministic-filler runs do not qualify on either count. They hit the cache,
+and they also missed their target size -- 181k, 425k and 815k tokens of prompt against
+250k, 500k and 1M, because the character-per-token ratio was guessed rather than measured.

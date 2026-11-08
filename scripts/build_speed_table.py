@@ -70,20 +70,30 @@ def main():
         except Exception:
             pass
 
-    def probe_cell(folder, want_kind, want):
+    def probe_vals(folder, want_kind, want):
+        """Every comparable run at this size, so repeated passes are averaged, not dropped.
+
+        Prefill is only comparable with an empty cache: a cached request reports the speed
+        of the uncached remainder. Generation does not depend on the cache, so all runs of
+        the right size count there.
+        """
+        vals = []
         for rec in probes.get(folder) or []:
             if rec.get("want") != want or rec.get("error"):
                 continue
-            # stale/broken pass: a "250k" record whose prompt was 5 tokens is not a measurement
             pn, cache = rec.get("prompt_n") or 0, rec.get("cache_n") or 0
-            # a probe point is only comparable with an empty cache and a prompt of the asked size
-            if cache != 0 or pn < want * 0.9:
+            if pn + cache < want * 0.9:
                 continue
-                if want_kind == "pre" and rec.get("prompt_tps"):
-                    return "%d t/s" % round(rec["prompt_tps"])
-                if want_kind == "gen" and rec.get("gen_tps"):
-                    return "%d t/s" % round(rec["gen_tps"])
-        return "—"
+            if want_kind == "pre":
+                if cache == 0 and rec.get("prompt_tps"):
+                    vals.append(rec["prompt_tps"])
+            elif rec.get("gen_tps"):
+                vals.append(rec["gen_tps"])
+        return vals
+
+    def probe_cell(folder, want_kind, want):
+        vals = probe_vals(folder, want_kind, want)
+        return "%d t/s" % round(sum(vals) / len(vals)) if vals else "—"
 
     def med(xs):
         return int(round(statistics.median(xs))) if xs else None
@@ -116,6 +126,10 @@ def main():
           "proves it actually read to the end. Generation there is uniform prose, which is "
           "the friendliest case for draft/MTP decoding, so treat those figures as an upper bound "
           "rather than a task-level expectation.")
+    print()
+    print("Repeated passes at one size are averaged. Prefill only counts runs with an empty "
+          "prompt cache; generation counts every run of that size, because a cache hit "
+          "affects the prefill and not the writing.")
 
 
 if __name__ == "__main__":
