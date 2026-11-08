@@ -30,15 +30,16 @@ def cfg_label(cfg, budget):
     if not cfg:
         return "budget %s" % budget
     parts = ["ctx %s" % cfg.get("ctx", "?"),
-             "YaRN" if cfg.get("yarn") else "no YaRN",
-             "T %s" % cfg.get("temp", "default")]
+             "YaRN" if cfg.get("yarn") else "no YaRN"]
+    # a sampling value that is the default says nothing; only a deviation is worth a column
+    if cfg.get("temp") not in (None, "", "default"):
+        parts.append("T %s" % cfg["temp"])
     pen = cfg.get("penalty", "-")
     if pen and pen != "-":
         parts.append("pen %s" % pen)
     # budget is a cap, not a comparison parameter: recorded in results/run-configs.json
 
-    if cfg.get("guard"):
-        parts.append("guard")
+    # the loop guard is on for every canonical run now, so it is not a distinction
     if cfg.get("note"):
         parts.append(cfg["note"])
     if cfg.get("reasoning") not in (None, "default"):
