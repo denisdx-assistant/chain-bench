@@ -79,3 +79,15 @@ saturates memory bandwidth, so the provider's batch of two buys nothing for this
 
 Programs finished at 0/20 with 12 length cuts and 1.04M tokens written: the IQ1_M quant is
 not usable for code at this task size.
+
+## 4. Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S — full replicate for statistics
+
+Owner asked for a second complete sample to see run-to-run spread rather than a new
+record. Same settings as the first sample: 32k budget, temperature 0.3, penalties 0.3,
+YaRN 1M. Chain sets, the three 8-task subsets and all 20 programs.
+
+- script: `/tmp/series_iq3s_rep2.sh`, started automatically once the large-context probe
+  ends **and** `local-only` points at IQ3_S
+- output: `chains_{en,ru,zh}_20k_32k_rep2.json`, `..._rep2_8tasks.json`,
+  `programs_v4_32k_rep2.json` — the first sample is never overwritten
+- the Q4_K_XL programs run at 64k is deferred behind this one, as the owner asked
