@@ -1,0 +1,50 @@
+{
+ "dir": "datasets/programs/v4",
+ "model": "qwen3.8-flash-next-abiray-coder-iq1_m",
+ "resolved_provider": "local_qwen3.8-flash-next-abiray-coder-iq1_m",
+ "resolved_model": "qwen3.8-flash-next-abiray-coder-iq1_m",
+ "max_tokens": 64000,
+ "temperature": -1.0,
+ "frequency_penalty": 0.2,
+ "presence_penalty": 0.2,
+ "rows": [
+  {
+   "file": "v4_seed300.py",
+   "ok": false,
+   "kind": "wrong",
+   "arr_ok": false,
+   "sum_ok": false,
+   "latency_s": 803.1,
+   "finish": "length",
+   "reasoning_chars": 183535,
+   "reasoning_tail": "ine: `arr[9] = acc(arr, 7) % 100` might occur before sorted? It appears near end after *2, so no.\n\nLet's maybe run through candidate with a mini state table to ensure final array values correspond to original positions:\nPre-R1 S = [26,50,12,1,16,12,18,27,54,14]\nR1 -> [14,54,27,18,12,16,1,12,50,26]\nA4 index4= sum first6 14+54+27+18+12+16=141%100=41 -> [14,54,27,18,41,16,1,12,50,26]\nM8 index8-=3 -> 47 -> [14,54,27,18,41,16,1,12,47,26]\nSorted first three [14,54,27]->[14,27,54] -> [14,27,54,18,41,16,1,12,47,26]\n*2 index4=82 -> [14,27,54,18,82,16,1,12,47,26]\nacc9 sum first7 = 14+27+54+18+82+16+1=212%100=12 -> [14,27,54,18,82,16,1,12,47,12]\nR2 -> [12,47,12,1,16,82,18,54,27,14]\na5-=3 -> 79; a2+=5 -> 17; t168 index8=27 => 11 set a5=11. Final [12,47,17,1,16,11,18,54,27,14]. Sum 217.\n\nCheck if `arr[5] -= 3` before `arr[2] += 5` or after? Both independent indices. t168 capture after both; index8 unaffected by these (unless reverse positions? We are after R2). Good. If t168 capture before arr[2]+=5, index8 still 27; no effect. If arr[5]-=3 after t168 but before assignment? It is overwritten by assignment anyway, so irrelevant except if t168 used index5? no.\n\nCould there be actual line `arr[4] *= 2` after second reverse? In prompt it appears before second reverse; if after, final different. Need verify: The line `arr[4] *= 2` is in a block that ends with second reverse after acc9, so before. Good.\n\nCould there be actual line `arr.reverse()` first occurs after sorted? If R1 after sorted, then pre-R1 state would include sorted of [26,50,12] -> [12,26,50], and A4 sum different. Need ensure reverse before sorted. In prompt first reverse appears before sorted block? I think yes because final sequence has two reverses: one mid, one end; sorted near end before second but after first. Good.\n\nNow maybe the actual line `arr[0:3] = sorted(arr[0:3])` occurs **before** first reverse in prompt? Let's search from top: The line with sorted appears after a comment block that includes `# черnovik",
+   "repeat_max": 0,
+   "raw": "",
+   "raw_tail": "",
+   "server_timings": {
+    "cache_n": 0,
+    "prompt_n": 142737,
+    "prompt_ms": 52370.8,
+    "prompt_per_token_ms": 0.367,
+    "prompt_per_second": 2725.5,
+    "predicted_n": 64000,
+    "predicted_ms": 750521.6,
+    "predicted_per_token_ms": 11.727,
+    "predicted_per_second": 85.3,
+    "draft_n": 40319,
+    "draft_n_accepted": 35283
+   },
+   "usage": {
+    "prompt_tokens": 142737,
+    "completion_tokens": 64000,
+    "total_tokens": 206737,
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    }
+   },
+   "expected_array": "[83, 74, 17, 1, 16, 80, 18, 27, 20, 10]",
+   "expected_sum": 346,
+   "error": null
+  }
+ ]
+}
