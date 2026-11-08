@@ -81,10 +81,12 @@ def main():
         """
         vals = []
         for rec in probes.get(folder) or []:
-            if rec.get("want") != want or rec.get("error"):
+            # the 1M column is probed at 900k: a full 1M prompt leaves no room to answer
+            ok_want = (rec.get("want") in (900000, 1000000)) if want == 1000000 else rec.get("want") == want
+            if not ok_want or rec.get("error"):
                 continue
             pn, cache = rec.get("prompt_n") or 0, rec.get("cache_n") or 0
-            if pn + cache < want * 0.95:
+            if pn + cache < min(want, 900000) * 0.95:
                 continue
             if want_kind == "pre":
                 if cache == 0 and rec.get("prompt_tps"):

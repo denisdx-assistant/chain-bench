@@ -15,8 +15,9 @@ For example, on the English chains the Flash-Next models generate at ~80-98 t/s 
 and the 27B host serves the repeated 14k prompt from cache, so its prefill costs almost
 nothing.
 
-Prefill numbers below come only from requests with an empty prompt cache: a cached
-request reports the speed of the few uncached tokens, which is not comparable.
+Prefill numbers come only from requests with an empty prompt cache: a cached request
+reports the speed of the few uncached tokens, which is not comparable. Generation does not
+depend on the cache, so every run of the right size counts there.
 
 ## Table
 
@@ -26,7 +27,78 @@ request reports the speed of the few uncached tokens, which is not comparable.
 | Qwen3.8-27B-UD-Q6_K_XL | — | 1557 t/s | 1342 t/s | — | — | — | — | — | 62 t/s | 54 t/s | — | — | — | — | 4099 | host A |
 | Qwen3.8-27B-UD-Q8_K_XL | — | 1327 t/s | — | 721 t/s | — | — | — | — | 58 t/s | 53 t/s | 40 t/s | — | — | — | 4100 | host A |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S | — | 1496 t/s | 2085 t/s | 2438 t/s | — | — | — | — | 90 t/s | 89 t/s | 98 t/s | — | — | — | 4899 | host A |
-| Qwen3.8-Flash-Next-UD-IQ4_XS | — | 1480 t/s | 2029 t/s | 2389 t/s | — | — | — | — | 86 t/s | 88 t/s | 96 t/s | — | — | — | 5511 | host A (2xV100) |
+| Qwen3.8-Flash-Next-UD-IQ4_XS | — | 1480 t/s | 2029 t/s | 2389 t/s | 2401 t/s | 2278 t/s | 2058 t/s | — | 86 t/s | 88 t/s | 96 t/s | 154 t/s | 111 t/s | 50 t/s | 5511 | host A (2xV100) |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL | — | 1132 t/s | 1530 t/s | 1796 t/s | — | — | — | — | 78 t/s | 79 t/s | 83 t/s | — | — | — | 5211 | host A (2xV100) |
 | Ripple-65B-Preview-Q6_K | — | 482 t/s | — | 372 t/s | — | — | — | — | 20 t/s | — | 14 t/s | — | — | — | 10428 | host A (2xV100) |
 | gemma-4-31B-it-UD-Q8_K_XL | — | 1041 t/s | — | 494 t/s | — | — | — | — | 71 t/s | 60 t/s | 43 t/s | — | — | — | 1601 | host A (2xV100) |
+
+## What the 250k/500k/1M columns measure
+
+Columns 250k, 500k and 1M are **not** measured on the benchmark tasks. They come from a
+separate synthetic probe (`scripts/speed_probe.py`):
+
+- the prompt is a stream of ordinary English words, about one token per word, drawn from
+  `os.urandom` fresh for every run, so the server's prompt cache cannot serve it;
+- the instruction comes first and asks for the last ten words of the text, then for a
+  story. Repeating the tail proves the model reached the end of the prompt; it costs a
+  couple of lines and does not invite an echo of the whole document;
+- the sizes are calibrated on a 5k-token request before the big ones, so `prompt_n` lands
+  within about half a percent of the target;
+- a point is accepted only with `cache_n = 0` and an actual prompt within 5% of the target.
+
+**Read them as an upper bound, not as a task expectation.** Generation there is uniform
+prose, which is the friendliest case for draft/MTP decoding; on real tasks the model
+produces long structured reasoning and code, and the effective speed is lower. The 60k
+and 150k columns, by contrast, are measured on the actual test sets.
+
+## Averaging the probe runs
+
+Every distinct run at a size is kept, not just the last one: a retry with a different output
+budget or a different prompt text is a separate measurement, keyed by target size, budget
+and prompt hash. Repeated passes at one size are averaged, so a long run is never wasted.
+
+The earlier deterministic-filler runs do not qualify: they hit the cache, and they also
+missed their target size — 181k, 425k and 815k tokens of prompt against 250k, 500k and 1M —
+because the character-per-token ratio was guessed rather than measured.
+
+## The earlier probe was deterministic, and the cache proved it
+
+The first attempt at these sizes tried to defeat the cache with filler whose every sentence
+carried a different number. That filler was **fully deterministic**: the same size produced
+byte-identical text on every run. So the second request at a given size was a prefix match
+of the first, and the server rightly served it from cache — `cache_n` of 114 688, 262 144
+and 409 600 tokens against `prompt_n` of 66 789, 163 157 and 405 825.
+
+A cache hit on a supposedly unique prompt is a bug report, not a server artefact: it means
+the generated text repeated.
+
+## Findings from the large probes (IQ4_XS, 2xV100)
+
+| Target | Prompt | Cache | Prefill | Gen | Written | Finish | What it did |
+|---|---|---|---|---|---|---|---|
+| 250k | 251 219 | 0 | 2401 t/s | 154 t/s | 64 000 | length | re-quoted the source text |
+| 500k | 502 354 | 0 | 2278 t/s | 111 t/s | 61 383 | stop | answered, then wrote the story |
+| 900k | 904 358 | 0 | 2058 t/s | 50 t/s | 4 394 | stop | discussed the count, no story |
+
+On the 250k prompt the model did not loop and did not cut early: it spent the whole output
+budget re-quoting the source. No context window would have been enough for that variant of
+the task — the request failed, not the budget. That is why the check changed to the last ten
+words.
+
+The 154 t/s on that point is an echo-driven upper bound, not a generation speed.
+
+The 900k point is the opposite case: prefill is a real 2058 t/s, but the answer stopped
+after 4 394 tokens without a story, so its generation figure is not comparable either.
+
+## Gaps
+
+The 5k bucket has no rows yet: every series used prompts of ~14k (chains) or ~142k
+(programs). The 250k/500k/1M columns are filled for IQ4_XS only; the other models need the
+same probe while they are loaded.
+
+## Regenerating
+
+```
+python3 scripts/build_speed_table.py
+python3 scripts/update_speed_doc.py
+```
