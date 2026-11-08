@@ -10,10 +10,8 @@ import argparse, json, os, re, time, urllib.request
 FILLER = ("The document also contains general notes on approval order, preparation timelines "
           "and participants. Some records refer to earlier periods and do not affect current "
           "calculations. ")
-ASK = ("Тебе дан большой массив английских слов. Сначала посчитай, сколько раз в нём встречается "
-       "слово `context`, и напиши это число. Затем расскажи историю о рыбаке и море, примерно на 2000 "
-       "слов. "
-       "Затем ниже идёт технический документ, который к истории отношения не имеет.\n\n")
+ASK = ("Тебе дан большой массив английских слов. Сначала выпиши ПОСЛЕДНИЕ 10 слов этого текста, "
+       "затем расскажи историю о рыбаке и море, примерно на 2000 слов. ")
 
 
 CHARS_PER_TOKEN = float(os.environ.get("CHAIN_BENCH_CHARS_PER_TOKEN", "7.1"))
@@ -107,7 +105,8 @@ def build_prompt(target_tokens, reserve):
     """
     # target_tokens is the prompt size we want; the reserve only guards the window
     body, expected = random_filler(target_tokens)
-    return ASK + body, expected
+    tail = " ".join(body.split()[-10:])
+    return ASK + body, {"markers": expected, "tail": tail}
 
 
 def main():
@@ -194,7 +193,18 @@ def main():
         print("  цель %-7s | промпт %-8s | префилл %-5s t/s | генерация %-5s t/s (%s tok) | %s c"
               % (want, rec["prompt_n"], int(rec["prompt_tps"] or 0), int(rec["gen_tps"] or 0),
                  rec["predicted_n"], rec["wall_s"]), flush=True)
-    json.dump(recs, open(out, "w"), ensure_ascii=False, indent=1)
+    # merge with earlier passes so a retry adds a point instead of replacing the file
+    merged = []
+    if os.path.exists(out):
+        try:
+            prev = json.load(open(out))
+        except Exception:
+            prev = []
+        by_want = {r.get("want"): r for r in prev if isinstance(r, dict)}
+        for r in recs:
+            by_want[r.get("want")] = r
+        merged = [by_want[k] for k in sorted(by_want, key=lambda x: (x is None, x))]
+    json.dump(merged or recs, open(out, "w"), ensure_ascii=False, indent=1)
     print("записано:", out)
 
 

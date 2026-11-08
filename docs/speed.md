@@ -62,3 +62,15 @@ separate synthetic probe (`scripts/speed_probe.py`):
 prose, which is the friendliest case for draft/MTP decoding; on real tasks the model
 produces long structured reasoning and code, and the effective speed is lower. The 60k
 and 150k columns, by contrast, are measured on the actual test sets.
+
+### A finding from the first large probe
+
+On the 250k prompt the model did not loop, did not cut early, and did not answer the
+counting question: it spent the whole 64k output re-quoting the source text back. So no
+context window would have been enough for that variant of the task — it was the request
+that failed, not the budget.
+
+The verification step has therefore changed: the instruction now asks for the **last ten
+words of the text** and then for a story. Repeating the tail proves the model reached the
+end of the prompt, and it costs a couple of lines instead of inviting an echo of the whole
+document.
