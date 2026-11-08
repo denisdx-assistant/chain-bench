@@ -83,11 +83,12 @@ not usable for code at this task size.
 ## 4. Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S — full replicate for statistics
 
 Owner asked for a second complete sample to see run-to-run spread rather than a new
-record. Sampling matches the first sample (temperature 0.3, penalties 0.3, YaRN 1M), but the
-budget is **65536**, not 32k: on the owner's instruction, because 32k cuts long chains and
-programs and these models are fast enough that the headroom is cheap. Chain sets, the three
-8-task subsets and all 20 programs. A first attempt at 32k ran 7 English tasks and was
-archived to `results/_archive/IQ3S_32k_rep2_partial`.
+record. Sampling matches the first sample (temperature 0.3, penalties 0.3, YaRN 1M); the
+budget is 65536 instead of 32k, which does **not** break the comparison: the budget is only a
+cutoff, and any task it cut was rerun separately at a larger limit. So the two samples are
+interchangeable and the table averages them into one row. Chain sets, the three 8-task
+subsets and all 20 programs. A first attempt at 32k ran 7 English tasks and was archived to
+`results/_archive/IQ3S_32k_rep2_partial`.
 
 - provider renamed by the owner to `ista-iq3_s` (server model id
   `qwen3.8-flash-next-ista-iq3_s`); the runner still addresses it as `local-only`, and the
