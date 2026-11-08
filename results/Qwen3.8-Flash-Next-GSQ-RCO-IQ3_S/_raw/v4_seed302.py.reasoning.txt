@@ -1,0 +1,3161 @@
+We need answer user's request: execute program mentally / compute final array and sum. Need be careful. We have huge code with many comments/traps. Need determine actual executed statements only, ignoring comments and traps variables? Program defines functions, MANUAL string, TRAP variables (unused), arr initial, many assignments to tmp/note/code/copy/label variables that don't affect arr except some later actual statements. Need parse all non-comment executable lines affecting arr. Then output final array and sum.
+
+We need compute accurately. Let's extract all actual executable statements that mutate arr or use arr values for later mutations. There are many lines like tmp_0 = arr[8] + 48 etc no effect. code_x = re.sub no effect. copy_x = arr[...] no effect. note_x string no effect. label_x strings no effect. Some assignments to arr: initial, arr.reverse(), arr[3] += 5, arr2 = arr (alias), arr2[2] += 3, arr[1], arr[8] = arr[8], arr[1], arr[4:7] = sorted(arr[4:7]), arr[3:6] = sorted(arr[3:6]), arr[2], arr[6] = arr[6], arr[2], apply_twice(arr, 7, 4), t973 = str(arr[7]) + str(arr[2]), arr[0] = int(t973) % 97, arr2 = arr, t58 = str(arr[1]) + str(arr[4]), arr[0] = int(t58) % 97, arr[8] += 1, bump_all(arr, 5), arr[2] *= 2, arr[2] += 3, s590 = ''.join(str(x) for x in arr), arr[6] = len(re.findall(r'\d', s590)) % 50. Also maybe MANUAL not executed. TRAP variables unused. Need ensure no other executable statements: functions definitions, import re, assignments to tmp/copy/note/code/label, comments. Need check if any trap variables used? No. Need maybe line "arr2 = arr" multiple times; alias doesn't change values but later arr2[3] += 2 and arr2[3] += 6 affect arr because alias. Also earlier arr2 = arr after reverse? Let's list chronological actual mutations:
+
+Initial:
+arr = [18, 18, 28, 18, 14, 16, 7, 27, 2, 13]
+
+Then many no-effect. Then:
+arr.reverse()
+
+Then comments until:
+arr[3] += 5
+
+Then comments until:
+arr2 = arr
+
+Then comments until:
+arr2[2] += 3
+
+Then comments until:
+arr[1], arr[8] = arr[8], arr[1]
+
+Then comments until:
+arr[4:7] = sorted(arr[4:7])
+
+Then comments until:
+arr[3:6] = sorted(arr[3:6])
+
+Then comments until:
+arr[2], arr[6] = arr[6], arr[2]
+
+Then comments until:
+apply_twice(arr, 7, 4)
+
+Then comments until:
+t973 = str(arr[7]) + str(arr[2])
+
+Then comments until:
+arr[0] = int(t973) % 97
+
+Then comments until:
+arr2 = arr
+
+Then comments until:
+t58 = str(arr[1]) + str(arr[4])
+
+Then comments until:
+arr[0] = int(t58) % 97
+
+Then comments until:
+arr[8] += 1
+
+Then comments until:
+bump_all(arr, 5)
+
+Then comments until:
+arr[2] *= 2
+
+Then comments until:
+arr[2] += 3
+
+Then comments until:
+s590 = ''.join(str(x) for x in arr)
+
+Then comments until:
+arr[6] = len(re.findall(r'\d', s590)) % 50
+
+Need also check line "arr2[3] += 2" and "arr2[3] += 6" after arr2=arr? Yes there are actual statements:
+After many comments: arr2[3] += 2 (line near middle)
+Then later arr2 = arr (again)
+Then later arr2[3] += 6. Need include. Let's locate exact order. The code after first arr2 = arr includes comments then arr2[2] += 3, then comments, then arr[1], arr[8] = ... , comments, arr[4:7]=sorted..., comments, arr[3:6]=sorted..., comments, arr[2],arr[6]=..., comments, apply_twice..., comments, t973=..., comments, arr[0]=int(t973)%97, then many comments? Then "arr2 = arr" appears later after a huge block? Let's scan. There is line:
+# ... many comments ...
+arr2 = arr
+# ... comments ...
+t58 = str(arr[1]) + str(arr[4])
+...
+arr[0] = int(t58) % 97
+...
+arr[8] += 1
+...
+bump_all(arr, 5)
+...
+arr[2] *= 2
+...
+arr[2] += 3
+...
+s590 = ''.join(str(x) for x in arr)
+...
+arr[6] = len(re.findall(r'\d', s590)) % 50
+
+But also there is "arr2[3] += 2" before second arr2=arr? Let's find in text: After many comments following first arr2=arr, there is line:
+# ... 
+arr2[3] += 2
+# ... 
+Then later after many comments:
+# ... 
+arr2 = arr
+...
+t58...
+...
+Then later:
+# ... 
+arr2[3] += 6
+...
+
+Need include arr2[3] += 2 and arr2[3] += 6. Also first arr2=arr before arr2[2]+=3. Need ensure order of arr2[3]+=2 relative to mutations. Let's reconstruct full sequence from code. We need parse actual non-comment lines in order after initial no-effect block. Let's extract all executable lines that are not comments and not variable no-effect? But no-effect assignments to tmp/copy/note/code/label don't affect arr, but they may depend on arr values at that time; however they are never used later except t973/t58/s590 actual. The many tmp/copy/note/code/label assignments occur before mutations? They don't affect arr and not used later, so ignore. But t973, t58, s590 are used later; they are assigned at specific times after some mutations. Need include them.
+
+Need be meticulous: There may be executable lines like "arr[3] += 5" after comments. Also "arr2 = arr" alias. "arr2[2] += 3". "arr[1], arr[8] = arr[8], arr[1]". "arr[4:7] = sorted(arr[4:7])". "arr[3:6] = sorted(arr[3:6])". "arr[2], arr[6] = arr[6], arr[2]". "apply_twice(arr, 7, 4)". "t973 = str(arr[7]) + str(arr[2])". "arr[0] = int(t973) % 97". "arr2 = arr". "t58 = str(arr[1]) + str(arr[4])". "arr[0] = int(t58) % 97". "arr[8] += 1". "bump_all(arr, 5)". "arr[2] *= 2". "arr[2] += 3". "s590 = ''.join(str(x) for x in arr)". "arr[6] = len(re.findall(r'\d', s590)) % 50". Plus "arr2[3] += 2" and "arr2[3] += 6". Need order of these two relative to others.
+
+Let's locate exact positions in provided code. I can scan mentally from text. The huge code after initial no-effect block:
+
+arr.reverse()
+# comments many
+arr[3] += 5
+# comments many
+arr2 = arr
+# comments many
+arr2[2] += 3
+# comments many
+arr[1], arr[8] = arr[8], arr[1]
+# comments many
+arr[4:7] = sorted(arr[4:7])
+# comments many
+arr[3:6] = sorted(arr[3:6])
+# comments many
+arr[2], arr[6] = arr[6], arr[2]
+# comments many
+apply_twice(arr, 7, 4)
+# comments many
+t973 = str(arr[7]) + str(arr[2])
+# comments many
+arr[0] = int(t973) % 97
+# comments many? Then maybe arr2 = arr? Let's find.
+
+After arr[0] = int(t973) % 97, there are many comments. Then line:
+arr2 = arr
+Then comments. Then t58 = str(arr[1]) + str(arr[4])
+Then comments. Then arr[0] = int(t58) % 97
+Then comments. Then arr[8] += 1
+Then comments. Then bump_all(arr, 5)
+Then comments. Then arr[2] *= 2
+Then comments. Then arr[2] += 3
+Then comments. Then s590 = ''.join(str(x) for x in arr)
+Then comments. Then arr[6] = len(re.findall(r'\d', s590)) % 50
+
+But where are arr2[3] += 2 and arr2[3] += 6? Need scan text around. I recall after first arr2=arr block, there is line:
+# ... 
+arr2[3] += 2
+# ... 
+Then later after second arr2=arr? Let's search memory from code: There is a line "arr2[3] += 2" near after many comments following first arr2=arr? In the provided text, I saw:
+...
+# замечание: arr[0], arr[1] = arr[1], arr[0] — не выполняется
+# примечание: arr[7], arr[7] = arr[7], arr[7] — не выполняется
+# замечание: запись 844 обработана, изменений нет
+# отладка: arr[1] += 30 — не выполняется
+# примечание: arr[9] += 95 — не выполняется
+# пометка: arr[6] = 7 — не выполняется
+# проверено: arr[0] = 45 — не выполняется
+# замечание: запись 436 обработана, изменений нет
+# временная запись: запись 837 обработана, изменений нет
+# временная запись: запись 48 обработана, изменений нет
+# отладка: запись 320 обработана, изменений нет
+# временная запись: запись 76 обработана, изменений нет
+# замечание: arr2[3] = 70 — не выполняется
+# пометка: запись 565 обработана, изменений нет
+# замечание: arr[8] *= 70 — не выполняется
+# черновик: arr[3] = 30 — не выполняется
+# справка: arr2[0] = 42 — не выполняется
+# замечание: arr[8] = 36 — не выполняется
+# временная запись: запись 56 обработана, изменений нет
+# замечание: arr[0] += 50 — не выполняется
+# справка: запись 609 обработана, изменений нет
+# проверено: arr[8], arr[7] = arr[7], arr[8] — не выполняется
+# архив: arr[4] = 20 — не выполняется
+# примечание: arr[0], arr[3] = arr[3], arr[0] — не выполняется
+# черновик: arr[1] = 58 — не выполняется
+# черновик: запись 115 обработана, изменений нет
+# пометка: запись 290 обработана, изменений нет
+# черновик: запись 116 обработана, изменений нет
+# пометка: запись 898 обработана, изменений нет
+# черновик: запись 947 обработана, изменений нет
+# проверено: arr[6] *= 17 — не выполняется
+# архив: запись 299 обработана, изменений нет
+# архив: arr[6], arr[8] = arr[8], arr[6] — не выполняется
+# черновик: arr[6] += 90 — не выполняется
+# архив: запись 642 обработана, изменений нет
+# замечание: запись 193 обработана, изменений нет
+# пометка: запись 225 обработана, изменений нет
+# проверено: запись 99 обработана, изменений нет
+# отладка: arr2[8] = 60 — не выполняется
+# справка: запись 556 обработана, изменений нет
+# примечание: arr[7], arr[2] = arr[2], arr[7] — не выполняется
+# черновик: arr[1] = 70 — не выполняется
+# архив: arr[7] = 92 — не выполняется
+# черновик: arr[0] = 87 — не выполняется
+# черновик: запись 526 обработана, изменений нет
+# архив: arr[2], arr[3] = arr[3], arr[2] — не выполняется
+# временная запись: запись 402 обработана, изменений нет
+# архив: arr[3] = 57 — не выполняется
+# пометка: arr[3] += 36 — не выполняется
+# архив: arr[4], arr[4] = arr[4], arr[4] — не выполняется
+# архив: arr[0] *= 7 — не выполняется
+# пометка: arr2[9] = 88 — не выполняется
+# отладка: запись 517 обработана, изменений нет
+# черновик: arr[8] = 75 — не выполняется
+# примечание: arr[7], arr[4] = arr[4], arr[7] — не выполняется
+# замечание: запись 934 обработана, изменений нет
+# отладка: запись 48 обработана, изменений нет
+# отладка: arr[7], arr[2] = arr[2], arr[7] — не выполняется
+# черновик: запись 93 обработана, изменений нет
+# временная запись: запись 970 обработана, изменений нет
+# черновик: arr[8], arr[2] = arr[2], arr[8] — не выполняется
+# ревизия: arr[7] *= 89 — не выполняется
+# временная запись: запись 353 обработана, изменений нет
+# временная запись: запись 662 обработана, изменений нет
+arr2[3] += 2
+
+Yes arr2[3]+=2 occurs before second arr2=arr? It appears after first arr2=arr and before t58? Let's continue after arr2[3]+=2:
+# архив: arr[1] += 12 — не выполняется
+... many comments
+# черновик: запись 965 обработана, изменений нет
+# черновик: arr[8] *= 49 — не выполняется
+# пометка: запись 655 обработана, изменений нет
+# временная запись: arr[3] *= 94 — не выполняется
+# примечание: arr[6] += 97 — не выполняется
+# пометка: arr[9] += 9 — не выполняется
+# архив: запись 116 обработана, изменений нет
+# справка: запись 556 обработана, изменений нет
+# примечание: запись 768 обработана, изменений нет
+# архив: запись 977 обработана, изменений нет
+# справка: запись 72 обработана, изменений нет
+# пометка: arr[8], arr[7] = arr[7], arr[8] — не выполняется
+# справка: arr[2] *= 82 — не выполняется
+# черновик: запись 220 обработана, изменений нет
+# проверено: arr2[6] = 57 — не выполняется
+# пометка: запись 395 обработана, изменений нет
+# пометка: запись 845 обработана, изменений нет
+# пометка: arr[5] *= 14 — не выполняется
+# замечание: arr[7] += 85 — не выполняется
+# справка: arr[0] = 57 — не выполняется
+# ревизия: запись 47 обработана, изменений нет
+# архив: arr[3], arr[9] = arr[9], arr[3] — не выполняется
+# отладка: запись 993 обработана, изменений нет
+# проверено: запись 572 обработана, изменений нет
+# отладка: запись 896 обработана, изменений нет
+# примечание: arr[1] = 75 — не выполняется
+# справка: запись 574 обработана, изменений нет
+# справка: запись 632 обработана, изменений нет
+# проверено: запись 463 обработана, изменений нет
+# архив: запись 686 обработана, изменений нет
+# временная запись: arr[2], arr[2] = arr[2], arr[2] — не выполняется
+# примечание: arr[1] = 2 — не выполняется
+# отладка: запись 702 обработана, изменений нет
+# замечание: arr[5], arr[6] = arr[6], arr[5] — не выполняется
+# примечание: arr2[5] = 4 — не выполняется
+# архив: запись 404 обработана, изменений нет
+# временная запись: запись 996 обработана, изменений нет
+# проверено: arr[6] += 39 — не выполняется
+# отладка: arr[1], arr[1] = arr[1], arr[1] — не выполняется
+# справка: arr[8] += 46 — не выполняется
+# пометка: arr[8] *= 26 — не выполняется
+# замечание: arr[5], arr[5] = arr[5], arr[5] — не выполняется
+# временная запись: запись 825 обработана, изменений нет
+# архив: arr[3], arr[5] = arr[5], arr[3] — не выполняется
+# проверено: arr[0], arr[7] = arr[7], arr[0] — не выполняется
+# пометка: arr2[0] = 75 — не выполняется
+# временная запись: запись 176 обработана, изменений нет
+# проверено: запись 437 обработана, изменений нет
+# отладка: arr[2] = 57 — не выполняется
+# пометка: arr[6] = 88 — не выполняется
+# справка: запись 401 обработана, изменений нет
+# примечание: запись 910 обработана, изменений нет
+# пометка: arr2[3] = 71 — не выполняется
+# черновик: arr[2], arr[9] = arr[9], arr[2] — не выполняется
+# временная запись: запись 497 обработана, изменений нет
+# отладка: запись 370 обработана, изменений нет
+# примечание: arr[3] = 68 — не выполняется
+# замечание: arr[4], arr[9] = arr[9], arr[4] — не выполняется
+# пометка: запись 344 обработана, изменений нет
+# примечание: запись 440 обработана, изменений нет
+# отладка: запись 522 обработана, изменений нет
+# архив: запись 319 обработана, изменений нет
+# архив: запись 382 обработана, изменений нет
+# отладка: arr2[5] = 46 — не выполняется
+# ревизия: запись 885 обработана, изменений нет
+# временная запись: arr[0], arr[9] = arr[9], arr[0] — не выполняется
+# черновик: запись 274 обработана, изменений нет
+# архив: запись 681 обработана, изменений нет
+# замечание: запись 617 обработана, изменений нет
+# справка: arr2[5] = 91 — не выполняется
+# справка: запись 397 обработана, изменений нет
+# ревизия: запись 414 обработана, изменений нет
+# временная запись: arr[0], arr[9] = arr[9], arr[0] — не выполняется
+# временная запись: запись 698 обработана, изменений нет
+# справка: запись 159 обработана, изменений нет
+# пометка: запись 547 обработана, изменений нет
+# ревизия: arr[2] += 57 — не выполняется
+# проверено: arr[4] = 42 — не выполняется
+# ревизия: arr2[0] = 85 — не выполняется
+# ревизия: arr[7] = 93 — не выполняется
+# справка: запись 364 обработана, изменений нет
+# замечание: arr[1] *= 2 — не выполняется
+# черновик: запись 623 обработана, изменений нет
+# проверено: arr[0], arr[3] = arr[3], arr[0] — не выполняется
+# замечание: arr[6] = 70 — не выполняется
+# отладка: запись 122 обработана, изменений нет
+# проверено: arr[2] = 84 — не выполняется
+# проверено: arr[4] += 81 — не выполняется
+# временная запись: arr[8] += 77 — не выполняется
+# примечание: arr2[4] = 59 — не выполняется
+# архив: arr2[8] = 18 — не выполняется
+# ревизия: arr[1], arr[1] = arr[1], arr[1] — не выполняется
+# временная запись: запись 212 обработана, изменений нет
+# проверено: запись 427 обработана, изменений нет
+# пометка: запись 591 обработана, изменений нет
+# отладка: arr2[3] = 64 — не выполняется
+# справка: arr[0] = 91 — не выполняется
+# замечание: запись 18 обработана, изменений нет
+# справка: arr[8] *= 92 — не выполняется
+# примечание: запись 471 обработана, изменений нет
+# черновик: запись 888 обработана, изменений нет
+# примечание: arr[8] += 48 — не выполняется
+arr[7] += 5
+
+Ah there is actual arr[7] += 5 after arr2[3]+=2 and before second arr2=arr? Need include! I missed. Let's continue after arr[7]+=5:
+# ревизия: arr[1] += 54 — не выполняется
+... many comments
+# пометка: запись 464 обработана, изменений нет
+# пометка: запись 45 обработана, изменений нет
+# замечание: запись 853 обработана, изменений нет
+# ревизия: запись 296 обработана, изменений нет
+# примечание: arr[3], arr[0] = arr[0], arr[3] — не выполняется
+# ревизия: arr[1] = 24 — не выполняется
+s590 = ''.join(str(x) for x in arr)
+
+Wait s590 appears before second arr2=arr? Need check. Actually after arr[7]+=5, there are comments then s590? But earlier I thought s590 near end after arr[2]+=3. There may be two s590 assignments? Let's scan: In text after arr[7]+=5 and many comments, I saw line:
+s590 = ''.join(str(x) for x in arr)
+Then later many comments, then arr[6] = len(re.findall(r'\d', s590)) % 50. But also there is second arr2=arr and t58 etc? Need order. Let's locate all actual lines after first arr2=arr in full sequence.
+
+Maybe the code has actual statements interspersed:
+- arr2 = arr (first)
+- arr2[2] += 3
+- arr[1], arr[8] = ...
+- arr[4:7] = sorted...
+- arr[3:6] = sorted...
+- arr[2], arr[6] = ...
+- apply_twice...
+- t973=...
+- arr[0]=int(t973)%97
+- arr2 = arr (second?) maybe before t58? Let's find. There is line "arr2 = arr" after some comments following arr[0]=int(t973)%97? In text: after arr[0] = int(t973) % 97, many comments, then:
+# ... 
+arr2 = arr
+# ... 
+t58 = str(arr[1]) + str(arr[4])
+...
+arr[0] = int(t58) % 97
+...
+arr[8] += 1
+...
+bump_all(arr, 5)
+...
+arr[2] *= 2
+...
+arr[2] += 3
+...
+s590 = ''.join(str(x) for x in arr)
+...
+arr[6] = len(...)
+
+But I also saw arr2[3]+=2 and arr[7]+=5 before second arr2=arr? Need determine exact ordering from provided text. Let's search in the user code visually. It is huge. We need not rely on memory; we can parse by scanning the text in order. Let's copy relevant segments mentally or use reasoning. Since no actual execution environment, but we can simulate. Need ensure all actual statements included.
+
+Let's extract all lines that are not comments and not variable no-effect? Could manually scan from top to bottom. The code after initial no-effect block:
+
+arr.reverse()
+# comments...
+arr[3] += 5
+# comments...
+arr2 = arr
+# comments...
+arr2[2] += 3
+# comments...
+arr[1], arr[8] = arr[8], arr[1]
+# comments...
+arr[4:7] = sorted(arr[4:7])
+# comments...
+arr[3:6] = sorted(arr[3:6])
+# comments...
+arr[2], arr[6] = arr[6], arr[2]
+# comments...
+apply_twice(arr, 7, 4)
+# comments...
+t973 = str(arr[7]) + str(arr[2])
+# comments...
+arr[0] = int(t973) % 97
+# comments...
+arr2 = arr
+# comments...
+t58 = str(arr[1]) + str(arr[4])
+# comments...
+arr[0] = int(t58) % 97
+# comments...
+arr[8] += 1
+# comments...
+bump_all(arr, 5)
+# comments...
+arr[2] *= 2
+# comments...
+arr[2] += 3
+# comments...
+s590 = ''.join(str(x) for x in arr)
+# comments...
+arr[6] = len(re.findall(r'\d', s590)) % 50
+
+But this omits arr2[3]+=2, arr[7]+=5, maybe second arr2=arr? Wait the sequence above includes second arr2=arr after t973? But where did arr2[3]+=2 and arr[7]+=5 fit? They might be before second arr2=arr? Let's inspect actual text around t973. After "t973 = str(arr[7]) + str(arr[2])" there are many comments, then "arr[0] = int(t973) % 97". Then after that many comments. I recall a line "arr2 = arr" appears later after a block of comments, but before t58? Let's find in text: Search for "t58" in user code. It appears after many comments:
+...
+# замечание: запись 296 обработана, изменений нет
+# примечание: arr[3], arr[0] = arr[0], arr[3] — не выполняется
+# ревизия: arr[1] = 24 — не выполняется
+t58 = str(arr[1]) + str(arr[4])
+...
+
+Before t58, there is line "arr2 = arr"? Let's scroll upward from t58 in provided text: I see after a huge comment block:
+# архив: запись 916 обработана, изменений нет
+# временная запись: arr[4] *= 32 — не выполняется
+# проверено: запись 285 обработана, изменений нет
+# ревизия: запись 513 обработана, изменений нет
+# замечание: arr2[8] = 20 — не выполняется
+# временная запись: arr2[7] = 83 — не выполняется
+# архив: arr[9] *= 34 — не выполняется
+# проверено: запись 179 обработана, изменений нет
+# архив: arr2[6] = 48 — не выполняется
+# архив: arr[0] += 37 — не выполняется
+# отладка: arr[7] += 15 — не выполняется
+# справка: arr[6] *= 78 — не выполняется
+# пометка: запись 837 обработана, изменений нет
+# черновик: запись 21 обработана, изменений нет
+# примечание: запись 945 обработана, изменений нет
+# справка: запись 388 обработана, изменений нет
+# архив: запись 916 обработана, изменений нет
+# временная запись: arr[4] *= 32 — не выполняется
+...
+Maybe there is "arr2 = arr" just before t58? Let's search memory: In text after many comments following arr[0]=int(t973)%97, there is:
+# ... 
+arr2 = arr
+# ... 
+t58 = str(arr[1]) + str(arr[4])
+Yes likely. But also there is "arr2[3] += 2" before that? Let's locate exact order from code snippet after t973 assignment:
+
+After t973 line, comments, then arr[0] = int(t973) % 97. Then comments. Then maybe "arr2 = arr"? Wait I saw in the text:
+...
+# черновик: запись 508 обработана, изменений нет
+# пометка: запись 330 обработана, изменений нет
+# отладка: запись 611 обработана, изменений нет
+# временная запись: arr[4] = 89 — не выполняется
+# черновик: arr2[7] = 33 — не выполняется
+# справка: arr[8] += 12 — не выполняется
+# пометка: arr[7], arr[1] = arr[1], arr[7] — не выполняется
+# примечание: запись 961 обработана, изменений нет
+# справка: запись 12 обработана, изменений нет
+# справка: arr2[5] = 49 — не выполняется
+# архив: arr[2], arr[5] = arr[5], arr[2] — не выполняется
+# черновик: arr[1], arr[2] = arr[2], arr[1] — не выполняется
+# отладка: запись 787 обработана, изменений нет
+# временная запись: arr[3] += 73 — не выполняется
+# замечание: arr[7] += 31 — не выполняется
+# замечание: запись 546 обработана, изменений нет
+# черновик: запись 89 обработана, изменений нет
+# архив: arr[5], arr[7] = arr[7], arr[5] — не выполняется
+# проверено: запись 109 обработана, изменений нет
+# справка: arr[7] = 8 — не выполняется
+# замечание: запись 496 обработана, изменений нет
+# ревизия: arr2[7] = 99 — не выполняется
+# замечание: arr[2] += 24 — не выполняется
+# архив: запись 983 обработана, изменений нет
+# пометка: arr[4] *= 46 — не выполняется
+# отладка: запись 49 обработана, изменений нет
+# временная запись: запись 452 обработана, изменений нет
+# пометка: arr[1] += 88 — не выполняется
+# замечание: arr[3] += 34 — не выполняется
+# пометка: arr[1] *= 30 — не выполняется
+# справка: запись 965 обработана, изменений нет
+# справка: запись 848 обработана, изменений нет
+# ревизия: запись 51 обработана, изменений нет
+# архив: arr2[5] = 87 — не выполняется
+# архив: запись 888 обработана, изменений нет
+# пометка: запись 911 обработана, изменений нет
+# справка: arr[7] += 7 — не выполняется
+# проверено: запись 51 обработана, изменений нет
+# отладка: arr[6] *= 8 — не выполняется
+# черновик: arr[5] = 42 — не выполняется
+# примечание: arr[1] = 3 — не выполняется
+# архив: arr[7], arr[8] = arr[8], arr[7] — не выполняется
+# архив: arr[9] *= 92 — не выполняется
+# архив: запись 626 обработана, изменений нет
+# ревизия: arr[5] = 67 — не выполняется
+# ревизия: запись 600 обработана, изменений нет
+# проверено: arr[6] += 94 — не выполняется
+# проверено: запись 937 обработана, изменений нет
+# примечание: запись 800 обработана, изменений нет
+# отладка: arr[0] += 51 — не выполняется
+# проверено: arr[5] *= 36 — не выполняется
+# архив: arr[9] *= 20 — не выполняется
+# отладка: arr2[1] = 64 — не выполняется
+# проверено: arr[1] *= 40 — не выполняется
+# временная запись: запись 668 обработана, изменений нет
+# пометка: arr[4] = 91 — не выполняется
+# архив: arr[9] = 78 — не выполняется
+# справка: arr2[0] = 20 — не выполняется
+# отладка: запись 964 обработана, изменений нет
+# примечание: запись 499 обработана, изменений нет
+# справка: arr[8] += 10 — не выполняется
+# пометка: arr[9], arr[6] = arr[6], arr[9] — не выполняется
+# пометка: arr[0] = 94 — не выполняется
+# черновик: запись 99 обработана, изменений нет
+# отладка: запись 336 обработана, изменений нет
+# замечание: arr[8], arr[0] = arr[0], arr[8] — не выполняется
+# замечание: arr[9], arr[0] = arr[0], arr[9] — не выполняется
+# примечание: запись 103 обработана, изменений нет
+# временная запись: запись 450 обработана, изменений нет
+# черновик: запись 731 обработана, изменений нет
+# справка: запись 888 обработана, изменений нет
+# справка: запись 757 обработана, изменений нет
+# пометка: запись 337 обработана, изменений нет
+# проверено: запись 211 обработана, изменений нет
+# отладка: arr2[8] = 79 — не выполняется
+# проверено: запись 243 обработана, изменений нет
+# пометка: запись 9 обработана, изменений нет
+# временная запись: запись 984 обработана, изменений нет
+# замечание: запись 768 обработана, изменений нет
+# замечание: запись 845 обработана, изменений нет
+# временная запись: arr2[0] = 87 — не выполняется
+# проверено: arr[9], arr[2] = arr[2], arr[9] — не выполняется
+# архив: запись 328 обработана, изменений нет
+# архив: arr[3] += 45 — не выполняется
+# справка: arr[3], arr[6] = arr[6], arr[3] — не выполняется
+# архив: arr2[4] = 4 — не выполняется
+# ревизия: arr[9] = 30 — не выполняется
+# ревизия: arr[1] = 9 — не выполняется
+# отладка: arr[8] = 63 — не выполняется
+# проверено: arr[3] *= 21 — не выполняется
+# справка: arr2[7] = 97 — не выполняется
+# справка: запись 707 обработана, изменений нет
+# временная запись: arr2[0] = 19 — не выполняется
+# ревизия: запись 127 обработана, изменений нет
+# временная запись: arr[9] *= 61 — не выполняется
+# проверено: запись 52 обработана, изменений нет
+# черновик: arr[7] = 3 — не выполняется
+# справка: запись 448 обработана, изменений нет
+# ревизия: запись 284 обработана, изменений нет
+# пометка: arr[7] = 95 — не выполняется
+# проверено: запись 452 обработана, изменений нет
+# пометка: arr[9] += 38 — не выполняется
+# замечание: запись 705 обработана, изменений нет
+# черновик: запись 248 обработана, изменений нет
+# отладка: arr[2] = 16 — не выполняется
+# отладка: arr2[5] = 8 — не выполняется
+# черновик: запись 893 обработана, изменений нет
+# проверено: запись 515 обработана, изменений нет
+# черновик: запись 416 обработана, изменений нет
+# пометка: запись 386 обработана, изменений нет
+# черновик: arr[7] *= 85 — не выполняется
+# отладка: запись 637 обработана, изменений нет
+# временная запись: запись 117 обработана, изменений нет
+# справка: запись 619 обработана, изменений нет
+# пометка: запись 173 обработана, изменений нет
+# ревизия: arr[5], arr[3] = arr[3], arr[5] — не выполняется
+# примечание: arr[5] += 43 — не выполняется
+# справка: arr[8] += 26 — не выполняется
+# проверено: запись 298 обработана, изменений нет
+# замечание: запись 70 обработана, изменений нет
+# временная запись: запись 807 обработана, изменений нет
+# отладка: запись 400 обработана, изменений нет
+# ревизия: arr2[2] = 87 — не выполняется
+# ревизия: arr[5], arr[4] = arr[4], arr[5] — не выполняется
+# справка: запись 807 обработана, изменений нет
+# временная запись: arr[9] *= 41 — не выполняется
+# примечание: arr2[3] = 11 — не выполняется
+# проверено: запись 88 обработана, изменений нет
+# замечание: запись 903 обработана, изменений нет
+# проверено: запись 300 обработана, изменений нет
+# замечание: запись 397 обработана, изменений нет
+# пометка: arr[4] *= 5 — не выполняется
+# примечание: запись 963 обработана, изменений нет
+# проверено: arr[3] *= 35 — не выполняется
+# пометка: запись 796 обработана, изменений нет
+# отладка: запись 813 обработана, изменений нет
+# отладка: запись 221 обработана, изменений нет
+# примечание: arr[6], arr[1] = arr[1], arr[6] — не выполняется
+# черновик: запись 726 обработана, изменений нет
+# замечание: запись 796 обработана, изменений нет
+# черновик: arr[6] += 2 — не выполняется
+# архив: arr[9] *= 36 — не выполняется
+# черновик: запись 780 обработана, изменений нет
+# замечание: arr2[4] = 7 — не выполняется
+# справка: arr2[0] = 48 — не выполняется
+# проверено: arr[6], arr[3] = arr[3], arr[6] — не выполняется
+# черновик: arr2[9] = 15 — не выполняется
+# архив: arr[9] += 9 — не выполняется
+# черновик: arr2[7] = 12 — не выполняется
+# замечание: запись 626 обработана, изменений нет
+# пометка: arr2[2] = 15 — не выполняется
+# черновик: arr[1] += 71 — не выполняется
+# архив: запись 423 обработана, изменений нет
+# пометка: arr[1] += 4 — не выполняется
+# замечание: запись 226 обработана, изменений нет
+# справка: arr[8] += 41 — не выполняется
+# отладка: запись 468 обработана, изменений нет
+# отладка: запись 866 обработана, изменений нет
+# примечание: запись 393 обработана, изменений нет
+# замечание: arr[6] = 32 — не выполняется
+# проверено: запись 685 обработана, изменений нет
+# примечание: запись 447 обработана, изменений нет
+# примечание: запись 13 обработана, изменений нет
+# черновик: запись 98 обработана, изменений нет
+# отладка: запись 844 обработана, изменений нет
+# проверено: запись 497 обработана, изменений нет
+# примечание: arr2[6] = 57 — не выполняется
+# отладка: arr2[6] = 33 — не выполняется
+# временная запись: запись 522 обработана, изменений нет
+# проверено: запись 214 обработана, изменений нет
+# справка: запись 618 обработана, изменений нет
+# черновик: запись 537 обработана, изменений нет
+# архив: arr[4] *= 69 — не выполняется
+# замечание: arr2[3] = 51 — не выполняется
+# временная запись: запись 436 обработана, изменений нет
+# пометка: запись 754 обработана, изменений нет
+# временная запись: запись 135 обработана, изменений нет
+# временная запись: arr[9] += 52 — не выполняется
+# черновик: arr[7] *= 5 — не выполняется
+# отладка: arr[5] *= 87 — не выполняется
+# архив: запись 884 обработана, изменений нет
+# архив: arr2[8] = 85 — не выполняется
+# пометка: запись 260 обработана, изменений нет
+# проверено: arr2[4] = 1 — не выполняется
+# черновик: запись 314 обработана, изменений нет
+# черновик: запись 827 обработана, изменений нет
+# ревизия: arr[7] = 76 — не выполняется
+# архив: запись 568 обработана, изменений нет
+# замечание: arr[4] = 93 — не выполняется
+# примечание: запись 576 обработана, изменений нет
+# проверено: запись 569 обработана, изменений нет
+# архив: arr[6] *= 64 — не выполняется
+# черновик: запись 469 обработана, изменений нет
+# ревизия: запись 421 обработана, изменений нет
+# архив: запись 250 обработана, изменений нет
+# отладка: arr2[8] = 86 — не выполняется
+# черновик: arr[2] *= 88 — не выполняется
+# замечание: запись 951 обработана, изменений нет
+# справка: запись 975 обработана, изменений нет
+# архив: запись 334 обработана, изменений нет
+arr[4] = acc(arr, 5) % 100
+
+Ah! There is actual statement arr[4] = acc(arr, 5) % 100 after t973? Wait this appears before arr2=arr? Let's see: I recall earlier after many comments following apply_twice? Actually line "arr[4] = acc(arr, 5) % 100" is present in code. I missed it! Need include. It occurs after a huge comment block following maybe t973? Let's locate: In the user code, after apply_twice and t973? There is line:
+arr[4] = acc(arr, 5) % 100
+Then comments, then arr[3:6] = sorted(arr[3:6])? Wait I saw earlier sequence: after apply_twice, comments, t973, comments, arr[0]=..., then many comments, then arr2=arr? But also there is line "arr[4] = acc(arr, 5) % 100" before "arr[3:6] = sorted(arr[3:6])"? Let's re-evaluate from original text. I need parse entire code from top after initial no-effect. There are actual statements in order maybe:
+arr.reverse()
+...
+arr[3] += 5
+...
+arr2 = arr
+...
+arr2[2] += 3
+...
+arr[1], arr[8] = arr[8], arr[1]
+...
+arr[4:7] = sorted(arr[4:7])
+...
+arr[3:6] = sorted(arr[3:6])? Wait before that there is arr[4] = acc(arr,5)%100? Let's search text around "arr[4:7] = sorted". I saw:
+# отладка: запись 82 обработана, изменений нет
+# отладка: arr[9] = 68 — не выполняется
+...
+arr[4:7] = sorted(arr[4:7])
+...
+# пометка: arr[5] *= 37 — не выполняется
+...
+arr[3:6] = sorted(arr[3:6])
+
+But also line "arr[4] = acc(arr, 5) % 100" appears after a huge comment block and before "arr[3:6] = sorted"? Let's find in text: I saw near after many comments:
+# архив: запись 334 обработана, изменений нет
+arr[4] = acc(arr, 5) % 100
+# замечание: arr[1] += 1 — не выполняется
+...
+# проверено: запись 865 обработана, изменений нет
+# ревизия: запись 796 обработана, изменений нет
+# справка: arr[4] *= 91 — не выполняется
+# ревизия: arr[2] = 89 — не выполняется
+...
+arr[3:6] = sorted(arr[3:6])
+
+Yes! So actual sequence includes arr[4] = acc(arr,5)%100 before arr[3:6] sorted? Need locate relative to arr[4:7] sorted. Let's scan from earlier: After arr[1],arr[8]=..., there are comments then "arr[4:7] = sorted(arr[4:7])". Then comments then maybe "arr[4] = acc(arr,5)%100"? Wait I saw line "arr[4] = acc(arr, 5) % 100" after a long comment block that started after arr[2],arr[6]=...? Let's reconstruct from actual text order by searching for markers.
+
+The code after initial no-effect:
+arr.reverse()
+# comments
+arr[3] += 5
+# comments
+arr2 = arr
+# comments
+arr2[2] += 3
+# comments
+arr[1], arr[8] = arr[8], arr[1]
+# comments
+arr[4:7] = sorted(arr[4:7])
+# comments
+arr[3:6] = sorted(arr[3:6])? Or maybe there is arr[4]=acc before? Let's look at text around "arr[4:7] = sorted". In user code I saw:
+# пометка: запись 158 обработана, изменений нет
+# временная запись: запись 196 обработана, изменений нет
+# примечание: arr[5] += 71 — не выполняется
+# отладка: запись 70 обработана, изменений нет
+# временная запись: arr[7], arr[0] = arr[0], arr[7] — не выполняется
+# замечание: arr[1] = 35 — не выполняется
+# отладка: arr2[1] = 16 — не выполняется
+# справка: arr[9] = 69 — не выполняется
+# примечание: запись 778 обработана, изменений нет
+# отладка: arr[7] += 43 — не выполняется
+# пометка: arr[7] *= 44 — не выполняется
+# временная запись: запись 710 обработана, изменений нет
+# отладка: запись 441 обработана, изменений нет
+# отладка: arr2[9] = 60 — не выполняется
+# проверено: запись 856 обработана, изменений нет
+# ревизия: запись 514 обработана, изменений нет
+# ревизия: запись 223 обработана, изменений нет
+# примечание: запись 25 обработана, изменений нет
+# проверено: arr[0] = 95 — не выполняется
+# архив: запись 467 обработана, изменений нет
+# временная запись: arr[9], arr[4] = arr[4], arr[9] — не выполняется
+# справка: arr[9] *= 62 — не выполняется
+# временная запись: arr[4] = 42 — не выполняется
+# пометка: arr2[8] = 81 — не выполняется
+# справка: arr2[9] = 92 — не выполняется
+# отладка: запись 373 обработана, изменений нет
+# черновик: arr[9], arr[3] = arr[3], arr[9] — не выполняется
+# ревизия: arr2[5] = 5 — не выполняется
+# ревизия: arr[5] *= 95 — не выполняется
+# черновик: запись 188 обработана, изменений нет
+# проверено: arr[8] += 75 — не выполняется
+# архив: запись 679 обработана, изменений нет
+# проверено: запись 799 обработана, изменений нет
+# примечание: arr[3] *= 86 — не выполняется
+# проверено: запись 831 обработана, изменений нет
+# пометка: запись 996 обработана, изменений нет
+# проверено: arr[9] *= 52 — не выполняется
+# пометка: запись 607 обработана, изменений нет
+# архив: запись 815 обработана, изменений нет
+# замечание: arr[5] += 62 — не выполняется
+# проверено: запись 607 обработана, изменений нет
+# проверено: запись 652 обработана, изменений нет
+# пометка: запись 894 обработана, изменений нет
+# ревизия: arr[7] = 22 — не выполняется
+# проверено: arr[9] *= 14 — не выполняется
+# пометка: arr2[5] = 1 — не выполняется
+# ревизия: arr[7], arr[7] = arr[7], arr[7] — не выполняется
+# черновик: запись 162 обработана, изменений нет
+# отладка: arr[8] = 22 — не выполняется
+# черновик: arr[7], arr[2] = arr[2], arr[7] — не выполняется
+# справка: arr[0] *= 61 — не выполняется
+# черновик: arr[1] = 62 — не выполняется
+# замечание: arr[3] += 47 — не выполняется
+# проверено: arr[1] *= 63 — не выполняется
+# ревизия: arr[1] = 15 — не выполняется
+# черновик: запись 635 обработана, изменений нет
+# временная запись: arr[7] += 43 — не выполняется
+# проверено: arr[0] += 40 — не выполняется
+# справка: arr2[9] = 84 — не выполняется
+# замечание: запись 481 обработана, изменений нет
+# справка: arr2[6] = 40 — не выполняется
+# отладка: запись 951 обработана, изменений нет
+# временная запись: запись 784 обработана, изменений нет
+# примечание: arr[2] += 98 — не выполняется
+# примечание: запись 551 обработана, изменений нет
+# проверено: запись 953 обработана, изменений нет
+# примечание: arr[4] = 60 — не выполняется
+# ревизия: запись 751 обработана, изменений нет
+# проверено: запись 547 обработана, изменений нет
+# архив: arr[6], arr[0] = arr[0], arr[6] — не выполняется
+# ревизия: запись 59 обработана, изменений нет
+# справка: arr[6], arr[1] = arr[1], arr[6] — не выполняется
+# пометка: arr[0] *= 52 — не выполняется
+# временная запись: запись 529 обработана, изменений нет
+# пометка: запись 469 обработана, изменений нет
+# черновик: запись 840 обработана, изменений нет
+# отладка: arr[8] = 83 — не выполняется
+# архив: arr2[1] = 70 — не выполняется
+# архив: запись 366 обработана, изменений нет
+# замечание: запись 613 обработана, изменений нет
+# пометка: arr[7] = 13 — не выполняется
+# ревизия: arr[7], arr[9] = arr[9], arr[7] — не выполняется
+# ревизия: запись 47 обработана, изменений нет
+# замечание: arr[7], arr[6] = arr[6], arr[7] — не выполняется
+# пометка: запись 883 обработана, изменений нет
+# ревизия: запись 608 обработана, изменений нет
+# справка: arr[0], arr[2] = arr[2], arr[0] — не выполняется
+# справка: arr[8] *= 84 — не выполняется
+arr2[2] += 3
+
+Wait this suggests arr2[2]+=3 occurs after a huge comment block, not immediately after first arr2=arr? But there is also earlier "arr2 = arr" before that? Let's step back. The initial no-effect block ends with tmp_799 = arr[7] + 40. Then:
+arr.reverse()
+# comments ... (many)
+arr[3] += 5
+# comments ... (many)
+arr2 = arr
+# comments ... (many)
+arr2[2] += 3? Actually I saw line "arr2[2] += 3" after a huge comment block that includes many traps. But there may be another "arr2[2] += 3"? Let's search: The code has line "arr2[2] += 3" exactly once? In the text after first arr2=arr and many comments, yes. But the huge comment block above ends with arr2[2] += 3. Then after that comments, then arr[1], arr[8] = ...? Need see.
+
+Let's locate actual statements by scanning from top after initial no-effect using the provided text (I can scroll mentally). It begins:
+arr.reverse()
+# проверено: arr2[3] = 22 — не выполняется
+... many comments ...
+arr[3] += 5
+# черновик: запись 760 обработана, изменений нет
+... many comments ...
+arr2 = arr
+# проверено: arr[9] *= 12 — не выполняется
+... many comments ...
+arr2[2] += 3
+# проверено: arr[8] = 40 — не выполняется
+... many comments ...
+arr[1], arr[8] = arr[8], arr[1]
+# архив: arr[2] += 55 — не выполняется
+... many comments ...
+arr[4:7] = sorted(arr[4:7])
+# пометка: arr[5] *= 37 — не выполняется
+... many comments ...
+arr[3:6] = sorted(arr[3:6])? Wait after arr[4:7] there are comments then maybe arr[4]=acc? Let's find exact after arr[4:7]. In text I saw:
+arr[4:7] = sorted(arr[4:7])
+# пометка: arr[5] *= 37 — не выполняется
+... many comments ...
+arr[3:6] = sorted(arr[3:6])
+But also line "arr[4] = acc(arr, 5) % 100" appears before arr[3:6]? Let's search in text: After arr[4:7], there is a huge comment block. I recall seeing "arr[4] = acc(arr, 5) % 100" after comments that include "архив: запись 334 обработана, изменений нет". Then after that more comments, then "arr[3:6] = sorted(arr[3:6])". So sequence likely:
+arr[4:7] = sorted(arr[4:7])
+... comments ...
+arr[4] = acc(arr, 5) % 100
+... comments ...
+arr[3:6] = sorted(arr[3:6])
+
+Need verify if arr[3:6] sorted occurs after arr[4]=acc. In text after arr[4]=acc there are comments then line "arr[3:6] = sorted(arr[3:6])" yes. Then later arr[2],arr[6]=... etc.
+
+Then after arr[3:6], comments, then "arr[2], arr[6] = arr[6], arr[2]"? I saw line after many comments:
+# примечание: arr[4] *= 54 — не выполняется
+arr[2], arr[6] = arr[6], arr[2]
+Yes.
+
+Then comments, then "apply_twice(arr, 7, 4)"? I saw line after many comments:
+# отладка: arr[0] *= 47 — не выполняется
+apply_twice(arr, 7, 4)
+Yes.
+
+Then comments, then "t973 = str(arr[7]) + str(arr[2])"? I saw after apply_twice huge comments then:
+t973 = str(arr[7]) + str(arr[2])
+Yes.
+
+Then comments, then "arr[0] = int(t973) % 97"? I saw after t973 huge comments then:
+# проверено: запись 866 обработана, изменений нет
+...
+arr[0] = int(t973) % 97
+Yes.
+
+Then comments, then maybe "arr2 = arr"? Need find after arr[0]=int(t973)%97. In text after that there are many comments, then line:
+# архив: запись 683 обработана, изменений нет
+...
+arr2 = arr
+Then comments, then "t58 = str(arr[1]) + str(arr[4])"? Let's search. I saw after arr[0]=int(t973)%97, many comments, then line "arr2 = arr" near after:
+# примечание: запись 416 обработана, изменений нет
+# архив: запись 810 обработана, изменений нет
+# примечание: запись 932 обработана, изменений нет
+# проверено: arr2[6] = 10 — не выполняется
+# архив: запись 486 обработана, изменений нет
+# проверено: arr2[7] = 74 — не выполняется
+# отладка: запись 303 обработана, изменений нет
+# пометка: запись 52 обработана, изменений нет
+# архив: запись 844 обработана, изменений нет
+# замечание: arr[0], arr[0] = arr[0], arr[0] — не выполняется
+# черновик: arr[0] = 48 — не выполняется
+# архив: arr[7] = 98 — не выполняется
+# замечание: arr[9] += 89 — не выполняется
+# архив: запись 192 обработана, изменений нет
+# отладка: запись 885 обработана, изменений нет
+# временная запись: arr[9] += 88 — не выполняется
+# черновик: запись 821 обработана, изменений нет
+# пометка: arr[9] += 83 — не выполняется
+# замечание: запись 359 обработана, изменений нет
+# ревизия: arr[7] += 11 — не выполняется
+# справка: arr[2], arr[4] = arr[4], arr[2] — не выполняется
+# замечание: arr[9], arr[4] = arr[4], arr[9] — не выполняется
+# временная запись: arr[6], arr[1] = arr[1], arr[6] — не выполняется
+# временная запись: запись 173 обработана, изменений нет
+# временная запись: запись 514 обработана, изменений нет
+# ревизия: запись 752 обработана, изменений нет
+# примечание: запись 118 обработана, изменений нет
+# пометка: arr2[1] = 82 — не выполняется
+# временная запись: запись 433 обработана, изменений нет
+# отладка: запись 873 обработана, изменений нет
+# пометка: запись 283 обработана, изменений нет
+# примечание: запись 534 обработана, изменений нет
+# проверено: запись 278 обработана, изменений нет
+# справка: arr[3] *= 32 — не выполняется
+# справка: запись 540 обработана, изменений нет
+# архив: arr[7], arr[9] = arr[9], arr[7] — не выполняется
+# отладка: arr[6], arr[5] = arr[5], arr[6] — не выполняется
+# черновик: запись 723 обработана, изменений нет
+# отладка: запись 147 обработана, изменений нет
+# замечание: arr[5], arr[3] = arr[3], arr[5] — не выполняется
+# ревизия: запись 292 обработана, изменений нет
+# архив: запись 62 обработана, изменений нет
+# черновик: arr[4] = 69 — не выполняется
+# справка: запись 583 обработана, изменений нет
+# примечание: arr[1] *= 31 — не выполняется
+# замечание: arr2[8] = 71 — не выполняется
+# временная запись: запись 895 обработана, изменений нет
+# временная запись: запись 205 обработана, изменений нет
+# замечание: запись 79 обработана, изменений нет
+# справка: запись 111 обработана, изменений нет
+# отладка: arr[0] = 8 — не выполняется
+# ревизия: arr[6] += 47 — не выполняется
+# справка: запись 32 обработана, изменений нет
+# пометка: arr[4] += 56 — не выполняется
+# архив: запись 271 обработана, изменений нет
+# примечание: arr[7] = 85 — не выполняется
+# черновик: arr[1] += 21 — не выполняется
+# черновик: запись 415 обработана, изменений нет
+# черновик: запись 966 обработана, изменений нет
+arr2[3] += 6
+
+Wait this is confusing. There is arr2[3]+=6 near end after second arr2=arr? Need order. Let's systematically identify all actual statements by searching for lines not starting with # and not assignments to tmp/copy/note/code/label. But there are many no-effect assignments before arr.reverse. After that, actual statements include:
+- arr.reverse()
+- arr[3] += 5
+- arr2 = arr
+- arr2[2] += 3
+- arr[1], arr[8] = arr[8], arr[1]
+- arr[4:7] = sorted(arr[4:7])
+- arr[4] = acc(arr, 5) % 100 (maybe)
+- arr[3:6] = sorted(arr[3:6])
+- arr[2], arr[6] = arr[6], arr[2]
+- apply_twice(arr, 7, 4)
+- t973 = str(arr[7]) + str(arr[2])
+- arr[0] = int(t973) % 97
+- arr2 = arr (maybe second)
+- t58 = str(arr[1]) + str(arr[4])
+- arr[0] = int(t58) % 97
+- arr[8] += 1
+- bump_all(arr, 5)
+- arr[2] *= 2
+- arr[2] += 3
+- s590 = ''.join(str(x) for x in arr)
+- arr[6] = len(re.findall(r'\d', s590)) % 50
+Plus maybe:
+- arr2[3] += 2 (where?)
+- arr[7] += 5 (where?)
+- arr2[3] += 6 (where?)
+
+Need exact order of arr2[3]+=2, arr[7]+=5, arr2[3]+=6 relative to other statements. Let's use the provided text and search visually for these lines.
+
+I can copy the code mentally? Better: We can reason from line numbers? Not available. But we can scan the user message in order. Let's break into sections.
+
+After initial no-effect assignments, there is:
+arr.reverse()
+# comments (many)
+arr[3] += 5
+# comments (many)
+arr2 = arr
+# comments (many)
+arr2[2] += 3
+# comments (many)
+arr[1], arr[8] = arr[8], arr[1]
+# comments (many)
+arr[4:7] = sorted(arr[4:7])
+# comments (many)
+arr[3:6] = sorted(arr[3:6])? Wait need check if arr[4]=acc before. Let's search for "arr[4] = acc" in text. It appears after a comment block that includes "архив: запись 334 обработана, изменений нет". Where is that relative to arr[4:7]? The comment block before arr[4]=acc includes many comments after arr[2],arr[6]? Hmm.
+
+Let's locate by markers:
+- There is line "arr[4:7] = sorted(arr[4:7])" near after comments following arr[1],arr[8]. Immediately after that line in text I saw:
+# пометка: arr[5] *= 37 — не выполняется
+# замечание: запись 951 обработана, изменений нет
+# справка: запись 596 обработана, изменений нет
+# временная запись: arr[0], arr[6] = arr[6], arr[0] — не выполняется
+# замечание: arr[3], arr[4] = arr[4], arr[3] — не выполняется
+# черновик: запись 168 обработана, изменений нет
+# временная запись: arr[4] *= 52 — не выполняется
+# пометка: arr[9] = 67 — не выполняется
+# справка: arr[4] = 47 — не выполняется
+# временная запись: запись 981 обработана, изменений нет
+# архив: arr[7], arr[6] = arr[6], arr[7] — не выполняется
+# отладка: запись 650 обработана, изменений нет
+# черновик: запись 987 обработана, изменений нет
+# замечание: arr[6] *= 86 — не выполняется
+# справка: arr[2] *= 2 — не выполняется
+# справка: запись 359 обработана, изменений нет
+# отладка: запись 736 обработана, изменений нет
+# проверено: arr[0] = 82 — не выполняется
+# временная запись: arr[2] = 16 — не выполняется
+# ревизия: arr[5] += 58 — не выполняется
+# архив: arr[4] *= 38 — не выполняется
+# справка: arr[6] *= 4 — не выполняется
+# отладка: запись 610 обработана, изменений нет
+# отладка: запись 742 обработана, изменений нет
+# архив: arr2[7] = 4 — не выполняется
+# временная запись: arr[4] = 26 — не выполняется
+# ревизия: arr[9] = 42 — не выполняется
+# архив: запись 979 обработана, изменений нет
+# пометка: запись 342 обработана, изменений нет
+# пометка: запись 297 обработана, изменений нет
+# черновик: arr[6] += 19 — не выполняется
+# архив: запись 972 обработана, изменений нет
+# примечание: запись 506 обработана, изменений нет
+# временная запись: запись 362 обработана, изменений нет
+# черновик: запись 304 обработана, изменений нет
+# ревизия: arr2[1] = 78 — не выполняется
+# пометка: запись 328 обработана, изменений нет
+# пометка: запись 106 обработана, изменений нет
+# архив: arr2[2] = 26 — не выполняется
+# замечание: arr2[5] = 96 — не выполняется
+# пометка: запись 341 обработана, изменений нет
+# проверено: arr[5], arr[5] = arr[5], arr[5] — не выполняется
+# пометка: arr[2] += 59 — не выполняется
+# проверено: запись 366 обработана, изменений нет
+# временная запись: arr[8] += 34 — не выполняется
+# архив: запись 181 обработана, изменений нет
+# пометка: запись 311 обработана, изменений нет
+# примечание: запись 490 обработана, изменений нет
+# ревизия: запись 284 обработана, изменений нет
+# временная запись: запись 671 обработана, изменений нет
+# отладка: arr[5] += 14 — не выполняется
+# временная запись: arr2[7] = 61 — не выполняется
+# отладка: arr[0] = 71 — не выполняется
+# черновик: arr2[8] = 92 — не выполняется
+# замечание: запись 684 обработана, изменений нет
+# архив: arr[9], arr[9] = arr[9], arr[9] — не выполняется
+# примечание: запись 631 обработана, изменений нет
+# замечание: arr[6] += 33 — не выполняется
+# ревизия: arr[7] = 20 — не выполняется
+# временная запись: запись 115 обработана, изменений нет
+# проверено: arr[0] = 7 — не выполняется
+# архив: arr[8] *= 14 — не выполняется
+# замечание: запись 895 обработана, изменений нет
+# проверено: arr[8], arr[6] = arr[6], arr[8] — не выполняется
+# черновик: запись 176 обработана, изменений нет
+# архив: запись 317 обработана, изменений нет
+# справка: запись 905 обработана, изменений нет
+# отладка: arr[0], arr[9] = arr[9], arr[0] — не выполняется
+# проверено: arr[8], arr[2] = arr[2], arr[8] — не выполняется
+# временная запись: запись 774 обработана, изменений нет
+# проверено: запись 616 обработана, изменений нет
+# замечание: arr[2] *= 11 — не выполняется
+# пометка: запись 5 обработана, изменений нет
+# ревизия: запись 753 обработана, изменений нет
+# примечание: запись 785 обработана, изменений нет
+# ревизия: arr2[2] = 53 — не выполняется
+# справка: запись 501 обработана, изменений нет
+# архив: arr[5] += 32 — не выполняется
+# отладка: запись 856 обработана, изменений нет
+# временная запись: arr[7], arr[1] = arr[1], arr[7] — не выполняется
+# временная запись: запись 893 обработана, изменений нет
+# проверено: запись 119 обработана, изменений нет
+# временная запись: запись 424 обработана, изменений нет
+# архив: arr[7], arr[5] = arr[5], arr[7] — не выполняется
+# примечание: arr[5] = 63 — не выполняется
+# пометка: запись 446 обработана, изменений нет
+# отладка: запись 611 обработана, изменений нет
+# временная запись: arr[4] = 89 — не выполняется
+# черновик: arr2[7] = 33 — не выполняется
+# справка: arr[8] += 12 — не выполняется
+# пометка: arr[7], arr[1] = arr[1], arr[7] — не выполняется
+# примечание: запись 961 обработана, изменений нет
+# справка: запись 12 обработана, изменений нет
+# справка: arr2[5] = 49 — не выполняется
+# архив: arr[2], arr[5] = arr[5], arr[2] — не выполняется
+# черновик: arr[1], arr[2] = arr[2], arr[1] — не выполняется
+# отладка: запись 787 обработана, изменений нет
+# временная запись: arr[3] += 73 — не выполняется
+# замечание: arr[7] += 31 — не выполняется
+# замечание: запись 546 обработана, изменений нет
+# черновик: запись 89 обработана, изменений нет
+# архив: arr[5], arr[7] = arr[7], arr[5] — не выполняется
+# проверено: запись 109 обработана, изменений нет
+# справка: arr[7] = 8 — не выполняется
+# замечание: запись 496 обработана, изменений нет
+# ревизия: arr2[7] = 99 — не выполняется
+# замечание: arr[2] += 24 — не выполняется
+# архив: запись 983 обработана, изменений нет
+# пометка: arr[4] *= 46 — не выполняется
+# отладка: запись 49 обработана, изменений нет
+# временная запись: запись 452 обработана, изменений нет
+# пометка: arr[1] += 88 — не выполняется
+# замечание: arr[3] += 34 — не выполняется
+# пометка: arr[1] *= 30 — не выполняется
+# справка: запись 965 обработана, изменений нет
+# справка: запись 848 обработана, изменений нет
+# ревизия: запись 51 обработана, изменений нет
+# архив: arr2[5] = 87 — не выполняется
+# архив: запись 888 обработана, изменений нет
+# пометка: запись 911 обработана, изменений нет
+# справка: arr[7] += 7 — не выполняется
+# проверено: запись 51 обработана, изменений нет
+# отладка: arr[6] *= 8 — не выполняется
+# черновик: arr[5] = 42 — не выполняется
+# примечание: arr[1] = 3 — не выполняется
+# архив: arr[7], arr[8] = arr[8], arr[7] — не выполняется
+# архив: arr[9] *= 92 — не выполняется
+# архив: запись 626 обработана, изменений нет
+# ревизия: arr[5] = 67 — не выполняется
+# ревизия: запись 600 обработана, изменений нет
+# проверено: arr[6] += 94 — не выполняется
+# проверено: запись 937 обработана, изменений нет
+# примечание: запись 800 обработана, изменений нет
+# отладка: arr[0] += 51 — не выполняется
+# проверено: arr[5] *= 36 — не выполняется
+# архив: arr[9] *= 20 — не выполняется
+# отладка: arr2[1] = 64 — не выполняется
+# проверено: arr[1] *= 40 — не выполняется
+# временная запись: запись 668 обработана, изменений нет
+# пометка: arr[4] = 91 — не выполняется
+# архив: arr[9] = 78 — не выполняется
+# справка: arr2[0] = 20 — не выполняется
+# отладка: запись 964 обработана, изменений нет
+# примечание: запись 499 обработана, изменений нет
+# справка: arr[8] += 10 — не выполняется
+# пометка: arr[9], arr[6] = arr[6], arr[9] — не выполняется
+# пометка: arr[0] = 94 — не выполняется
+# черновик: запись 99 обработана, изменений нет
+# отладка: запись 336 обработана, изменений нет
+# замечание: arr[8], arr[0] = arr[0], arr[8] — не выполняется
+# замечание: arr[9], arr[0] = arr[0], arr[9] — не выполняется
+# примечание: запись 103 обработана, изменений нет
+# временная запись: запись 450 обработана, изменений нет
+# черновик: запись 731 обработана, изменений нет
+# справка: запись 888 обработана, изменений нет
+# справка: запись 757 обработана, изменений нет
+# пометка: запись 337 обработана, изменений нет
+# проверено: запись 211 обработана, изменений нет
+# отладка: arr2[8] = 79 — не выполняется
+# проверено: запись 243 обработана, изменений нет
+# пометка: запись 9 обработана, изменений нет
+# временная запись: запись 984 обработана, изменений нет
+# замечание: запись 768 обработана, изменений нет
+# замечание: запись 845 обработана, изменений нет
+# временная запись: arr2[0] = 87 — не выполняется
+# проверено: arr[9], arr[2] = arr[2], arr[9] — не выполняется
+# архив: запись 328 обработана, изменений нет
+# архив: arr[3] += 45 — не выполняется
+# справка: arr[3], arr[6] = arr[6], arr[3] — не выполняется
+# архив: arr2[4] = 4 — не выполняется
+# ревизия: arr[9] = 30 — не выполняется
+# ревизия: arr[1] = 9 — не выполняется
+# отладка: arr[8] = 63 — не выполняется
+# проверено: arr[3] *= 21 — не выполняется
+# справка: arr2[7] = 97 — не выполняется
+# справка: запись 707 обработана, изменений нет
+# временная запись: arr2[0] = 19 — не выполняется
+# ревизия: запись 127 обработана, изменений нет
+# временная запись: arr[9] *= 61 — не выполняется
+# проверено: запись 52 обработана, изменений нет
+# черновик: arr[7] = 3 — не выполняется
+# справка: запись 448 обработана, изменений нет
+# ревизия: запись 284 обработана, изменений нет
+# пометка: arr[7] = 95 — не выполняется
+# проверено: запись 452 обработана, изменений нет
+# пометка: arr[9] += 38 — не выполняется
+# замечание: запись 705 обработана, изменений нет
+# черновик: запись 248 обработана, изменений нет
+# отладка: arr[2] = 16 — не выполняется
+# отладка: arr2[5] = 8 — не выполняется
+# черновик: запись 893 обработана, изменений нет
+# проверено: запись 515 обработана, изменений нет
+# черновик: запись 416 обработана, изменений нет
+# пометка: запись 386 обработана, изменений нет
+# черновик: arr[7] *= 85 — не выполняется
+# отладка: запись 637 обработана, изменений нет
+# временная запись: запись 117 обработана, изменений нет
+# справка: запись 619 обработана, изменений нет
+# пометка: запись 173 обработана, изменений нет
+# ревизия: arr[5], arr[3] = arr[3], arr[5] — не выполняется
+# примечание: arr[5] += 43 — не выполняется
+# справка: arr[8] += 26 — не выполняется
+# проверено: запись 298 обработана, изменений нет
+# замечание: запись 70 обработана, изменений нет
+# временная запись: запись 807 обработана, изменений нет
+# отладка: запись 400 обработана, изменений нет
+# ревизия: arr2[2] = 87 — не выполняется
+# ревизия: arr[5], arr[4] = arr[4], arr[5] — не выполняется
+# справка: запись 807 обработана, изменений нет
+# временная запись: arr[9] *= 41 — не выполняется
+# примечание: arr2[3] = 11 — не выполняется
+# проверено: запись 88 обработана, изменений нет
+# замечание: запись 903 обработана, изменений нет
+# проверено: запись 300 обработана, изменений нет
+# замечание: запись 397 обработана, изменений нет
+# пометка: arr[4] *= 5 — не выполняется
+# примечание: запись 963 обработана, изменений нет
+# проверено: arr[3] *= 35 — не выполняется
+# пометка: запись 796 обработана, изменений нет
+# отладка: запись 813 обработана, изменений нет
+# отладка: запись 221 обработана, изменений нет
+# примечание: arr[6], arr[1] = arr[1], arr[6] — не выполняется
+# черновик: запись 726 обработана, изменений нет
+# замечание: запись 796 обработана, изменений нет
+# черновик: arr[6] += 2 — не выполняется
+# архив: arr[9] *= 36 — не выполняется
+# черновик: запись 780 обработана, изменений нет
+# замечание: arr2[4] = 7 — не выполняется
+# справка: arr2[0] = 48 — не выполняется
+# проверено: arr[6], arr[3] = arr[3], arr[6] — не выполняется
+# черновик: arr2[9] = 15 — не выполняется
+# архив: arr[9] += 9 — не выполняется
+# черновик: arr2[7] = 12 — не выполняется
+# замечание: запись 626 обработана, изменений нет
+# пометка: arr2[2] = 15 — не выполняется
+# черновик: arr[1] += 71 — не выполняется
+# архив: запись 423 обработана, изменений нет
+# пометка: arr[1] += 4 — не выполняется
+# замечание: запись 226 обработана, изменений нет
+# справка: arr[8] += 41 — не выполняется
+# отладка: запись 468 обработана, изменений нет
+# отладка: запись 866 обработана, изменений нет
+# примечание: запись 393 обработана, изменений нет
+# замечание: arr[6] = 32 — не выполняется
+# проверено: запись 685 обработана, изменений нет
+# примечание: запись 447 обработана, изменений нет
+# примечание: запись 13 обработана, изменений нет
+# черновик: запись 98 обработана, изменений нет
+# отладка: запись 844 обработана, изменений нет
+# проверено: запись 497 обработана, изменений нет
+# примечание: arr2[6] = 57 — не выполняется
+# отладка: arr2[6] = 33 — не выполняется
+# временная запись: запись 522 обработана, изменений нет
+# проверено: запись 214 обработана, изменений нет
+# справка: запись 618 обработана, изменений нет
+# черновик: запись 537 обработана, изменений нет
+# архив: arr[4] *= 69 — не выполняется
+# замечание: arr2[3] = 51 — не выполняется
+# временная запись: запись 436 обработана, изменений нет
+# пометка: запись 754 обработана, изменений нет
+# временная запись: запись 135 обработана, изменений нет
+# временная запись: arr[9] += 52 — не выполняется
+# черновик: arr[7] *= 5 — не выполняется
+# отладка: arr[5] *= 87 — не выполняется
+# архив: запись 884 обработана, изменений нет
+# архив: arr2[8] = 85 — не выполняется
+# пометка: запись 260 обработана, изменений нет
+# проверено: arr2[4] = 1 — не выполняется
+# черновик: запись 314 обработана, изменений нет
+# черновик: запись 827 обработана, изменений нет
+# ревизия: arr[7] = 76 — не выполняется
+# архив: запись 568 обработана, изменений нет
+# замечание: arr[4] = 93 — не выполняется
+# примечание: запись 576 обработана, изменений нет
+# проверено: запись 569 обработана, изменений нет
+# архив: arr[6] *= 64 — не выполняется
+# черновик: запись 469 обработана, изменений нет
+# ревизия: запись 421 обработана, изменений нет
+# архив: запись 250 обработана, изменений нет
+# отладка: arr2[8] = 86 — не выполняется
+# черновик: arr[2] *= 88 — не выполняется
+# замечание: запись 951 обработана, изменений нет
+# справка: запись 975 обработана, изменений нет
+# архив: запись 334 обработана, изменений нет
+arr[4] = acc(arr, 5) % 100
+
+This huge comment block is after arr[4:7]? It includes many comments that mention arr2 etc. It ends with arr[4]=acc. Then after that more comments then "arr[3:6] = sorted(arr[3:6])"? Let's continue after arr[4]=acc in text:
+# замечание: arr[1] += 1 — не выполняется
+... many comments ...
+# проверено: запись 865 обработана, изменений нет
+# ревизия: запись 796 обработана, изменений нет
+# справка: arr[4] *= 91 — не выполняется
+# ревизия: arr[2] = 89 — не выполняется
+... many comments ...
+arr[3:6] = sorted(arr[3:6])
+
+Yes. So sequence after arr[4:7] is a huge comment block then arr[4]=acc then huge comments then arr[3:6]. Good.
+
+Then after arr[3:6], comments, then "arr[2], arr[6] = arr[6], arr[2]"? Let's find. I saw after arr[3:6] there are many comments, then:
+# примечание: arr[4] *= 54 — не выполняется
+arr[2], arr[6] = arr[6], arr[2]
+Yes.
+
+Then comments, then apply_twice? Let's find after arr[2],arr[6]. There are many comments, then:
+# отладка: arr[0] *= 47 — не выполняется
+apply_twice(arr, 7, 4)
+Yes.
+
+Then comments, then t973? I saw after apply_twice huge comments then:
+t973 = str(arr[7]) + str(arr[2])
+Yes.
+
+Then comments, then arr[0]=int(t973)%97. Then after that huge comments, then maybe arr2=arr? Let's find after arr[0]=int(t973)%97 in text:
+# архив: запись 140 обработана, изменений нет
+... many comments ...
+# примечание: запись 416 обработана, изменений нет
+# архив: запись 810 обработана, изменений нет
+# примечание: запись 932 обработана, изменений нет
+# проверено: arr2[6] = 10 — не выполняется
+... many comments ...
+arr2 = arr
+
+Then after that comments, then t58? Let's continue after second arr2=arr:
+# пометка: запись 300 обработана, изменений нет
+... many comments ...
+# черновик: запись 965 обработана, изменений нет
+# черновик: arr[8] *= 49 — не выполняется
+# пометка: запись 655 обработана, изменений нет
+# временная запись: arr[3] *= 94 — не выполняется
+# примечание: arr[6] += 97 — не выполняется
+# пометка: arr[9] += 9 — не выполняется
+# архив: запись 116 обработана, изменений нет
+# справка: запись 556 обработана, изменений нет
+# примечание: запись 768 обработана, изменений нет
+# архив: запись 977 обработана, изменений нет
+# справка: запись 72 обработана, изменений нет
+# пометка: arr[8], arr[7] = arr[7], arr[8] — не выполняется
+# справка: arr[2] *= 82 — не выполняется
+# черновик: запись 220 обработана, изменений нет
+# проверено: arr2[6] = 57 — не выполняется
+# пометка: запись 395 обработана, изменений нет
+# пометка: запись 845 обработана, изменений нет
+# пометка: arr[5] *= 14 — не выполняется
+# замечание: arr[7] += 85 — не выполняется
+# справка: arr[0] = 57 — не выполняется
+# ревизия: запись 47 обработана, изменений нет
+# архив: arr[3], arr[9] = arr[9], arr[3] — не выполняется
+# отладка: запись 993 обработана, изменений нет
+# проверено: запись 572 обработана, изменений нет
+# отладка: запись 896 обработана, изменений нет
+# примечание: arr[1] = 75 — не выполняется
+# справка: запись 574 обработана, изменений нет
+# справка: запись 632 обработана, изменений нет
+# проверено: запись 463 обработана, изменений нет
+# архив: запись 686 обработана, изменений нет
+# временная запись: arr[2], arr[2] = arr[2], arr[2] — не выполняется
+# примечание: arr[1] = 2 — не выполняется
+# отладка: запись 702 обработана, изменений нет
+# замечание: arr[5], arr[6] = arr[6], arr[5] — не выполняется
+# примечание: arr2[5] = 4 — не выполняется
+# архив: запись 404 обработана, изменений нет
+# временная запись: запись 996 обработана, изменений нет
+# проверено: arr[6] += 39 — не выполняется
+# отладка: arr[1], arr[1] = arr[1], arr[1] — не выполняется
+# справка: arr[8] += 46 — не выполняется
+# пометка: arr[8] *= 26 — не выполняется
+# замечание: arr[5], arr[5] = arr[5], arr[5] — не выполняется
+# временная запись: запись 825 обработана, изменений нет
+# архив: arr[3], arr[5] = arr[5], arr[3] — не выполняется
+# проверено: arr[0], arr[7] = arr[7], arr[0] — не выполняется
+# пометка: arr2[0] = 75 — не выполняется
+# временная запись: запись 176 обработана, изменений нет
+# проверено: запись 437 обработана, изменений нет
+# отладка: arr[2] = 57 — не выполняется
+# пометка: arr[6] = 88 — не выполняется
+# справка: запись 401 обработана, изменений нет
+# примечание: запись 910 обработана, изменений нет
+# пометка: arr2[3] = 71 — не выполняется
+# черновик: arr[2], arr[9] = arr[9], arr[2] — не выполняется
+# временная запись: запись 497 обработана, изменений нет
+# отладка: запись 370 обработана, изменений нет
+# примечание: arr[3] = 68 — не выполняется
+# замечание: arr[4], arr[9] = arr[9], arr[4] — не выполняется
+# пометка: запись 344 обработана, изменений нет
+# примечание: запись 440 обработана, изменений нет
+# отладка: запись 522 обработана, изменений нет
+# архив: запись 319 обработана, изменений нет
+# архив: запись 382 обработана, изменений нет
+# отладка: arr2[5] = 46 — не выполняется
+# ревизия: запись 885 обработана, изменений нет
+# временная запись: arr[0], arr[9] = arr[9], arr[0] — не выполняется
+# черновик: запись 274 обработана, изменений нет
+# архив: запись 681 обработана, изменений нет
+# замечание: запись 617 обработана, изменений нет
+# справка: arr2[5] = 91 — не выполняется
+# справка: запись 397 обработана, изменений нет
+# ревизия: запись 414 обработана, изменений нет
+# временная запись: arr[0], arr[9] = arr[9], arr[0] — не выполняется
+# временная запись: запись 698 обработана, изменений нет
+# справка: запись 159 обработана, изменений нет
+# пометка: запись 547 обработана, изменений нет
+# ревизия: arr[2] += 57 — не выполняется
+# проверено: arr[4] = 42 — не выполняется
+# ревизия: arr2[0] = 85 — не выполняется
+# ревизия: arr[7] = 93 — не выполняется
+# справка: запись 364 обработана, изменений нет
+# замечание: arr[1] *= 2 — не выполняется
+# черновик: запись 623 обработана, изменений нет
+# проверено: arr[0], arr[3] = arr[3], arr[0] — не выполняется
+# замечание: arr[6] = 70 — не выполняется
+# отладка: запись 122 обработана, изменений нет
+# проверено: arr[2] = 84 — не выполняется
+# проверено: arr[4] += 81 — не выполняется
+# временная запись: arr[8] += 77 — не выполняется
+# примечание: arr2[4] = 59 — не выполняется
+# архив: arr2[8] = 18 — не выполняется
+# ревизия: arr[1], arr[1] = arr[1], arr[1] — не выполняется
+# временная запись: запись 212 обработана, изменений нет
+# проверено: запись 427 обработана, изменений нет
+# пометка: запись 591 обработана, изменений нет
+# отладка: arr2[3] = 64 — не выполняется
+# справка: arr[0] = 91 — не выполняется
+# замечание: запись 18 обработана, изменений нет
+# справка: arr[8] *= 92 — не выполняется
+# примечание: запись 471 обработана, изменений нет
+# черновик: запись 888 обработана, изменений нет
+# примечание: arr[8] += 48 — не выполняется
+arr[7] += 5
+
+Ah! So after second arr2=arr, there is huge comments then arr[7]+=5. Then after arr[7]+=5, more comments then s590? Let's continue after arr[7]+=5:
+# ревизия: arr[1] += 54 — не выполняется
+... many comments ...
+# пометка: запись 464 обработана, изменений нет
+# пометка: запись 45 обработана, изменений нет
+# замечание: запись 853 обработана, изменений нет
+# ревизия: запись 296 обработана, изменений нет
+# примечание: arr[3], arr[0] = arr[0], arr[3] — не выполняется
+# ревизия: arr[1] = 24 — не выполняется
+s590 = ''.join(str(x) for x in arr)
+
+Then after s590, comments, then arr[6] = len...? Let's continue:
+# ревизия: запись 991 обработана, изменений нет
+... many comments ...
+# справка: arr2[4] = 41 — не выполняется
+
+if __name__ == "__main__":
+    print("ARRAY:", arr)
+    print("SUM:", sum(arr))
+
+But wait where are t58, arr[0]=int(t58)%97, arr[8]+=1, bump_all, arr[2]*=2, arr[2]+=3? They might occur before second arr2=arr? Let's search. I saw t58 line after first arr2=arr? Let's locate in text: There is line "t58 = str(arr[1]) + str(arr[4])" near after many comments following arr[0]=int(t973)%97? Actually I saw it in a block after a huge comment sequence that includes "архив: запись 916 обработана, изменений нет" etc. Let's search memory: In user code, after arr[0] = int(t973) % 97, there are comments, then line:
+arr2 = arr
+Then comments, then t58? Wait I saw t58 line in the text after a block that includes "архив: запись 916 обработана, изменений нет" and before "arr[0] = int(t58) % 97". Let's find exact sequence around t58:
+...
+# черновик: запись 965 обработана, изменений нет
+# черновик: arr[8] *= 49 — не выполняется
+# пометка: запись 655 обработана, изменений нет
+# временная запись: arr[3] *= 94 — не выполняется
+# примечание: arr[6] += 97 — не выполняется
+# пометка: arr[9] += 9 — не выполняется
+# архив: запись 116 обработана, изменений нет
+# справка: запись 556 обработана, изменений нет
+# примечание: запись 768 обработана, изменений нет
+# архив: запись 977 обработана, изменений нет
+# справка: запись 72 обработана, изменений нет
+# пометка: arr[8], arr[7] = arr[7], arr[8] — не выполняется
+# справка: arr[2] *= 82 — не выполняется
+# черновик: запись 220 обработана, изменений нет
+# проверено: arr2[6] = 57 — не выполняется
+# пометка: запись 395 обработана, изменений нет
+# пометка: запись 845 обработана, изменений нет
+# пометка: arr[5] *= 14 — не выполняется
+# замечание: arr[7] += 85 — не выполняется
+# справка: arr[0] = 57 — не выполняется
+# ревизия: запись 47 обработана, изменений нет
+# архив: arr[3], arr[9] = arr[9], arr[3] — не выполняется
+# отладка: запись 993 обработана, изменений нет
+# проверено: запись 572 обработана, изменений нет
+# отладка: запись 896 обработана, изменений нет
+# примечание: arr[1] = 75 — не выполняется
+# справка: запись 574 обработана, изменений нет
+# справка: запись 632 обработана, изменений нет
+# проверено: запись 463 обработана, изменений нет
+# архив: запись 686 обработана, изменений нет
+# временная запись: arr[2], arr[2] = arr[2], arr[2] — не выполняется
+# примечание: arr[1] = 2 — не выполняется
+# отладка: запись 702 обработана, изменений нет
+# замечание: arr[5], arr[6] = arr[6], arr[5] — не выполняется
+# примечание: arr2[5] = 4 — не выполняется
+# архив: запись 404 обработана, изменений нет
+# временная запись: запись 996 обработана, изменений нет
+# проверено: arr[6] += 39 — не выполняется
+# отладка: arr[1], arr[1] = arr[1], arr[1] — не выполняется
+# справка: arr[8] += 46 — не выполняется
+# пометка: arr[8] *= 26 — не выполняется
+# замечание: arr[5], arr[5] = arr[5], arr[5] — не выполняется
+# временная запись: запись 825 обработана, изменений нет
+# архив: arr[3], arr[5] = arr[5], arr[3] — не выполняется
+# проверено: arr[0], arr[7] = arr[7], arr[0] — не выполняется
+# пометка: arr2[0] = 75 — не выполняется
+# временная запись: запись 176 обработана, изменений нет
+# проверено: запись 437 обработана, изменений нет
+# отладка: arr[2] = 57 — не выполняется
+# пометка: arr[6] = 88 — не выполняется
+# справка: запись 401 обработана, изменений нет
+# примечание: запись 910 обработана, изменений нет
+# пометка: arr2[3] = 71 — не выполняется
+# черновик: arr[2], arr[9] = arr[9], arr[2] — не выполняется
+# временная запись: запись 497 обработана, изменений нет
+# отладка: запись 370 обработана, изменений нет
+# примечание: arr[3] = 68 — не выполняется
+# замечание: arr[4], arr[9] = arr[9], arr[4] — не выполняется
+# пометка: запись 344 обработана, изменений нет
+# примечание: запись 440 обработана, изменений нет
+# отладка: запись 522 обработана, изменений нет
+# архив: запись 319 обработана, изменений нет
+# архив: запись 382 обработана, изменений нет
+# отладка: arr2[5] = 46 — не выполняется
+# ревизия: запись 885 обработана, изменений нет
+# временная запись: arr[0], arr[9] = arr[9], arr[0] — не выполняется
+# черновик: запись 274 обработана, изменений нет
+# архив: запись 681 обработана, изменений нет
+# замечание: запись 617 обработана, изменений нет
+# справка: arr2[5] = 91 — не выполняется
+# справка: запись 397 обработана, изменений нет
+# ревизия: запись 414 обработана, изменений нет
+# временная запись: arr[0], arr[9] = arr[9], arr[0] — не выполняется
+# временная запись: запись 698 обработана, изменений нет
+# справка: запись 159 обработана, изменений нет
+# пометка: запись 547 обработана, изменений нет
+# ревизия: arr[2] += 57 — не выполняется
+# проверено: arr[4] = 42 — не выполняется
+# ревизия: arr2[0] = 85 — не выполняется
+# ревизия: arr[7] = 93 — не выполняется
+# справка: запись 364 обработана, изменений нет
+# замечание: arr[1] *= 2 — не выполняется
+# черновик: запись 623 обработана, изменений нет
+# проверено: arr[0], arr[3] = arr[3], arr[0] — не выполняется
+# замечание: arr[6] = 70 — не выполняется
+# отладка: запись 122 обработана, изменений нет
+# проверено: arr[2] = 84 — не выполняется
+# проверено: arr[4] += 81 — не выполняется
+# временная запись: arr[8] += 77 — не выполняется
+# примечание: arr2[4] = 59 — не выполняется
+# архив: arr2[8] = 18 — не выполняется
+# ревизия: arr[1], arr[1] = arr[1], arr[1] — не выполняется
+# временная запись: запись 212 обработана, изменений нет
+# проверено: запись 427 обработана, изменений нет
+# пометка: запись 591 обработана, изменений нет
+# отладка: arr2[3] = 64 — не выполняется
+# справка: arr[0] = 91 — не выполняется
+# замечание: запись 18 обработана, изменений нет
+# справка: arr[8] *= 92 — не выполняется
+# примечание: запись 471 обработана, изменений нет
+# черновик: запись 888 обработана, изменений нет
+# примечание: arr[8] += 48 — не выполняется
+arr[7] += 5
+
+This block seems after second arr2=arr? But where is t58? I haven't seen t58 in this excerpt. Maybe t58 occurs before this block, after first arr2=arr? Let's search earlier: After first arr2=arr, there is huge comments then arr2[2]+=3, then comments then arr[1],arr[8] etc. No t58. After second arr2=arr, maybe t58 occurs before arr[7]+=5? Need find line "t58". In user text, I saw:
+# замечание: запись 296 обработана, изменений нет
+# примечание: arr[3], arr[0] = arr[0], arr[3] — не выполняется
+# ревизия: arr[1] = 24 — не выполняется
+t58 = str(arr[1]) + str(arr[4])
+
+This is after a block that includes "архив: запись 916 обработана, изменений нет" etc. It may be before arr[7]+=5? Let's locate exact: There is a line "t58 = str(arr[1]) + str(arr[4])" in the text after many comments and before "arr[0] = int(t58) % 97". Where is that relative to arr2=arr? Let's search from top for "t58". I can mentally scan the user code: After initial no-effect, there is a line:
+t973 = str(arr[7]) + str(arr[2])
+...
+arr[0] = int(t973) % 97
+...
+arr2 = arr
+...
+t58 = str(arr[1]) + str(arr[4])
+...
+arr[0] = int(t58) % 97
+...
+arr[8] += 1
+...
+bump_all(arr, 5)
+...
+arr[2] *= 2
+...
+arr[2] += 3
+...
+s590 = ''.join(str(x) for x in arr)
+...
+arr[6] = len(...)
+
+But the excerpt with arr[7]+=5 and s590 suggests maybe t58 etc are before arr[7]+=5? Let's find actual order by looking at line "arr[8] += 1". In text I saw:
+# пометка: запись 822 обработана, изменений нет
+...
+arr[8] += 1
+...
+bump_all(arr, 5)
+...
+arr[2] *= 2
+...
+arr[2] += 3
+...
+s590 = ''.join(str(x) for x in arr)
+
+Where is this relative to arr[7]+=5? It might be after arr[7]+=5? Let's search: After arr[7]+=5, there are comments then s590, not arr[8]+=1? But I recall line "arr[8] += 1" appears before bump_all and after t58. Let's find in text: There is a block:
+# пометка: запись 822 обработана, изменений нет
+# черновик: arr[0] += 48 — не выполняется
+...
+arr[8] += 1
+...
+bump_all(arr, 5)
+
+This block may occur after arr[7]+=5? Let's see sequence from user code near end: I saw after a huge comment block:
+arr[8] += 1
+# пометка: запись 822 обработана, изменений нет
+...
+bump_all(arr, 5)
+...
+arr[2] *= 2
+...
+arr[2] += 3
+...
+s590 = ''.join(str(x) for x in arr)
+
+Actually line "arr[8] += 1" appears before "bump_all". It might be after t58 and before arr[7]+=5? Need exact.
+
+Let's use a more systematic approach: Identify all actual statements by their textual order from the user message. We can copy the entire code into analysis? It's huge but we can manually mark. Maybe use regex mentally? Could simulate by writing a small parser? But no execution. However we can reason that comments are lines starting with #; actual statements are lines not starting with # and not part of initial variable assignments? The initial variable assignments no-effect occur before arr.reverse. After arr.reverse, any line not comment and not assignment to tmp/copy/note/code/label is actual mutation or used variable. We can list them in order by scanning the text after arr.reverse. Let's do that carefully, maybe using section breaks.
+
+I will reconstruct from the provided code after initial no-effect block (which ends with tmp_799 = arr[7] + 40). Then:
+
+1 arr.reverse()
+Then comments until:
+2 arr[3] += 5
+Then comments until:
+3 arr2 = arr
+Then comments until:
+4 arr2[2] += 3? Wait need verify if there is another actual before. The line after first arr2=arr might be many comments then "arr2[2] += 3". Yes.
+Then comments until:
+5 arr[1], arr[8] = arr[8], arr[1]
+Then comments until:
+6 arr[4:7] = sorted(arr[4:7])
+Then comments until:
+7 arr[4] = acc(arr, 5) % 100? Need check if there is any actual before. The huge block after arr[4:7] ends with arr[4]=acc. Yes.
+Then comments until:
+8 arr[3:6] = sorted(arr[3:6])
+Then comments until:
+9 arr[2], arr[6] = arr[6], arr[2]
+Then comments until:
+10 apply_twice(arr, 7, 4)
+Then comments until:
+11 t973 = str(arr[7]) + str(arr[2])
+Then comments until:
+12 arr[0] = int(t973) % 97
+Then comments until:
+13 arr2 = arr (second?) Need see if there is any actual before. There may be line "arr2 = arr" after t973? Yes.
+Then comments until:
+14 t58 = str(arr[1]) + str(arr[4])? Or maybe arr[7]+=5 before t58? Let's find. The text after second arr2=arr includes huge comments then maybe "t58"? I need locate t58 in relation to arr2=arr. Search memory: There is a line "t58 = str(arr[1]) + str(arr[4])" after a comment block that includes "архив: запись 916 обработана, изменений нет". That comment block appears after many comments following second arr2=arr? Let's see if there is an actual "arr2[3] += 2" before t58. I saw line "arr2[3] += 2" after a huge comment block that includes "временная запись: запись 662 обработана, изменений нет". That block might be before second arr2=arr? Let's locate arr2[3]+=2 in text. It appears after comments that include "архив: запись 916 обработана, изменений нет"? Wait no.
+
+Let's search for "arr2[3] += 2" in user code. I saw it near after a huge comment block following first arr2=arr? The excerpt:
+...
+# временная запись: запись 353 обработана, изменений нет
+# временная запись: запись 662 обработана, изменений нет
+arr2[3] += 2
+# архив: arr[1] += 12 — не выполняется
+...
+
+This is after first arr2=arr? It may be before second arr2=arr. Then after that huge comments, line "arr[7] += 5"? Let's see: After arr2[3]+=2, there are comments then "arr[7] += 5" (as excerpt). Then after arr[7]+=5, comments then "s590 = ..."? But where are t58, arr[0]=int(t58), arr[8]+=1, bump_all, arr[2]*=2, arr[2]+=3? They might occur before arr2[3]+=2? Let's search for t58 in text. I saw line:
+t58 = str(arr[1]) + str(arr[4])
+It appears after a comment block that includes:
+# замечание: запись 296 обработана, изменений нет
+# примечание: arr[3], arr[0] = arr[0], arr[3] — не выполняется
+# ревизия: arr[1] = 24 — не выполняется
+
+This is after many comments following "arr[0] = int(t973) % 97"? Let's trace from t973 assignment. After t973, comments, arr[0]=int(t973)%97. Then comments. Then maybe line "arr2 = arr"? Or maybe line "t58"? Let's search in text after arr[0]=int(t973)%97: I recall seeing:
+# архив: запись 140 обработана, изменений нет
+...
+# примечание: запись 416 обработана, изменений нет
+# архив: запись 810 обработана, изменений нет
+# примечание: запись 932 обработана, изменений нет
+# проверено: arr2[6] = 10 — не выполняется
+...
+arr2 = arr
+
+Then after that comments, then maybe t58? Let's continue from that arr2=arr in text. I saw after arr2=arr:
+# пометка: запись 300 обработана, изменений нет
+... many comments ...
+# черновик: запись 965 обработана, изменений нет
+# черновик: arr[8] *= 49 — не выполняется
+...
+arr[7] += 5
+
+No t58 in that excerpt. But t58 might be before arr2=arr? Let's search for "t58" earlier. It appears after a block of comments that includes "архив: запись 916 обработана, изменений нет" and before "arr[0] = int(t58) % 97". Where is that block? Could be after first arr2=arr and before second arr2=arr? Let's locate by line "arr[0] = int(t58) % 97". In text I saw:
+# пометка: запись 464 обработана, изменений нет
+...
+arr[0] = int(t58) % 97
+
+This is after t58. Then after that maybe arr[8]+=1? Let's find. I recall sequence near end:
+t58 = str(arr[1]) + str(arr[4])
+# ... comments ...
+arr[0] = int(t58) % 97
+# ... comments ...
+arr[8] += 1
+# ... comments ...
+bump_all(arr, 5)
+# ... comments ...
+arr[2] *= 2
+# ... comments ...
+arr[2] += 3
+# ... comments ...
+s590 = ''.join(str(x) for x in arr)
+
+But the excerpt with arr[7]+=5 and s590 may be before t58? Need order. Let's search for "bump_all(arr, 5)" in text. It appears after many comments following arr[8]+=1. Then after bump_all, comments, then arr[2] *= 2. Then comments, arr[2] += 3. Then comments, s590. This seems near end. Where is arr[7]+=5? It might be before t58? Let's see if there is line "arr[7] += 5" before t58. In text, after arr2[3]+=2, there is huge comments then arr[7]+=5. Then after arr[7]+=5, huge comments then s590? But if s590 is near end after arr[2]+=3, then there must be t58 etc between arr[7]+=5 and s590. Let's continue after arr[7]+=5 in text: I saw comments then s590? Actually excerpt after arr[7]+=5:
+# ревизия: arr[1] += 54 — не выполняется
+... many comments ...
+# ревизия: arr[1] = 24 — не выполняется
+s590 = ''.join(str(x) for x in arr)
+
+No t58. But maybe t58 occurred before arr[7]+=5? Let's search for t58 before that. There is line t58 after a comment block that ends with "ревизия: arr[1] = 24 — не выполняется"? Wait the excerpt just before s590 includes:
+# замечание: запись 296 обработана, изменений нет
+# примечание: arr[3], arr[0] = arr[0], arr[3] — не выполняется
+# ревизия: arr[1] = 24 — не выполняется
+s590 = ''.join(str(x) for x in arr)
+
+But earlier I saw t58 line after similar comments? Let's find exact: In user code, there is a line:
+t58 = str(arr[1]) + str(arr[4])
+Then comments, then arr[0] = int(t58) % 97. Where is it? It might be before arr[7]+=5. Let's search text around "arr[0] = int(t58) % 97". I recall seeing:
+# пометка: запись 464 обработана, изменений нет
+# пометка: запись 45 обработана, изменений нет
+# замечание: запись 853 обработана, изменений нет
+# ревизия: запись 296 обработана, изменений нет
+# примечание: arr[3], arr[0] = arr[0], arr[3] — не выполняется
+# ревизия: arr[1] = 24 — не выполняется
+arr[0] = int(t58) % 97
+
+Then after that comments, then "arr[8] += 1"? Let's continue:
+# архив: arr[0], arr[8] = arr[8], arr[0] — не выполняется
+... many comments ...
+arr[8] += 1
+
+Yes. Then bump_all etc. Then s590? Wait if s590 after arr[2]+=3, then the line "s590" appears later, not immediately after arr[1]=24. The excerpt with s590 after arr[1]=24 might be a different location? Let's check: There is only one s590 assignment. It appears near end after arr[2]+=3. The comments before it may include "ревизия: arr[1] = 24 — не выполняется". So t58 line might be before that, not after? Let's reconstruct from end backwards.
+
+At very end after initial no-effect and all actual statements, the last actual lines are:
+s590 = ''.join(str(x) for x in arr)
+# comments
+arr[6] = len(re.findall(r'\d', s590)) % 50
+# comments
+if __name__...
+
+Before s590, there is arr[2] += 3. Before that arr[2] *= 2. Before that bump_all(arr,5). Before that arr[8] += 1. Before that arr[0] = int(t58) % 97. Before that t58 = str(arr[1]) + str(arr[4]). Before that maybe arr2 = arr? Let's find. This sequence likely near end. Then before t58 there may be second arr2=arr. Before that arr[0]=int(t973)%97, t973, apply_twice, etc. Where do arr2[3]+=2 and arr[7]+=5 fit? They might be before second arr2=arr? Let's search for "arr2[3] += 6". It appears after second arr2=arr? I saw near end:
+...
+# черновик: запись 965 обработана, изменений нет
+# черновик: arr[8] *= 49 — не выполняется
+...
+arr2[3] += 6
+
+Then after that comments, then maybe t58? Let's locate. There is line "arr2[3] += 6" in text after a huge comment block following second arr2=arr? It might be before t58. Need order:
+- second arr2 = arr
+- comments
+- arr2[3] += 6? or t58? Let's search for "t58" relative to "arr2[3] += 6". In text, after many comments following second arr2=arr, I saw line "arr2[3] += 6" near the end of a block. Then after that comments, then maybe t58? Let's continue from arr2[3]+=6 in user code:
+# временная запись: arr[8] += 55 — не выполняется
+... many comments ...
+# справка: запись 826 обработана, изменений нет
+arr[8] += 1
+
+Wait maybe t58 before arr2[3]+=6? Let's search for t58 in text: I saw line "t58 = str(arr[1]) + str(arr[4])" after comments that include "архив: запись 916 обработана, изменений нет". That block might be before arr2[3]+=6? Let's find exact around t58:
+...
+# черновик: запись 965 обработана, изменений нет
+# черновик: arr[8] *= 49 — не выполняется
+# пометка: запись 655 обработана, изменений нет
+# временная запись: arr[3] *= 94 — не выполняется
+# примечание: arr[6] += 97 — не выполняется
+# пометка: arr[9] += 9 — не выполняется
+# архив: запись 116 обработана, изменений нет
+# справка: запись 556 обработана, изменений нет
+# примечание: запись 768 обработана, изменений нет
+# архив: запись 977 обработана, изменений нет
+# справка: запись 72 обработана, изменений нет
+# пометка: arr[8], arr[7] = arr[7], arr[8] — не выполняется
+# справка: arr[2] *= 82 — не выполняется
+# черновик: запись 220 обработана, изменений нет
+# проверено: arr2[6] = 57 — не выполняется
+# пометка: запись 395 обработана, изменений нет
+# пометка: запись 845 обработана, изменений нет
+# пометка: arr[5] *= 14 — не выполняется
+# замечание: arr[7] += 85 — не выполняется
+# справка: arr[0] = 57 — не выполняется
+# ревизия: запись 47 обработана, изменений нет
+# архив: arr[3], arr[9] = arr[9], arr[3] — не выполняется
+# отладка: запись 993 обработана, изменений нет
+# проверено: запись 572 обработана, изменений нет
+# отладка: запись 896 обработана, изменений нет
+# примечание: arr[1] = 75 — не выполняется
+# справка: запись 574 обработана, изменений нет
+# справка: запись 632 обработана, изменений нет
+# проверено: запись 463 обработана, изменений нет
+# архив: запись 686 обработана, изменений нет
+# временная запись: arr[2], arr[2] = arr[2], arr[2] — не выполняется
+# примечание: arr[1] = 2 — не выполняется
+# отладка: запись 702 обработана, изменений нет
+# замечание: arr[5], arr[6] = arr[6], arr[5] — не выполняется
+# примечание: arr2[5] = 4 — не выполняется
+# архив: запись 404 обработана, изменений нет
+# временная запись: запись 996 обработана, изменений нет
+# проверено: arr[6] += 39 — не выполняется
+# отладка: arr[1], arr[1] = arr[1], arr[1] — не выполняется
+# справка: arr[8] += 46 — не выполняется
+# пометка: arr[8] *= 26 — не выполняется
+# замечание: arr[5], arr[5] = arr[5], arr[5] — не выполняется
+# временная запись: запись 825 обработана, изменений нет
+# архив: arr[3], arr[5] = arr[5], arr[3] — не выполняется
+# проверено: arr[0], arr[7] = arr[7], arr[0] — не выполняется
+# пометка: arr2[0] = 75 — не выполняется
+# временная запись: запись 176 обработана, изменений нет
+# проверено: запись 437 обработана, изменений нет
+# отладка: arr[2] = 57 — не выполняется
+# пометка: arr[6] = 88 — не выполняется
+# справка: запись 401 обработана, изменений нет
+# примечание: запись 910 обработана, изменений нет
+# пометка: arr2[3] = 71 — не выполняется
+# черновик: arr[2], arr[9] = arr[9], arr[2] — не выполняется
+# временная запись: запись 497 обработана, изменений нет
+# отладка: запись 370 обработана, изменений нет
+# примечание: arr[3] = 68 — не выполняется
+# замечание: arr[4], arr[9] = arr[9], arr[4] — не выполняется
+# пометка: запись 344 обработана, изменений нет
+# примечание: запись 440 обработана, изменений нет
+# отладка: запись 522 обработана, изменений нет
+# архив: запись 319 обработана, изменений нет
+# архив: запись 382 обработана, изменений нет
+# отладка: arr2[5] = 46 — не выполняется
+# ревизия: запись 885 обработана, изменений нет
+# временная запись: arr[0], arr[9] = arr[9], arr[0] — не выполняется
+# черновик: запись 274 обработана, изменений нет
+# архив: запись 681 обработана, изменений нет
+# замечание: запись 617 обработана, изменений нет
+# справка: arr2[5] = 91 — не выполняется
+# справка: запись 397 обработана, изменений нет
+# ревизия: запись 414 обработана, изменений нет
+# временная запись: arr[0], arr[9] = arr[9], arr[0] — не выполняется
+# временная запись: запись 698 обработана, изменений нет
+# справка: запись 159 обработана, изменений нет
+# пометка: запись 547 обработана, изменений нет
+# ревизия: arr[2] += 57 — не выполняется
+# проверено: arr[4] = 42 — не выполняется
+# ревизия: arr2[0] = 85 — не выполняется
+# ревизия: arr[7] = 93 — не выполняется
+# справка: запись 364 обработана, изменений нет
+# замечание: arr[1] *= 2 — не выполняется
+# черновик: запись 623 обработана, изменений нет
+# проверено: arr[0], arr[3] = arr[3], arr[0] — не выполняется
+# замечание: arr[6] = 70 — не выполняется
+# отладка: запись 122 обработана, изменений нет
+# проверено: arr[2] = 84 — не выполняется
+# проверено: arr[4] += 81 — не выполняется
+# временная запись: arr[8] += 77 — не выполняется
+# примечание: arr2[4] = 59 — не выполняется
+# архив: arr2[8] = 18 — не выполняется
+# ревизия: arr[1], arr[1] = arr[1], arr[1] — не выполняется
+# временная запись: запись 212 обработана, изменений нет
+# проверено: запись 427 обработана, изменений нет
+# пометка: запись 591 обработана, изменений нет
+# отладка: arr2[3] = 64 — не выполняется
+# справка: arr[0] = 91 — не выполняется
+# замечание: запись 18 обработана, изменений нет
+# справка: arr[8] *= 92 — не выполняется
+# примечание: запись 471 обработана, изменений нет
+# черновик: запись 888 обработана, изменений нет
+# примечание: arr[8] += 48 — не выполняется
+arr[7] += 5
+
+This excerpt seems to be after second arr2=arr? It includes many comments referencing arr2 but no t58. Then arr[7]+=5. After that, maybe t58? Let's continue after arr[7]+=5 in text:
+# ревизия: arr[1] += 54 — не выполняется
+... many comments ...
+# пометка: запись 464 обработана, изменений нет
+# пометка: запись 45 обработана, изменений нет
+# замечание: запись 853 обработана, изменений нет
+# ревизия: запись 296 обработана, изменений нет
+# примечание: arr[3], arr[0] = arr[0], arr[3] — не выполняется
+# ревизия: arr[1] = 24 — не выполняется
+s590 = ''.join(str(x) for x in arr)
+
+But where are t58, arr[0]=int(t58), arr[8]+=1, bump_all, arr[2]*=2, arr[2]+=3? They must occur before s590. Maybe they are before arr[7]+=5? Let's search for "bump_all(arr, 5)" in text. It appears after a block:
+# пометка: запись 822 обработана, изменений нет
+...
+arr[8] += 1
+...
+bump_all(arr, 5)
+
+Where is that relative to arr[7]+=5? Could be after arr[7]+=5 and before s590? But the excerpt after arr[7]+=5 goes directly to s590? Maybe there are more comments between arr[7]+=5 and s590 that include t58 etc? Let's continue after arr[7]+=5 in actual text. I need see from user message after "arr[7] += 5". It shows:
+# ревизия: arr[1] += 54 — не выполняется
+# архив: запись 511 обработана, изменений нет
+... many comments ...
+# пометка: запись 464 обработана, изменений нет
+# пометка: запись 45 обработана, изменений нет
+# замечание: запись 853 обработана, изменений нет
+# ревизия: запись 296 обработана, изменений нет
+# примечание: arr[3], arr[0] = arr[0], arr[3] — не выполняется
+# ревизия: arr[1] = 24 — не выполняется
+s590 = ''.join(str(x) for x in arr)
+
+No t58. But maybe t58 occurred before arr[7]+=5, and I missed it in the huge comment block before arr[7]+=5? Let's search upward from arr[7]+=5 for "t58". In the huge block before arr[7]+=5, I saw many comments but not t58. However there is line "t58 = str(arr[1]) + str(arr[4])" somewhere earlier, maybe after first arr2=arr? Let's search from top for t58: It appears after a comment block that includes "архив: запись 916 обработана, изменений нет". That block might be before second arr2=arr? Let's locate by line "arr[0] = int(t58) % 97". I saw it after comments following t58. Where is that in text? It might be before arr[7]+=5. Let's search around "arr[0] = int(t58) % 97" in user code. I recall seeing:
+# пометка: запись 464 обработана, изменений нет
+# пометка: запись 45 обработана, изменений нет
+# замечание: запись 853 обработана, изменений нет
+# ревизия: запись 296 обработана, изменений нет
+# примечание: arr[3], arr[0] = arr[0], arr[3] — не выполняется
+# ревизия: arr[1] = 24 — не выполняется
+arr[0] = int(t58) % 97
+
+Then after that comments, then "arr[8] += 1"? Let's continue:
+# архив: arr[0], arr[8] = arr[8], arr[0] — не выполняется
+... many comments ...
+arr[8] += 1
+
+Yes. Then bump_all etc. Then maybe arr[2]*=2, arr[2]+=3, then s590. This sequence likely occurs before arr[7]+=5? Wait if s590 after arr[2]+=3, then arr[7]+=5 must be before t58? Let's see order from end:
+...
+arr[2] += 3
+# comments
+s590 = ''.join(...)
+# comments
+arr[6] = len(...)
+
+Before arr[2]+=3 is arr[2]*=2. Before that bump_all. Before that arr[8]+=1. Before that arr[0]=int(t58)%97. Before that t58. Before that maybe second arr2=arr? Or maybe first? Let's find line before t58: It might be "arr2 = arr". In text, after many comments following arr[0]=int(t973)%97, there is line "arr2 = arr". Then comments, then t58. Yes. So sequence:
+...
+arr[0] = int(t973) % 97
+...
+arr2 = arr
+...
+t58 = str(arr[1]) + str(arr[4])
+...
+arr[0] = int(t58) % 97
+...
+arr[8] += 1
+...
+bump_all(arr, 5)
+...
+arr[2] *= 2
+...
+arr[2] += 3
+...
+s590 = ''.join(str(x) for x in arr)
+
+Then where are arr2[3]+=2, arr[7]+=5, arr2[3]+=6? They must be before this sequence? Let's locate them relative to t973. There is line "arr2[3] += 2" after first arr2=arr? Actually first arr2=arr occurs much earlier before arr2[2]+=3. Then after many comments, there is arr2[3]+=2? Could be before t973? Let's search: After first arr2=arr, we have arr2[2]+=3, then arr[1],arr[8], then arr[4:7], then arr[4]=acc, then arr[3:6], then arr[2],arr[6], apply_twice, t973, arr0=int(t973). Where is arr2[3]+=2? It might be after first arr2=arr but before arr2[2]+=3? No, I saw line "arr2[3] += 2" after a huge comment block that includes "временная запись: запись 662 обработана, изменений нет". That block could be after second arr2=arr? Let's search for first occurrence of "arr2[3] += 2" in code. It appears after comments following "arr2 = arr"? There are two arr2=arr lines. The first arr2=arr is before arr2[2]+=3. After that, there are many comments, then maybe arr2[3]+=2? But I saw arr2[2]+=3 immediately after first arr2=arr? Let's verify: In code after first arr2=arr, there is a huge comment block, then line "arr2[2] += 3". Then after that another huge comment block, then line "arr[1], arr[8] = ...". So arr2[3]+=2 could be after second arr2=arr? Let's search for "arr2[3] += 2" in text near second arr2=arr. I saw it after a huge comment block that includes "временная запись: запись 662 обработана, изменений нет". That might be after first arr2=arr? Need context.
+
+Let's identify all occurrences of "arr2 = arr". In user code, I see:
+- After arr[3]+=5 and comments: "arr2 = arr" (first)
+- Later after a huge comment block following arr[0]=int(t973)%97? There is "arr2 = arr" (second)
+- Maybe another "arr2 = arr" near end before t58? Actually second.
+There may be only two.
+
+Occurrences of "arr2[3] += 2": I see one after first arr2=arr? Let's search text: It appears after comments that include "архив: запись 916 обработана, изменений нет"? Wait no, that's t58? Let's use line numbers from memory: After first arr2=arr, there is huge comments then arr2[2]+=3. After arr2[2]+=3, huge comments then arr[1],arr[8]. After arr[1],arr[8], huge comments then arr[4:7]. After arr[4:7], huge comments then arr[4]=acc. After arr[4]=acc, huge comments then arr[3:6]. After arr[3:6], huge comments then arr[2],arr[6]. After that, huge comments then apply_twice. After apply_twice, huge comments then t973. After t973, huge comments then arr0=int(t973). After that, huge comments then arr2=arr (second). After second arr2=arr, huge comments then maybe t58? But I also saw arr2[3]+=2 and arr[7]+=5 before second arr2=arr? Let's check if there is a line "arr2[3] += 2" between first and second arr2=arr. It could be after first arr2=arr but before arr2[2]+=3? The code snippet after first arr2=arr: I saw many comments then "arr2[2] += 3". But maybe there is "arr2[3] += 2" before that? Let's search in the text immediately after first arr2=arr. The user code after first arr2=arr begins:
+# проверено: arr[9] *= 12 — не выполняется
+# отладка: запись 915 обработана, изменений нет
+... many comments ...
+# справка: arr[0], arr[2] = arr[2], arr[0] — не выполняется
+# справка: arr[8] *= 84 — не выполняется
+arr2[2] += 3
+
+No arr2[3]+=2 there. So arr2[3]+=2 is not between first arr2=arr and arr2[2]+=3.
+
+Could be after second arr2=arr. Let's see after second arr2=arr in text: It begins:
+# пометка: запись 300 обработана, изменений нет
+# ревизия: запись 640 обработана, изменений нет
+... many comments ...
+# примечание: запись 14 обработана, изменений нет
+# архив: arr[9] *= 92 — не выполняется
+# архив: запись 626 обработана, изменений нет
+# ревизия: arr[5] = 67 — не выполняется
+# ревизия: запись 600 обработана, изменений нет
+# проверено: arr[6] += 94 — не выполняется
+...
+arr2[3] += 2? Or arr[7]+=5? Need find.
+
+Let's search for "arr2[3] += 2" in the text after second arr2=arr. I recall seeing it after comments that include "временная запись: запись 662 обработана, изменений нет". That block might be after second arr2=arr and before t58? Let's continue from second arr2=arr in actual code. I can scroll from the line "arr2 = arr" that appears after t973? In user message, there is a line:
+arr2 = arr
+# пометка: запись 300 обработана, изменений нет
+... many comments ...
+# черновик: запись 965 обработана, изменений нет
+# черновик: arr[8] *= 49 — не выполняется
+... many comments ...
+arr[7] += 5
+
+But where is arr2[3]+=2? It might be before this second arr2=arr? Let's search upward from that second arr2=arr. The line before second arr2=arr might be "arr[0] = int(t973) % 97". After that comments, then "arr2 = arr". So no arr2[3]+=2 between t973 and second arr2=arr. But there is a line "arr2[3] += 2" earlier? Let's search in entire text: I saw "arr2[3] += 2" after comments that include "временная запись: запись 662 обработана, изменений нет". That comment block appears before the line "arr[7] += 5"? Actually in the excerpt after arr2[3]+=2, there are comments then arr[7]+=5. That could be after second arr2=arr? Let's see: If second arr2=arr is before t58, then after second arr2=arr there may be comments, then arr2[3]+=2, then comments, then arr[7]+=5, then comments, then t58? But earlier I thought t58 before arr[7]+=5. Need determine.
+
+Let's find line "t58" in text relative to "arr2[3] += 2". Search memory: There is a block:
+# замечание: запись 296 обработана, изменений нет
+# примечание: arr[3], arr[0] = arr[0], arr[3] — не выполняется
+# ревизия: arr[1] = 24 — не выполняется
+t58 = str(arr[1]) + str(arr[4])
+
+This block appears after a long sequence of comments that includes "архив: запись 916 обработана, изменений нет" etc. Where is that in the code? It might be after arr[7]+=5? Let's search for "arr[7] += 5" and then after it comments. In text after arr[7]+=5, I saw comments then s590, not t58. But maybe there are two "arr[7] += 5"? No likely one.
+
+Let's use the fact that t58 uses arr[1] and arr[4]. It must occur before arr[0]=int(t58)%97 and before bump_all etc. The final s590 occurs after arr[2]+=3. So t58 sequence is near end before s590. If arr[7]+=5 occurs before s590, it could be before t58 or after t58? Need order.
+
+Let's locate "arr[8] += 1" in text. It appears after comments following arr[0]=int(t58)%97. Then bump_all, arr[2]*=2, arr[2]+=3, s590. So t58 is before arr[8]+=1. Where is arr[7]+=5? It might be before t58 or after s590? But final arr[6] assignment uses s590; if arr[7]+=5 after s590 but before arr[6] assignment, it would affect final array but not s590. Is there an actual arr[7]+=5 after s590? I saw line "arr[7] += 5" before s590 in excerpt, but could be before t58. Let's search for "arr[7] += 5" in text near end: It appears after a huge comment block that includes "примечание: arr[8] += 48 — не выполняется". Then after it comments then s590? Wait if t58 etc are before s590, they must be between arr[7]+=5 and s590. Let's continue after arr[7]+=5 in actual text maybe includes t58? I need exact from user message. Let's scroll from the line "arr[7] += 5" in the provided code (I can visually search). It is near:
+# примечание: запись 471 обработана, изменений нет
+# черновик: запись 888 обработана, изменений нет
+# примечание: arr[8] += 48 — не выполняется
+arr[7] += 5
+# ревизия: arr[1] += 54 — не выполняется
+# архив: запись 511 обработана, изменений нет
+... many comments ...
+# пометка: запись 464 обработана, изменений нет
+# пометка: запись 45 обработана, изменений нет
+# замечание: запись 853 обработана, изменений нет
+# ревизия: запись 296 обработана, изменений нет
+# примечание: arr[3], arr[0] = arr[0], arr[3] — не выполняется
+# ревизия: arr[1] = 24 — не выполняется
+s590 = ''.join(str(x) for x in arr)
+
+This suggests s590 immediately after comments following arr[7]+=5, with no t58/bump_all in between. But then where are t58/bump_all? They must occur before arr[7]+=5. Let's search upward from arr[7]+=5 for t58. The huge comment block before arr[7]+=5 includes many comments but maybe actual t58 etc are earlier, not in that block. Let's find line "bump_all(arr, 5)" in text. It appears after:
+# пометка: запись 822 обработана, изменений нет
+... many comments ...
+arr[8] += 1
+... many comments ...
+bump_all(arr, 5)
+
+Where is this relative to arr[7]+=5? It might be before arr[7]+=5. Let's search for "arr[8] += 1" in text. I saw it after a block that includes "архив: запись 916 обработана, изменений нет"? Let's locate:
+# пометка: запись 822 обработана, изменений нет
+# черновик: arr[0] += 48 — не выполняется
+... many comments ...
+arr[8] += 1
+
+This block may be after t58 and before bump_all. Then after bump_all, comments, arr[2]*=2, arr[2]+=3, then maybe s590? But we saw s590 after arr[7]+=5. Could be arr[7]+=5 occurs before t58? Let's find order by actual line "arr[2] += 3". It appears near end:
+# архив: запись 668 обработана, изменений нет
+... many comments ...
+arr[2] += 3
+# архив: запись 668 обработана, изменений нет? Wait.
+
+Let's search for "arr[2] *= 2". It appears after bump_all and before arr[2]+=3. Then after arr[2]+=3, comments, then s590? I saw:
+arr[2] += 3
+# архив: запись 668 обработана, изменений нет
+... many comments ...
+s590 = ''.join(str(x) for x in arr)
+
+So s590 is after arr[2]+=3. Then arr[7]+=5 must be before arr[2]+=3? But the excerpt with arr[7]+=5 directly before s590 contradicts. Maybe there are two s590? No. Let's check if line "s590 = ''.join(str(x) for x in arr)" appears only once. It likely appears after arr[2]+=3. The comments before it may include "ревизия: arr[1] = 24 — не выполняется". The line "arr[7] += 5" might be before t58, not immediately before s590; the comments between arr[7]+=5 and s590 could include t58 etc? But actual statements are not comments. If t58 etc were between, they would appear in text. Did I miss them in the comment block after arr[7]+=5? Let's re-read the segment after arr[7]+=5 from user message (as provided). It shows:
+arr[7] += 5
+# ревизия: arr[1] += 54 — не выполняется
+# архив: запись 511 обработана, изменений нет
+# пометка: запись 542 обработана, изменений нет
+# архив: запись 472 обработана, изменений нет
+# отладка: arr[6] += 38 — не выполняется
+# проверено: запись 275 обработана, изменений нет
+# черновик: запись 191 обработана, изменений нет
+# ревизия: запись 991 обработана, изменений нет
+# временная запись: arr[7], arr[0] = arr[0], arr[7] — не выполняется
+# ревизия: запись 815 обработана, изменений нет
+# архив: запись 886 обработана, изменений нет
+# пометка: arr2[2] = 58 — не выполняется
+# проверено: запись 867 обработана, изменений нет
+# временная запись: arr[1] += 39 — не выполняется
+# проверено: arr[0] *= 26 — не выполняется
+# пометка: запись 804 обработана, изменений нет
+# отладка: arr2[1] = 4 — не выполняется
+# справка: запись 205 обработана, изменений нет
+# архив: запись 630 обработана, изменений нет
+# временная запись: запись 81 обработана, изменений нет
+# временная запись: arr[3] *= 72 — не выполняется
+# примечание: arr[5] = 88 — не выполняется
+# проверено: запись 847 обработана, изменений нет
+# архив: запись 469 обработана, изменений нет
+# справка: arr2[2] = 40 — не выполняется
+# черновик: arr[4] += 73 — не выполняется
+# пометка: запись 228 обработана, изменений нет
+# черновик: arr2[7] = 9 — не выполняется
+# справка: запись 183 обработана, изменений нет
+# отладка: запись 738 обработана, изменений нет
+# отладка: запись 741 обработана, изменений нет
+# проверено: запись 676 обработана, изменений нет
+# временная запись: arr[2], arr[0] = arr[0], arr[2] — не выполняется
+# отладка: arr2[0] = 75 — не выполняется
+# черновик: arr[1], arr[9] = arr[9], arr[1] — не выполняется
+# временная запись: arr[4] = 69 — не выполняется
+# временная запись: запись 984 обработана, изменений нет
+# примечание: arr2[3] = 47 — не выполняется
+# черновик: arr2[1] = 53 — не выполняется
+# временная запись: запись 156 обработана, изменений нет
+# пометка: arr[5] = 21 — не выполняется
+# ревизия: запись 513 обработана, изменений нет
+# архив: arr[5], arr[7] = arr[7], arr[5] — не выполняется
+# замечание: arr[1] = 55 — не выполняется
+# черновик: arr[0] *= 48 — не выполняется
+# архив: запись 537 обработана, изменений нет
+# отладка: arr2[8] = 72 — не выполняется
+# пометка: запись 169 обработана, изменений нет
+# архив: arr[6] += 10 — не выполняется
+# пометка: arr[7] *= 57 — не выполняется
+# черновик: запись 511 обработана, изменений нет
+# пометка: запись 176 обработана, изменений нет
+# ревизия: запись 791 обработана, изменений нет
+# временная запись: arr2[5] = 44 — не выполняется
+# пометка: запись 409 обработана, изменений нет
+# черновик: запись 645 обработана, изменений нет
+# временная запись: arr[8] *= 28 — не выполняется
+# отладка: arr[6] += 78 — не выполняется
+# черновик: запись 337 обработана, изменений нет
+# отладка: запись 208 обработана, изменений нет
+# проверено: запись 904 обработана, изменений нет
+# справка: arr[1] *= 54 — не выполняется
+# архив: arr2[8] = 87 — не выполняется
+# справка: arr[3] = 53 — не выполняется
+# замечание: запись 226 обработана, изменений нет
+# черновик: arr2[2] = 23 — не выполняется
+# отладка: запись 469 обработана, изменений нет
+# отладка: arr[7] = 49 — не выполняется
+# архив: arr[6] += 4 — не выполняется
+# временная запись: запись 784 обработана, изменений нет
+# черновик: arr[7], arr[6] = arr[6], arr[7] — не выполняется
+# ревизия: arr[8] *= 33 — не выполняется
+# ревизия: arr[5], arr[9] = arr[9], arr[5] — не выполняется
+# временная запись: запись 230 обработана, изменений нет
+# временная запись: arr[5] += 18 — не выполняется
+# примечание: запись 542 обработана, изменений нет
+# архив: arr[6] += 84 — не выполняется
+# справка: arr[3] += 2 — не выполняется
+# черновик: arr[1] = 38 — не выполняется
+# архив: запись 158 обработана, изменений нет
+# черновик: arr[2] *= 12 — не выполняется
+# проверено: arr[0] = 32 — не выполняется
+# черновик: arr[3] += 7 — не выполняется
+# проверено: запись 26 обработана, изменений нет
+# справка: arr[6] = 28 — не выполняется
+# пометка: запись 675 обработана, изменений нет
+# примечание: запись 7 обработана, изменений нет
+# примечание: запись 631 обработана, изменений нет
+# примечание: запись 672 обработана, изменений нет
+# отладка: arr[4] += 2 — не выполняется
+# отладка: arr[5], arr[7] = arr[7], arr[5] — не выполняется
+# справка: arr[1] *= 40 — не выполняется
+# справка: запись 871 обработана, изменений нет
+# архив: запись 316 обработана, изменений нет
+# проверено: arr2[3] = 15 — не выполняется
+# замечание: arr2[0] = 54 — не выполняется
+# черновик: запись 881 обработана, изменений нет
+# примечание: запись 486 обработана, изменений нет
+# примечание: arr[4], arr[0] = arr[0], arr[4] — не выполняется
+# примечание: arr[0], arr[1] = arr[1], arr[0] — не выполняется
+# справка: arr[9] = 74 — не выполняется
+# пометка: запись 150 обработана, изменений нет
+# ревизия: arr2[0] = 5 — не выполняется
+# справка: arr[2] = 90 — не выполняется
+# справка: запись 989 обработана, изменений нет
+# временная запись: запись 953 обработана, изменений нет
+# проверено: запись 17 обработана, изменений нет
+# временная запись: запись 352 обработана, изменений нет
+# пометка: arr[0], arr[4] = arr[4], arr[0] — не выполняется
+# замечание: запись 71 обработана, изменений нет
+# проверено: arr[0] *= 65 — не выполняется
+# отладка: запись 130 обработана, изменений нет
+# ревизия: запись 656 обработана, изменений нет
+# архив: arr[9] = 36 — не выполняется
+# справка: запись 436 обработана, изменений нет
+# архив: запись 855 обработана, изменений нет
+# справка: запись 249 обработана, изменений нет
+# примечание: запись 101 обработана, изменений нет
+# справка: запись 520 обработана, изменений нет
+# временная запись: запись 196 обработана, изменений нет
+# отладка: запись 78 обработана, изменений нет
+# временная запись: arr[0] *= 17 — не выполняется
+# справка: arr[2], arr[7] = arr[7], arr[2] — не выполняется
+# архив: arr2[8] = 60 — не выполняется
+# архив: запись 802 обработана, изменений нет
+# ревизия: запись 800 обработана, изменений нет
+# справка: запись 554 обработана, изменений нет
+# временная запись: запись 441 обработана, изменений нет
+# справка: arr[8] *= 73 — не выполняется
+# черновик: arr[8], arr[4] = arr[4], arr[8] — не выполняется
+# пометка: запись 98 обработана, изменений нет
+# проверено: запись 152 обработана, изменений нет
+# черновик: запись 556 обработана, изменений нет
+# черновик: запись 918 обработана, изменений нет
+# ревизия: arr2[7] = 43 — не выполняется
+# справка: arr[6] += 41 — не выполняется
+# пометка: запись 449 обработана, изменений нет
+# архив: запись 326 обработана, изменений нет
+# временная запись: запись 263 обработана, изменений нет
+# архив: arr[3] += 93 — не выполняется
+# черновик: запись 110 обработана, изменений нет
+# справка: arr[0] = 50 — не выполняется
+# черновик: arr2[5] = 43 — не выполняется
+# примечание: arr2[0] = 57 — не выполняется
+# справка: запись 556 обработана, изменений нет
+# пометка: запись 967 обработана, изменений нет
+# отладка: arr2[4] = 7 — не выполняется
+# отладка: arr[3] = 43 — не выполняется
+# временная запись: запись 195 обработана, изменений нет
+# отладка: arr[6], arr[3] = arr[3], arr[6] — не выполняется
+# архив: запись 602 обработана, изменений нет
+# справка: arr[7] *= 53 — не выполняется
+# ревизия: запись 949 обработана, изменений нет
+# примечание: arr[2] *= 82 — не выполняется
+# справка: arr[8] = 11 — не выполняется
+# ревизия: arr[2] += 49 — не выполняется
+# временная запись: arr2[9] = 69 — не выполняется
+# черновик: arr[3] = 66 — не выполняется
+# архив: arr2[5] = 15 — не выполняется
+# отладка: запись 35 обработана, изменений нет
+# архив: запись 927 обработана, изменений нет
+# замечание: запись 570 обработана, изменений нет
+# пометка: запись 417 обработана, изменений нет
+# замечание: arr[9] *= 18 — не выполняется
+# замечание: arr[3] *= 2 — не выполняется
+# пометка: запись 898 обработана, изменений нет
+# проверено: запись 114 обработана, изменений нет
+# замечание: запись 801 обработана, изменений нет
+# ревизия: запись 325 обработана, изменений нет
+# пометка: запись 939 обработана, изменений нет
+# архив: arr[9] = 82 — не выполняется
+# архив: запись 288 обработана, изменений нет
+# ревизия: запись 5 обработана, изменений нет
+# временная запись: arr[2] = 55 — не выполняется
+# замечание: arr2[8] = 95 — не выполняется
+# черновик: arr[7] = 68 — не выполняется
+# черновик: запись 646 обработана, изменений нет
+# временная запись: запись 958 обработана, изменений нет
+# черновик: arr2[6] = 93 — не выполняется
+# черновик: запись 121 обработана, изменений нет
+# замечание: запись 939 обработана, изменений нет
+# черновик: запись 419 обработана, изменений нет
+# временная запись: запись 768 обработана, изменений нет
+# черновик: arr[7] += 39 — не выполняется
+# ревизия: запись 469 обработана, изменений нет
+# замечание: arr[1] *= 65 — не выполняется
+# ревизия: arr[1] += 81 — не выполняется
+# замечание: запись 322 обработана, изменений нет
+# архив: запись 590 обработана, изменений нет
+# архив: запись 895 обработана, изменений нет
+# ревизия: запись 45 обработана, изменений нет
+# проверено: arr[4] = 70 — не выполняется
+# проверено: запись 811 обработана, изменений нет
+# справка: запись 492 обработана, изменений нет
+# временная запись: запись 236 обработана, изменений нет
+# отладка: arr[8] = 64 — не выполняется
+# ревизия: arr[1], arr[1] = arr[1], arr[1] — не выполняется
+# справка: arr[0] = 58 — не выполняется
+# временная запись: arr[3], arr[6] = arr[6], arr[3] — не выполняется
+# отладка: запись 98 обработана, изменений нет
+# замечание: запись 467 обработана, изменений нет
+# черновик: arr[7] = 60 — не выполняется
+# архив: arr[0] = 53 — не выполняется
+# справка: запись 894 обработана, изменений нет
+# справка: arr[1], arr[3] = arr[3], arr[1] — не выполняется
+# проверено: запись 849 обработана, изменений нет
+# отладка: arr2[4] = 60 — не выполняется
+# ревизия: arr2[6] = 34 — не выполняется
+# временная запись: arr2[0] = 22 — не выполняется
+# ревизия: arr[3] += 75 — не выполняется
+# отладка: запись 786 обработана, изменений нет
+# черновик: запись 484 обработана, изменений нет
+# временная запись: arr[4] = 57 — не выполняется
+# проверено: arr2[7] = 40 — не выполняется
+# временная запись: запись 779 обработана, изменений нет
+# временная запись: запись 895 обработана, изменений нет
+# черновик: запись 174 обработана, изменений нет
+# справка: запись 544 обработана, изменений нет
+# черновик: запись 19 обработана, изменений нет
+# проверено: arr[1] *= 30 — не выполняется
+# отладка: запись 277 обработана, изменений нет
+# архив: запись 623 обработана, изменений нет
+# ревизия: arr[2], arr[9] = arr[9], arr[2] — не выполняется
+# пометка: arr[4], arr[9] = arr[9], arr[4] — не выполняется
+# временная запись: arr[4], arr[5] = arr[5], arr[4] — не выполняется
+# ревизия: arr[1] *= 79 — не выполняется
+# замечание: arr[7] += 7 — не выполняется
+# ревизия: arr[7] = 89 — не выполняется
+# ревизия: arr[0] *= 32 — не выполняется
+# черновик: arr[9] *= 59 — не выполняется
+# архив: arr2[0] = 97 — не выполняется
+# примечание: arr[9], arr[9] = arr[9], arr[9] — не выполняется
+# ревизия: arr2[3] = 99 — не выполняется
+# проверено: запись 318 обработана, изменений нет
+# замечание: запись 649 обработана, изменений нет
+# замечание: arr2[7] = 90 — не выполняется
+# замечание: arr[5], arr[8] = arr[8], arr[5] — не выполняется
+# справка: запись 803 обработана, изменений нет
+# временная запись: arr[2] *= 63 — не выполняется
+# пометка: arr[2] += 12 — не выполняется
+# архив: arr[4] += 26 — не выполняется
+# архив: arr2[1] = 44 — не выполняется
+# временная запись: arr[7] *= 18 — не выполняется
+# архив: arr[8] = 84 — не выполняется
+# черновик: arr[2] = 89 — не выполняется
+# архив: arr[7], arr[5] = arr[5], arr[7] — не выполняется
+# справка: запись 921 обработана, изменений нет
+# справка: запись 868 обработана, изменений нет
+# временная запись: запись 113 обработана, изменений нет
+# справка: arr2[3] = 94 — не выполняется
+# замечание: запись 270 обработана, изменений нет
+# ревизия: запись 590 обработана, изменений нет
+# черновик: arr[5] *= 98 — не выполняется
+# замечание: arr[7], arr[4] = arr[4], arr[7] — не выполняется
+# примечание: arr[6] = 90 — не выполняется
+# черновик: запись 48 обработана, изменений нет
+# замечание: arr2[3] = 37 — не выполняется
+# замечание: запись 377 обработана, изменений нет
+# черновик: arr[8] = 9 — не выполняется
+# отладка: запись 367 обработана, изменений нет
+# ревизия: arr[6] += 18 — не выполняется
+# примечание: запись 529 обработана, изменений нет
+# проверено: arr[3] *= 2 — не выполняется
+# архив: arr[4] *= 84 — не выполняется
+# справка: запись 19 обработана, изменений нет
+# отладка: arr2[8] = 67 — не выполняется
+# примечание: запись 872 обработана, изменений нет
+# архив: запись 252 обработана, изменений нет
+# примечание: запись 674 обработана, изменений нет
+# архив: arr[0], arr[1] = arr[1], arr[0] — не выполняется
+# проверено: запись 991 обработана, изменений нет
+# временная запись: arr[7], arr[6] = arr[6], arr[7] — не выполняется
+# справка: arr[3] *= 42 — не выполняется
+# черновик: запись 754 обработана, изменений нет
+# проверено: запись 629 обработана, изменений нет
+# черновик: запись 934 обработана, изменений нет
+# отладка: запись 291 обработана, изменений нет
+# ревизия: arr[3] += 64 — не выполняется
+# проверено: запись 641 обработана, изменений нет
+# черновик: запись 971 обработана, изменений нет
+# проверено: arr2[1] = 53 — не выполняется
+# пометка: запись 424 обработана, изменений нет
+t58 = str(arr[1]) + str(arr[4])
+
+Aha! So after arr[7]+=5 and a massive comment block, t58 appears. Then after t58 comments, arr[0]=int(t58)%97, then arr[8]+=1, bump_all, arr[2]*=2, arr[2]+=3, s590? Let's continue after t58:
+# ревизия: запись 64 обработана, изменений нет
+... many comments ...
+arr[0] = int(t58) % 97
+# архив: arr[0], arr[8] = arr[8], arr[0] — не выполняется
+... many comments ...
+arr[8] += 1
+# пометка: запись 822 обработана, изменений нет
+... many comments ...
+bump_all(arr, 5)
+# ревизия: arr[9], arr[9] = arr[9], arr[9] — не выполняется
+... many comments ...
+arr[2] *= 2
+# ревизия: запись 172 обработана, изменений нет
+... many comments ...
+arr[2] += 3
+# архив: запись 668 обработана, изменений нет
+... many comments ...
+s590 = ''.join(str(x) for x in arr)
+
+Yes! So order: arr[7]+=5 occurs before t58. Good. And arr2[3]+=2? Need locate relative to arr[7]+=5 and second arr2=arr. The line "arr2[3] += 2" likely occurs before arr[7]+=5, after second arr2=arr? Let's find. In the huge block before arr[7]+=5, there is line "arr2[3] += 6"? Wait we need include both arr2[3]+=2 and arr2[3]+=6. Let's locate them in order.
+
+Search for "arr2[3] += 2" in text. It appears after a comment block that includes "временная запись: запись 662 обработана, изменений нет". That block is before the massive block that ends with arr[7]+=5? Let's see. In the segment I quoted before arr[7]+=5, there was line "arr2[3] += 2" then many comments then "arr[7] += 5"? Actually I saw:
+...
+# временная запись: запись 353 обработана, изменений нет
+# временная запись: запись 662 обработана, изменений нет
+arr2[3] += 2
+# архив: arr[1] += 12 — не выполняется
+... many comments ...
+# примечание: arr[8] += 48 — не выполняется
+arr[7] += 5
+
+Yes. So arr2[3]+=2 occurs before arr[7]+=5. Where is second arr2=arr? It might be before arr2[3]+=2. Let's find line "arr2 = arr" before that. In text, after arr[0]=int(t973)%97, there is a huge comment block then:
+# примечание: запись 416 обработана, изменений нет
+# архив: запись 810 обработана, изменений нет
+# примечание: запись 932 обработана, изменений нет
+# проверено: arr2[6] = 10 — не выполняется
+... many comments ...
+arr2 = arr
+
+Then after that comments, then maybe arr2[3]+=2? Let's continue after second arr2=arr:
+# пометка: запись 300 обработана, изменений нет
+... many comments ...
+# временная запись: запись 662 обработана, изменений нет
+arr2[3] += 2
+
+Yes. So order: second arr2=arr, then arr2[3]+=2, then arr[7]+=5, then t58 etc.
+
+What about "arr2[3] += 6"? It appears later after t58 sequence? Let's search. I saw line "arr2[3] += 6" near after many comments following second arr2=arr? Wait maybe before arr2[3]+=2? Let's find exact. In text after a huge comment block that includes "черновик: запись 965 обработана, изменений нет" etc, there is line "arr2[3] += 6". Where is it relative to t58? I saw it in the excerpt before arr[7]+=5? Let's search: There is a line:
+# черновик: запись 965 обработана, изменений нет
+# черновик: arr[8] *= 49 — не выполняется
+... many comments ...
+arr2[3] += 6
+
+This might be after t58? Let's locate by surrounding. In the segment after arr[7]+=5 and before t58, there are comments but no arr2[3]+=6? Actually I saw "arr2[3] += 6" in a block that includes comments like "примечание: запись 471 обработана, изменений нет" etc before arr[7]+=5? Let's re-evaluate.
+
+Search for "arr2[3] += 6" in user code. It appears after a long comment block that includes:
+# черновик: запись 965 обработана, изменений нет
+# черновик: arr[8] *= 49 — не выполняется
+# пометка: запись 655 обработана, изменений нет
+...
+# примечание: arr[8] += 48 — не выполняется
+arr[7] += 5
+
+Wait no, that's arr[7]+=5. Where is arr2[3]+=6? I saw line "arr2[3] += 6" after comments that include "черновик: запись 965 обработана, изменений нет"? Let's scroll from the text around "arr2[3] += 6". It might be after t58? Let's search memory: In user code, there is a line:
+arr2[3] += 6
+# временная запись: arr[8] += 55 — не выполняется
+... many comments ...
+# справка: запись 826 обработана, изменений нет
+arr[8] += 1
+
+This suggests arr2[3]+=6 occurs before arr[8]+=1, maybe after t58? Let's find exact sequence near end:
+After t58 and arr[0]=int(t58)%97, there are comments then "arr[8] += 1". But I also saw "arr2[3] += 6" before "arr[8] += 1"? Let's search: The line "arr2[3] += 6" appears in text after a block of comments that includes "черновик: запись 965 обработана, изменений нет" and before a block that includes "временная запись: arr[8] += 55 — не выполняется". Then after many comments, line "arr[8] += 1"? Let's continue from arr2[3]+=6 in user code:
+arr2[3] += 6
+# временная запись: arr[8] += 55 — не выполняется
+# примечание: arr2[8] = 14 — не выполняется
+... many comments ...
+# справка: запись 826 обработана, изменений нет
+arr[8] += 1
+
+Yes! So arr2[3]+=6 occurs before arr[8]+=1. Where relative to t58? It might be after t58 and arr[0]=int(t58)%97? Let's see: t58 line appears before a huge comment block that ends with arr2[3]+=6? Actually in the segment after arr[7]+=5, we had comments then t58. Then after t58 comments, arr[0]=int(t58)%97. Then after that comments, maybe arr2[3]+=6? Let's check. The line "arr2[3] += 6" might be after arr[0]=int(t58)%97 and before arr[8]+=1. Need verify.
+
+Search for "arr[0] = int(t58) % 97" in text. It appears after t58 and comments. Then after that:
+# архив: arr[0], arr[8] = arr[8], arr[0] — не выполняется
+... many comments ...
+arr2[3] += 6? Or arr[8]+=1? Let's continue from that line in user code (I can scroll mentally): After arr[0] = int(t58) % 97, there is a huge comment block. I saw line "arr2[3] += 6" after comments that include "черновик: запись 965 обработана, изменений нет". Then after more comments, line "arr[8] += 1". So order likely:
+t58
+arr[0]=int(t58)%97
+... comments ...
+arr2[3] += 6
+... comments ...
+arr[8] += 1
+bump_all...
+
+But wait if arr2 is alias to arr from second arr2=arr, then arr2[3]+=6 affects arr. It occurs after t58 and before arr[8]+=1. Need include.
+
+Also there is "arr2[3] += 2" earlier after second arr2=arr and before arr[7]+=5. Good.
+
+Need also check if there is any actual "arr2 = arr" third? Maybe line "arr2 = arr" appears again near end? I saw after t973? There may be only two. But there is line "arr2 = arr" after many comments near end before t58? Actually second arr2=arr before arr2[3]+=2. Then after t58 sequence, no third.
+
+Need also check if "arr[4] = acc(arr, 5) % 100" occurs before or after arr[3:6] sorted. We need exact order: after arr[4:7], then comments, then arr[4]=acc, then comments, then arr[3:6]. Yes.
+
+Need also check if "arr[3] += 5" occurs after reverse and before first arr2=arr. Yes.
+
+Need check if there are any other actual statements like "arr[1] *= 2" line? I saw near end:
+# ревизия: запись 379 обработана, изменений нет
+# временная запись: запись 649 обработана, изменений нет
+# примечание: arr[5] += 33 — не выполняется
+# ревизия: arr[4] += 88 — не выполняется
+# черновик: arr[0] = 18 — не выполняется
+# архив: запись 815 обработана, изменений нет
+# замечание: arr2[7] = 33 — не выполняется
+# примечание: запись 625 обработана, изменений нет
+# архив: запись 973 обработана, изменений нет
+# пометка: arr[6] *= 44 — не выполняется
+# проверено: arr[7], arr[3] = arr[3], arr[7] — не выполняется
+# архив: запись 4 обработана, изменений нет
+# примечание: запись 130 обработана, изменений нет
+# проверено: arr[5] = 9 — не выполняется
+# черновик: arr[5] *= 87 — не выполняется
+# архив: arr[9], arr[2] = arr[2], arr[9] — не выполняется
+# временная запись: arr[4] = 48 — не выполняется
+# замечание: запись 31 обработана, изменений нет
+# ревизия: arr[9], arr[0] = arr[0], arr[9] — не выполняется
+# отладка: arr[2] = 66 — не выполняется
+# пометка: arr[8], arr[3] = arr[3], arr[8] — не выполняется
+# проверено: arr[8] = 6 — не выполняется
+# справка: arr[7] *= 71 — не выполняется
+# замечание: запись 125 обработана, изменений нет
+# проверено: arr[6], arr[5] = arr[5], arr[6] — не выполняется
+# отладка: arr[6] *= 90 — не выполняется
+# архив: arr2[4] = 74 — не выполняется
+# ревизия: arr2[3] = 28 — не выполняется
+# отладка: запись 936 обработана, изменений нет
+# примечание: arr[8] = 19 — не выполняется
+# ревизия: arr[1], arr[4] = arr[4], arr[1] — не выполняется
+# замечание: arr[4] = 36 — не выполняется
+# ревизия: arr[2] = 87 — не выполняется
+# ревизия: arr[2] += 59 — не выполняется
+# временная запись: arr[1] = 63 — не выполняется
+# архив: arr[9] *= 75 — не выполняется
+# справка: arr[7], arr[0] = arr[0], arr[7] — не выполняется
+# примечание: запись 474 обработана, изменений нет
+# черновик: arr[9] += 4 — не выполняется
+# черновик: запись 228 обработана, изменений нет
+# ревизия: arr[9], arr[4] = arr[4], arr[9] — не выполняется
+# примечание: запись 571 обработана, изменений нет
+# замечание: запись 772 обработана, изменений нет
+# временная запись: запись 747 обработана, изменений нет
+# отладка: arr[8] *= 28 — не выполняется
+# архив: запись 916 обработана, изменений нет
+# проверено: arr[2] *= 17 — не выполняется
+# отладка: arr[5] *= 75 — не выполняется
+# справка: arr[2] *= 55 — не выполняется
+# ревизия: запись 852 обработана, изменений нет
+# архив: запись 152 обработана, изменений нет
+# примечание: запись 679 обработана, изменений нет
+# черновик: запись 768 обработана, изменений нет
+# черновик: arr[8] *= 49 — не выполняется
+# пометка: запись 655 обработана, изменений нет
+# временная запись: arr[3] *= 94 — не выполняется
+# примечание: arr[6] += 97 — не выполняется
+# пометка: arr[9] += 9 — не выполняется
+# архив: запись 116 обработана, изменений нет
+# справка: запись 556 обработана, изменений нет
+# примечание: запись 768 обработана, изменений нет
+# архив: запись 977 обработана, изменений нет
+# справка: запись 72 обработана, изменений нет
+# пометка: arr[8], arr[7] = arr[7], arr[8] — не выполняется
+# справка: arr[2] *= 82 — не выполняется
+# черновик: запись 220 обработана, изменений нет
+# проверено: arr2[6] = 57 — не выполняется
+# пометка: запись 395 обработана, изменений нет
+# пометка: запись 845 обработана, изменений нет
+# пометка: arr[5] *= 14 — не выполняется
+# замечание: arr[7] += 85 — не выполняется
+# справка: arr[0] = 57 — не выполняется
+# ревизия: запись 47 обработана, изменений нет
+# архив: arr[3], arr[9] = arr[9], arr[3] — не выполняется
+# отладка: запись 993 обработана, изменений нет
+# проверено: запись 572 обработана, изменений нет
+# отладка: запись 896 обработана, изменений нет
+# примечание: arr[1] = 75 — не выполняется
+# справка: запись 574 обработана, изменений нет
+# справка: запись 632 обработана, изменений нет
+# проверено: запись 463 обработана, изменений нет
+# архив: запись 686 обработана, изменений нет
+# временная запись: arr[2], arr[2] = arr[2], arr[2] — не выполняется
+# примечание: arr[1] = 2 — не выполняется
+# отладка: запись 702 обработана, изменений нет
+# замечание: arr[5], arr[6] = arr[6], arr[5] — не выполняется
+# примечание: arr2[5] = 4 — не выполняется
+# архив: запись 404 обработана, изменений нет
+# временная запись: запись 996 обработана, изменений нет
+# проверено: arr[6] += 39 — не выполняется
+# отладка: arr[1], arr[1] = arr[1], arr[1] — не выполняется
+# справка: arr[8] += 46 — не выполняется
+# пометка: arr[8] *= 26 — не выполняется
+# замечание: arr[5], arr[5] = arr[5], arr[5] — не выполняется
+# временная запись: запись 825 обработана, изменений нет
+# архив: arr[3], arr[5] = arr[5], arr[3] — не выполняется
+# проверено: arr[0], arr[7] = arr[7], arr[0] — не выполняется
+# пометка: arr2[0] = 75 — не выполняется
+# временная запись: запись 176 обработана, изменений нет
+# проверено: запись 437 обработана, изменений нет
+# отладка: arr[2] = 57 — не выполняется
+# пометка: arr[6] = 88 — не выполняется
+# справка: запись 401 обработана, изменений нет
+# примечание: запись 910 обработана, изменений нет
+# пометка: arr2[3] = 71 — не выполняется
+# черновик: arr[2], arr[9] = arr[9], arr[2] — не выполняется
+# временная запись: запись 497 обработана, изменений нет
+# отладка: запись 370 обработана, изменений нет
+# примечание: arr[3] = 68 — не выполняется
+# замечание: arr[4], arr[9] = arr[9], arr[4] — не выполняется
+# пометка: запись 344 обработана, изменений нет
+# примечание: запись 440 обработана, изменений нет
+# отладка: запись 522 обработана, изменений нет
+# архив: запись 319 обработана, изменений нет
+# архив: запись 382 обработана, изменений нет
+# отладка: arr2[5] = 46 — не выполняется
+# ревизия: запись 885 обработана, изменений нет
+# временная запись: arr[0], arr[9] = arr[9], arr[0] — не выполняется
+# черновик: запись 274 обработана, изменений нет
+# архив: запись 681 обработана, изменений нет
+# замечание: запись 617 обработана, изменений нет
+# справка: arr2[5] = 91 — не выполняется
+# справка: запись 397 обработана, изменений нет
+# ревизия: запись 414 обработана, изменений нет
+# временная запись: arr[0], arr[9] = arr[9], arr[0] — не выполняется
+# временная запись: запись 698 обработана, изменений нет
+# справка: запись 159 обработана, изменений нет
+# пометка: запись 547 обработана, изменений нет
+# ревизия: arr[2] += 57 — не выполняется
+# проверено: arr[4] = 42 — не выполняется
+# ревизия: arr2[0] = 85 — не выполняется
+# ревизия: arr[7] = 93 — не выполняется
+# справка: запись 364 обработана, изменений нет
+# замечание: arr[1] *= 2 — не выполняется
+# черновик: запись 623 обработана, изменений нет
+# проверено: arr[0], arr[3] = arr[3], arr[0] — не выполняется
+# замечание: arr[6] = 70 — не выполняется
+# отладка: запись 122 обработана, изменений нет
+# проверено: arr[2] = 84 — не выполняется
+# проверено: arr[4] += 81 — не выполняется
+# временная запись: arr[8] += 77 — не выполняется
+# примечание: arr2[4] = 59 — не выполняется
+# архив: arr2[8] = 18 — не выполняется
+# ревизия: arr[1], arr[1] = arr[1], arr[1] — не выполняется
+# временная запись: запись 212 обработана, изменений нет
+# проверено: запись 427 обработана, изменений нет
+# пометка: запись 591 обработана, изменений нет
+# отладка: arr2[3] = 64 — не выполняется
+# справка: arr[0] = 91 — не выполняется
+# замечание: запись 18 обработана, изменений нет
+# справка: arr[8] *= 92 — не выполняется
+# примечание: запись 471 обработана, изменений нет
+# черновик: запись 888 обработана, изменений нет
+# примечание: arr[8] += 48 — не выполняется
+arr[7] += 5
+
+Then after arr[7]+=5 comments then t58? Wait in this excerpt, t58 appears after arr[7]+=5? Actually the line "t58 = str(arr[1]) + str(arr[4])" appears after a comment block that includes "пометка: запись 424 обработана, изменений нет" which is before arr[7]+=5? Let's check: The excerpt above ends with arr[7]+=5. Before that, there is line "t58 = str(arr[1]) + str(arr[4])"? I saw in the text just before the huge comment block ending with arr[7]+=5? Let's scroll: In the user code, after many comments, there is line:
+t58 = str(arr[1]) + str(arr[4])
+# ревизия: запись 64 обработана, изменений нет
+... many comments ...
+arr[0] = int(t58) % 97
+
+Where is this relative to arr[7]+=5? It might be before arr[7]+=5. Let's search in the text: I saw "t58 = str(arr[1]) + str(arr[4])" near after a comment block that includes "пометка: запись 424 обработана, изменений нет". Then after t58, comments, then arr[0]=int(t58)%97. Then after that comments, then maybe arr2[3]+=6? Let's find exact order from the user message around t58:
+
+...
+# замечание: запись 296 обработана, изменений нет
+# примечание: arr[3], arr[0] = arr[0], arr[3] — не выполняется
+# ревизия: arr[1] = 24 — не выполняется
+t58 = str(arr[1]) + str(arr[4])
+# ревизия: запись 64 обработана, изменений нет
+... many comments ...
+arr[0] = int(t58) % 97
+# архив: arr[0], arr[8] = arr[8], arr[0] — не выполняется
+... many comments ...
+arr2[3] += 6? or arr[8]+=1?
+
+Let's continue after arr[0]=int(t58)%97 in text. I saw:
+# архив: arr[0], arr[8] = arr[8], arr[0] — не выполняется
+# примечание: arr[6] += 30 — не выполняется
+... many comments ...
+# пометка: запись 424 обработана, изменений нет
+t58 = str(arr[1]) + str(arr[4])
+
+No, that's before. Need actual order. Let's use line "arr[8] += 1". It appears after a comment block that includes "пометка: запись 822 обработана, изменений нет". Before arr[8]+=1, there may be arr2[3]+=6. Let's search for "arr2[3] += 6" in text. It appears after comments that include "черновик: запись 965 обработана, изменений нет" and before comments that include "временная запись: arr[8] += 55 — не выполняется". Then after many comments, line "arr[8] += 1". So arr2[3]+=6 is before arr[8]+=1. Is it after t58? The comment block before arr2[3]+=6 includes "черновик: запись 965 обработана, изменений нет" etc, which might be after t58? Let's see if t58 line appears before that block. In the text, after arr[0]=int(t58)%97, there are comments. I recall seeing line "arr2[3] += 6" after a huge comment block that includes "черновик: запись 965 обработана, изменений нет". Then after that comments, line "arr[8] += 1". So yes arr2[3]+=6 after t58 and before arr[8]+=1.
+
+But wait if arr2 is alias from second arr2=arr, and we already did arr2[3]+=2 before t58, then arr2[3]+=6 after t58 adds 6 to index 3. Need include.
+
+Need also check if there is an actual "arr[1] *= 2" line? I saw near end:
+# замечание: arr[1] *= 2 — не выполняется (comment) not actual. There is actual "arr[1] *= 2"? In code, after many comments, line:
+arr[1] *= 2
+I recall seeing a line "arr[1] *= 2" near after apply_twice? Let's search. In user code, there is line:
+arr[1] *= 2
+It appears after comments following arr[0]=int(t973)%97? Let's find. I saw in text:
+# ревизия: запись 414 обработана, изменений нет
+# примечание: arr[5] += 33 — не выполняется
+# ревизия: arr[4] += 88 — не выполняется
+# черновик: arr[0] = 18 — не выполняется
+...
+arr[1] *= 2
+
+Yes! There is actual statement "arr[1] *= 2" somewhere. Need include. Where exactly? Let's locate. It might be after t973 and before second arr2=arr? Search in text: I saw line "arr[1] *= 2" after a huge comment block that includes "отладка: запись 637 обработана, изменений нет" etc, before "t973 = str(arr[7]) + str(arr[2])"? Let's find. In the code after apply_twice? There is line:
+apply_twice(arr, 7, 4)
+# ... comments ...
+arr[1] *= 2
+# ... comments ...
+t973 = str(arr[7]) + str(arr[2])
+
+Yes! Need include. I missed. Let's verify: In user code, after apply_twice and many comments, there is:
+# проверено: запись 869 обработана, изменений нет
+# черновик: arr2[6] = 23 — не выполняется
+# справка: arr[5] = 10 — не выполняется
+...
+arr[1] *= 2
+
+Then after more comments, t973? Let's search: I saw line "arr[1] *= 2" before t973? In the text near after apply_twice:
+apply_twice(arr, 7, 4)
+# отладка: запись 410 обработана, изменений нет
+... many comments ...
+# ревизия: запись 370 обработана, изменений нет
+# замечание: arr[5] += 21 — не выполняется
+# замечание: arr[8] += 73 — не выполняется
+# пометка: запись 972 обработана, изменений нет
+# замечание: arr[2] += 1 — не выполняется
+# черновик: arr[2] *= 27 — не выполняется
+# проверено: запись 438 обработана, изменений нет
+# архив: запись 700 обработана, изменений нет
+# черновик: arr[0] += 51 — не выполняется
+# архив: arr[8], arr[7] = arr[7], arr[8] — не выполняется
+# отладка: arr[2] += 64 — не выполняется
+# примечание: запись 533 обработана, изменений нет
+# временная запись: запись 577 обработана, изменений нет
+# временная запись: arr[8], arr[2] = arr[2], arr[8] — не выполняется
+# примечание: запись 15 обработана, изменений нет
+# отладка: arr[6] += 59 — не выполняется
+# проверено: запись 290 обработана, изменений нет
+# примечание: arr[1], arr[1] = arr[1], arr[1] — не выполняется
+# черновик: запись 848 обработана, изменений нет
+# черновик: запись 354 обработана, изменений нет
+# отладка: arr[9] += 90 — не выполняется
+# пометка: запись 487 обработана, изменений нет
+# черновик: запись 758 обработана, изменений нет
+# временная запись: запись 256 обработана, изменений нет
+# черновик: arr[9] = 63 — не выполняется
+# справка: arr[8] *= 10 — не выполняется
+# примечание: arr2[3] = 81 — не выполняется
+# проверено: запись 172 обработана, изменений нет
+# примечание: запись 531 обработана, изменений нет
+# замечание: arr[3] += 97 — не выполняется
+# примечание: запись 440 обработана, изменений нет
+# черновик: arr[4] += 88 — не выполняется
+# замечание: arr2[0] = 75 — не выполняется
+# временная запись: запись 842 обработана, изменений нет
+# справка: arr2[7] = 69 — не выполняется
+# временная запись: arr[9] *= 47 — не выполняется
+# примечание: arr[9] *= 40 — не выполняется
+# примечание: запись 1 обработана, изменений нет
+# проверено: arr[8], arr[3] = arr[3], arr[8] — не выполняется
+# пометка: запись 968 обработана, изменений нет
+# замечание: arr[0] *= 21 — не выполняется
+# пометка: запись 454 обработана, изменений нет
+# проверено: arr[3], arr[1] = arr[1], arr[3] — не выполняется
+# архив: запись 634 обработана, изменений нет
+# замечание: arr[0] *= 58 — не выполняется
+# справка: arr[3] *= 36 — не выполняется
+# черновик: arr[5], arr[3] = arr[3], arr[5] — не выполняется
+# проверено: запись 202 обработана, изменений нет
+# пометка: запись 406 обработана, изменений нет
+# замечание: запись 805 обработана, изменений нет
+# проверено: arr[0] += 94 — не выполняется
+# пометка: запись 819 обработана, изменений нет
+# черновик: запись 724 обработана, изменений нет
+# архив: запись 634 обработана, изменений нет
+# замечание: arr[0] *= 58 — не выполняется (duplicate?)
+...
+arr[1] *= 2
+
+Then after that comments, t973? Let's continue:
+# проверено: запись 116 обработана, изменений нет
+... many comments ...
+t973 = str(arr[7]) + str(arr[2])
+
+Yes. So actual sequence includes arr[1] *= 2 before t973. Need include.
+
+Any other actual statements like "arr[4] = acc" we included. "arr[3] += 5" included. "arr[7] += 5" included. "arr2[3]+=2", "arr2[3]+=6" included. "arr[1]*=2" included.
+
+Need also check if there is actual "arr[8] += 1" yes. "bump_all(arr,5)" yes. "arr[2] *= 2" yes. "arr[2] += 3" yes.
+
+Need check if there is actual "arr[0] = int(t973) % 97" and "arr[0] = int(t58) % 97". Yes.
+
+Need check if there is actual "arr[6] = len(re.findall(r'\d', s590)) % 50". Yes.
+
+Need check if any actual statements like "arr2 = arr" after t58? There might be another "arr2 = arr" before t58? We have second arr2=arr before arr2[3]+=2. But maybe there is a third arr2=arr after t58? Let's search for "arr2 = arr" occurrences: I saw first after arr[3]+=5, second after t973/arr0? There may be a line "arr2 = arr" near end before t58? In text after many comments following arr[0]=int(t973)%97, there is "arr2 = arr". Then later after many comments following arr[0]=int(t58)%97? I saw line "arr2 = arr" again? Let's search: In user code, after a huge comment block near end, there is:
+# примечание: запись 416 обработана, изменений нет
+# архив: запись 810 обработана, изменений нет
+# примечание: запись 932 обработана, изменений нет
+# проверено: arr2[6] = 10 — не выполняется
+... many comments ...
+arr2 = arr
+
+Then later after t58? There is another line "arr2 = arr"? I saw near after a comment block:
+# примечание: запись 416 обработана, изменений нет
+# архив: запись 810 обработана, изменений нет
+# примечание: запись 932 обработана, изменений нет
+# проверено: arr2[6] = 10 — не выполняется
+... many comments ...
+arr2 = arr
+
+Maybe only one after t973. But there is also line "arr2 = arr" after many comments following arr[0]=int(t58)%97? Let's search in text: I saw near end:
+# примечание: запись 416 обработана, изменений нет
+# архив: запись 810 обработана, изменений нет
+# примечание: запись 932 обработана, изменений нет
+# проверено: arr2[6] = 10 — не выполняется
+... many comments ...
+arr2 = arr
+
+This might be the same second. Then after that comments, t58? Wait t58 appears after this arr2=arr? Let's check: In the text, after arr[0]=int(t973)%97, there are comments, then line "arr2 = arr". Then after that comments, then "t58 = str(arr[1]) + str(arr[4])"? But we also have arr2[3]+=2 and arr[7]+=5 before t58? Need order: second arr2=arr -> comments -> arr2[3]+=2 -> comments -> arr[7]+=5 -> comments -> t58? Or second arr2=arr -> comments -> t58? Let's find exact from text around "arr2 = arr" and "t58". I saw a line "arr2 = arr" after many comments following arr[0]=int(t973)%97. Then after that, there is a huge comment block that includes "пометка: запись 300 обработана, изменений нет" etc, then line "arr2[3] += 2"? Let's search: In the text after second arr2=arr, I saw:
+# пометка: запись 300 обработана, изменений нет
+... many comments ...
+# временная запись: запись 662 обработана, изменений нет
+arr2[3] += 2
+
+Yes. Then after arr2[3]+=2, comments then arr[7]+=5? Wait earlier we saw arr[7]+=5 after a huge comment block that includes "примечание: arr[8] += 48 — не выполняется". That block is after arr2[3]+=2. Then after arr[7]+=5, comments then t58? Let's verify: In the text after arr[7]+=5, there are comments then t58? I saw t58 line after a comment block that includes "пометка: запись 424 обработана, изменений нет". That block is after arr[7]+=5? Actually the excerpt before arr[7]+=5 ended with "пометка: запись 424 обработана, изменений нет" then t58? Let's re-read: The huge block before arr[7]+=5 included line "t58 = str(arr[1]) + str(arr[4])"? Wait I need exact order from user message. Let's search for "t58" in the text relative to "arr[7] += 5". In the user code, I see:
+...
+# замечание: запись 296 обработана, изменений нет
+# примечание: arr[3], arr[0] = arr[0], arr[3] — не выполняется
+# ревизия: arr[1] = 24 — не выполняется
+t58 = str(arr[1]) + str(arr[4])
+# ревизия: запись 64 обработана, изменений нет
+... many comments ...
+arr[0] = int(t58) % 97
+... many comments ...
+arr2[3] += 6? or arr[8]+=1?
+
+Where is arr[7]+=5? It appears before this t58? Let's search upward from t58: The comment block before t58 includes many comments, and just before that there is line "arr[7] += 5"? In the excerpt, after arr[7]+=5 there are comments then eventually t58. Yes likely: arr[7]+=5 occurs before t58. Good.
+
+So order after second arr2=arr:
+- arr2[3] += 2
+- arr[7] += 5
+- t58 = ...
+- arr[0] = int(t58) % 97
+- arr2[3] += 6? Need check if before or after arr[0]=int(t58). Let's find exact order of arr2[3]+=6 relative to t58. Search for "arr2[3] += 6" in text. It appears after comments following "arr[0] = int(t58) % 97"? Let's see. In the text after t58 line, there are comments then arr[0]=int(t58)%97. Then after that comments, I saw line "arr2[3] += 6"? Let's search: There is a block:
+# архив: arr[0], arr[8] = arr[8], arr[0] — не выполняется
+... many comments ...
+# черновик: запись 965 обработана, изменений нет
+# черновик: arr[8] *= 49 — не выполняется
+... many comments ...
+arr2[3] += 6
+
+Then after that comments, line "arr[8] += 1". So yes arr2[3]+=6 after arr[0]=int(t58)%97 and before arr[8]+=1.
+
+But wait there is also line "arr2 = arr" maybe third before t58? If second arr2=arr already, alias remains. If no reassignment, arr2 still references same list. So arr2[3]+=6 affects arr.
+
+Need check if any actual statement "arr[4] = acc(arr, 5) % 100" occurs before or after arr[3:6] sorted. We need compute with exact order. Let's list all actual mutations in final chronological order, including no-effect used variables:
+
+A. Initial arr = [18,18,28,18,14,16,7,27,2,13]
+B. arr.reverse()
+C. arr[3] += 5
+D. arr2 = arr (alias)
+E. arr2[2] += 3 (affects index 2)
+F. arr[1], arr[8] = arr[8], arr[1]
+G. arr[4:7] = sorted(arr[4:7])
+H. arr[4] = acc(arr, 5) % 100
+I. arr[3:6] = sorted(arr[3:6])
+J. arr[2], arr[6] = arr[6], arr[2]
+K. apply_twice(arr, 7, 4) (adds 8 to index 7)
+L. arr[1] *= 2
+M. t973 = str(arr[7]) + str(arr[2])
+N. arr[0] = int(t973) % 97
+O. arr2 = arr (alias again)
+P. arr2[3] += 2 (index 3)
+Q. arr[7] += 5
+R. t58 = str(arr[1]) + str(arr[4])
+S. arr[0] = int(t58) % 97
+T. arr2[3] += 6 (index 3) ? Need verify order: after S, before U? Let's confirm. Could be before R? Need exact. We'll need compute both possibilities? Let's determine from text. The line "arr2[3] += 6" appears after a huge comment block following arr[0]=int(t58)%97? I think yes. But let's verify by searching in the user code around "t58" and "arr2[3] += 6". In the text, after t58 line, comments, then arr[0] = int(t58) % 97. Then after that comments, then maybe "arr2[3] += 6"? I saw line "arr2[3] += 6" after comments that include "черновик: запись 965 обработана, изменений нет". That block is after arr[0]=int(t58)%97? Let's continue from arr[0]=int(t58)%97 in user code:
+# архив: arr[0], arr[8] = arr[8], arr[0] — не выполняется
+# примечание: arr[6] += 30 — не выполняется
+... many comments ...
+# черновик: запись 965 обработана, изменений нет
+# черновик: arr[8] *= 49 — не выполняется
+... many comments ...
+arr2[3] += 6
+
+Yes. Then after arr2[3]+=6 comments, then arr[8] += 1. So T after S.
+
+U. arr[8] += 1
+V. bump_all(arr, 5) (adds 5 to even indices 0,2,4,6,8)
+W. arr[2] *= 2
+X. arr[2] += 3
+Y. s590 = ''.join(str(x) for x in arr)
+Z. arr[6] = len(re.findall(r'\d', s590)) % 50
+
+Need check if there is actual "arr[1] *= 2" before t973, yes L. Could there be actual "arr[1] *= 2" after t58? No.
+
+Need check if there is actual "arr[4] = acc(arr,5)%100" before or after arr[3:6]. We have H before I. Need verify if arr[4]=acc occurs after arr[4:7] and before arr[3:6]. Yes.
+
+Need check if there is actual "arr2[2] += 3" after first arr2=arr, yes E. Since arr2 alias, index 2.
+
+Need check if there is actual "arr[3] += 5" after reverse, yes C.
+
+Need check if any actual "arr[4:7] = sorted(arr[4:7])" before arr[4]=acc? yes G.
+
+Need compute step by step carefully. Let's do arithmetic. Use Python mental or manual. Need final array and sum. Let's simulate with exact sequence.
+
+Initial arr: index 0..9
+0:18
+1:18
+2:28
+3:18
+4:14
+5:16
+6:7
+7:27
+8:2
+9:13
+
+B reverse -> [13,2,27,7,16,14,18,28,18,18]? Let's reverse original: original [18,18,28,18,14,16,7,27,2,13]. Reverse = [13,2,27,7,16,14,18,28,18,18]. Check indices:
+0 13
+1 2
+2 27
+3 7
+4 16
+5 14
+6 18
+7 28
+8 18
+9 18
+
+C arr[3] +=5 -> index3 7+5=12. arr = [13,2,27,12,16,14,18,28,18,18]
+
+D arr2=arr alias.
+E arr2[2]+=3 -> index2 27+3=30. arr = [13,2,30,12,16,14,18,28,18,18]
+
+F arr[1], arr[8] = arr[8], arr[1]. Current arr[1]=2, arr[8]=18. Swap -> index1=18, index8=2. arr = [13,18,30,12,16,14,18,28,2,18]
+
+G arr[4:7] = sorted(arr[4:7]). Slice indices 4,5,6 values [16,14,18]. Sorted [14,16,18]. Assign to indices 4,5,6. arr = [13,18,30,12,14,16,18,28,2,18]
+
+H arr[4] = acc(arr,5) % 100. acc(a,n) sums first n elements? If n<=0 return 0; return a[n-1]+acc(a,n-1). So acc(arr,5) = sum indices 0..4 of current arr before assignment. Current arr[0..4] = [13,18,30,12,14]. Sum = 13+18=31; +30=61; +12=73; +14=87. 87 % 100 = 87. Set arr[4]=87. arr = [13,18,30,12,87,16,18,28,2,18]
+
+I arr[3:6] = sorted(arr[3:6]). Slice indices 3,4,5 values [12,87,16]. Sorted [12,16,87]. Assign to indices 3,4,5. arr = [13,18,30,12,16,87,18,28,2,18]
+
+J arr[2], arr[6] = arr[6], arr[2]. Current index2=30, index6=18. Swap -> index2=18, index6=30. arr = [13,18,18,12,16,87,30,28,2,18]
+
+K apply_twice(arr, 7, 4). bump twice: arr[7] +=4 twice => +8. index7 28+8=36. arr = [13,18,18,12,16,87,30,36,2,18]
+
+L arr[1] *= 2 -> index1 18*2=36. arr = [13,36,18,12,16,87,30,36,2,18]
+
+M t973 = str(arr[7]) + str(arr[2]). arr[7]=36, arr[2]=18 -> "36" + "18" = "3618". int=3618.
+
+N arr[0] = int(t973) % 97. Need 3618 mod 97. 97*37 = 3589? 97*30=2910, *7=679, total 3589. Remainder 29. 97*37=3589, 3618-3589=29. So arr[0]=29. arr = [29,36,18,12,16,87,30,36,2,18]
+
+O arr2 = arr (alias)
+P arr2[3] += 2 -> index3 12+2=14. arr = [29,36,18,14,16,87,30,36,2,18]
+
+Q arr[7] += 5 -> index7 36+5=41. arr = [29,36,18,14,16,87,30,41,2,18]
+
+R t58 = str(arr[1]) + str(arr[4]). arr[1]=36, arr[4]=16 -> "36" + "16" = "3616". int=3616.
+
+S arr[0] = int(t58) % 97. 3616 mod 97: 97*37=3589, remainder 27. So arr[0]=27. arr = [27,36,18,14,16,87,30,41,2,18]
+
+T arr2[3] += 6 -> index3 14+6=20. arr = [27,36,18,20,16,87,30,41,2,18]
+
+U arr[8] += 1 -> index8 2+1=3. arr = [27,36,18,20,16,87,30,41,3,18]
+
+V bump_all(arr,5): for i in range(0,len(a),2): a[i]+=5. Even indices 0,2,4,6,8 add 5.
+index0 27+5=32
+index1 unchanged 36
+index2 18+5=23
+index3 unchanged 20
+index4 16+5=21
+index5 unchanged 87
+index6 30+5=35
+index7 unchanged 41
+index8 3+5=8
+index9 unchanged 18
+arr = [32,36,23,20,21,87,35,41,8,18]
+
+W arr[2] *= 2 -> index2 23*2=46. arr = [32,36,46,20,21,87,35,41,8,18]
+
+X arr[2] += 3 -> index2 49. arr = [32,36,49,20,21,87,35,41,8,18]
+
+Y s590 = ''.join(str(x) for x in arr). Need concatenate decimal representations:
+arr values: 32 -> "32"
+36 -> "36"
+49 -> "49"
+20 -> "20"
+21 -> "21"
+87 -> "87"
+35 -> "35"
+41 -> "41"
+8 -> "8"
+18 -> "18"
+Concatenate: "3236492021873541818"? Let's carefully join: 32 36 49 20 21 87 35 41 8 18 => string:
+"32" + "36" = "3236"
++ "49" = "323649"
++ "20" = "32364920"
++ "21" = "3236492021"
++ "87" = "323649202187"
++ "35" = "32364920218735"
++ "41" = "3236492021873541"
++ "8" = "32364920218735418"
++ "18" = "3236492021873541818". Yes length? Count digits: 2+2+2+2+2+2+2+2+1+2 = 19. String "3236492021873541818".
+
+Z arr[6] = len(re.findall(r'\d', s590)) % 50. re.findall digits in string: all characters are digits, length 19. 19 % 50 = 19. Set index6 = 19. Previously index6=35. Final arr = [32,36,49,20,21,87,19,41,8,18]
+
+Sum: 32+36=68; +49=117; +20=137; +21=158; +87=245; +19=264; +41=305; +8=313; +18=331. Sum 331.
+
+Need ensure no missed actual statements that affect arr before s590 or after. Let's double-check entire code for actual lines not considered:
+- import re, functions, MANUAL, TRAP variables (unused). No effect.
+- Initial no-effect assignments: tmp_0 etc. They don't mutate arr. But some use arr values before mutations; irrelevant unless used later? Only t973/t58/s590 are used. The many code_x/note_x/copy_x/label_x not used later. No effect.
+- Could there be actual assignment to arr in those no-effect lines? No, they assign to tmp/copy/code/note/label variables, not arr. Some like "copy_3 = arr[2]" no mutation.
+- Comments after arr.reverse: all lines starting with # are comments. Some contain "arr[9], arr[3] = arr[3], arr[9] — не выполняется" but commented, no effect.
+- Need check if line "arr2 = arr" first before arr2[2]+=3; yes.
+- Need check if line "arr2[2] += 3" occurs after first arr2=arr; yes.
+- Need check if line "arr[1], arr[8] = arr[8], arr[1]" occurs after arr2[2]+=3; yes.
+- Need check if line "arr[4:7] = sorted(arr[4:7])" occurs after swap; yes.
+- Need check if line "arr[4] = acc(arr, 5) % 100" occurs after arr[4:7]; yes. But could there be another actual "arr[3:6] = sorted(arr[3:6])" before arr[4]=acc? We need verify order. In text, after arr[4:7], huge comments then arr[4]=acc then comments then arr[3:6]. Yes.
+- Need check if line "arr[2], arr[6] = arr[6], arr[2]" occurs after arr[3:6]; yes.
+- Need check if line "apply_twice(arr, 7, 4)" occurs after swap; yes.
+- Need check if line "arr[1] *= 2" occurs after apply_twice and before t973; yes. Could there be another actual "arr[1] *= 2" earlier? No.
+- Need check if line "t973 = str(arr[7]) + str(arr[2])" after arr[1]*=2; yes.
+- Need check if line "arr[0] = int(t973) % 97" after t973; yes.
+- Need check if line "arr2 = arr" after that; yes.
+- Need check if line "arr2[3] += 2" after second arr2=arr; yes. Could there be line "arr2[3] += 6" before arr2[3]+=2? We need order of the two arr2[3] increments. In text, I saw arr2[3]+=2 then later arr2[3]+=6. Need ensure no third? There is also comment "arr2[3] = ..." many, but actual only +=2 and +=6. The order: after second arr2=arr, comments, arr2[3]+=2, comments, arr[7]+=5, comments, t58, comments, arr0=int(t58), comments, arr2[3]+=6? Wait earlier I thought arr2[3]+=6 after t58. But in the text segment after arr[7]+=5 and before t58, there might be arr2[3]+=6? Let's verify exact order of arr2[3]+=6 relative to t58. This is critical because t58 uses arr[4] not arr[3], so order of arr2[3]+=6 relative to t58 doesn't affect t58, but affects final index3 if before/after bump_all? It is before bump_all in either case? Need know if arr2[3]+=6 occurs before or after arr[7]+=5? It doesn't affect t58 (index1,4) or t973 (index7,2) except if before t973? But arr2[3]+=6 is after second arr2=arr, which is after t973. So no effect on t973. It affects final index3 only; order relative to arr[7]+=5/t58 doesn't matter for index3 except both before bump_all. But if there is an actual "arr[3:6] sorted" after arr2[3]+=6? No, sorted earlier. So final index3 = 20 regardless of whether +2 and +6 order (both add 8 to 12). Unless there is another mutation to index3 between them? arr[7]+=5 no, t58 no, arr0 no. So okay.
+
+But need ensure arr2[3]+=6 occurs before bump_all; yes likely. If after bump_all? Let's check: It appears before arr[8]+=1 and bump_all in text? I saw arr2[3]+=6 then comments then arr[8]+=1. Yes before bump_all. Good.
+
+- Need check if line "arr[7] += 5" occurs before t58; yes. It affects t973? No, t973 earlier. It affects final index7 before bump_all (odd index not bumped). We included +5 after apply_twice and arr1*2. Good.
+- Need check if line "t58 = str(arr[1]) + str(arr[4])" occurs after arr[7]+=5; yes. It uses arr[1]=36, arr[4]=16. Did any mutation to index4 between H/I and t58? Let's track: After I, index4=16. H set 87 then sorted moved 87 to index5, index4=16. Later no mutations to index4 until bump_all (adds 5). So t58 uses 16. Good.
+- Need check if arr[0]=int(t58)%97 after t58; yes. It overwrites arr0 from 29 to 27 before bump_all. Good.
+- Need check if line "arr[8] += 1" after arr2[3]+=6; yes. Then bump_all adds 5 to index8 too, so index8 final 3+5=8. Good.
+- Need check if line "bump_all(arr, 5)" after arr[8]+=1; yes.
+- Need check if line "arr[2] *= 2" after bump_all; yes. We did bump then multiply. If order reversed? Text: bump_all then arr[2]*=2. Yes.
+- Need check if line "arr[2] += 3" after multiply; yes.
+- Need check if s590 after arr[2]+=3; yes.
+- Need check if arr[6] assignment after s590; yes.
+
+Potential missed actual statement: "arr[4] = acc(arr, 5) % 100" uses acc function recursive sum of first 5 elements. We computed sum before assignment. Good.
+
+Potential missed actual statement: "arr[3:6] = sorted(arr[3:6])" after arr[4]=acc. We did. Good.
+
+Potential missed actual statement: "arr[4:7] = sorted(arr[4:7])" before acc. We did.
+
+Potential missed actual statement: "arr2 = arr" first before arr2[2]+=3. Good.
+
+Potential missed actual statement: "arr2[2] += 3" after first alias. Good.
+
+Potential missed actual statement: "arr[1], arr[8] = arr[8], arr[1]" after arr2[2]+=3. Good.
+
+Potential missed actual statement: "arr[2], arr[6] = arr[6], arr[2]" after sorted slices. Good.
+
+Potential missed actual statement: "apply_twice(arr, 7, 4)" after swap. Good.
+
+Potential missed actual statement: "arr[1] *= 2" before t973. Need verify exact position: Could it be after t973? Let's search in text around t973. I saw line "arr[1] *= 2" before t973? In the code, after apply_twice there are many comments, then line "arr[1] *= 2", then more comments, then "t973 = ...". Let's confirm from user text: There is a line:
+# проверено: запись 869 обработана, изменений нет
+# черновик: arr2[6] = 23 — не выполняется
+...
+arr[1] *= 2
+# проверено: запись 116 обработана, изменений нет
+...
+t973 = str(arr[7]) + str(arr[2])
+
+Yes. Good.
+
+Potential missed actual statement: "arr[0] = int(t973) % 97" after t973. Good.
+
+Potential missed actual statement: "arr2 = arr" second after arr0=int(t973). Good.
+
+Potential missed actual statement: "arr2[3] += 2" after second alias. Good.
+
+Potential missed actual statement: "arr[7] += 5" after arr2[3]+=2? Need verify if there is another actual "arr[7] += 5" before t973? There is comment "arr[7] += ..." many, but actual line appears after arr2[3]+=2. We included. Could there be actual "arr[7] += 5" before apply_twice? Search: I saw line "arr[7] += 5" only once near end. Good.
+
+Potential missed actual statement: "t58 = str(arr[1]) + str(arr[4])" after arr[7]+=5. Good.
+
+Potential missed actual statement: "arr[0] = int(t58) % 97". Good.
+
+Potential missed actual statement: "arr2[3] += 6". Need ensure it occurs after t58? If before t58, index3 final same? It adds 6 before/after t58 no effect on t58. But if before arr[7]+=5? Still same. If after bump_all? Need ensure not after bump_all. Text shows before arr[8]+=1 and bump_all. Good.
+
+Potential missed actual statement: "arr[8] += 1". Good.
+
+Potential missed actual statement: "bump_all(arr, 5)". Good.
+
+Potential missed actual statement: "arr[2] *= 2". Good.
+
+Potential missed actual statement: "arr[2] += 3". Good.
+
+Potential missed actual statement: "s590 = ''.join(str(x) for x in arr)". Good.
+
+Potential missed actual statement: "arr[6] = len(re.findall(r'\d', s590)) % 50". Good.
+
+Need consider if re.findall(r'\d', s590) counts digits in negative numbers? No negatives. All values positive. Length 19. If any value becomes multi-digit? yes all digits count as characters. We counted total digits of each number. Need verify final values before s590: [32,36,49,20,21,87,35,41,8,18]. Digits: 2+2+2+2+2+2+2+2+1+2=19. Good.
+
+Need consider if arr[6] assignment after s590 uses len % 50 = 19. Good.
+
+Need consider if sum includes final arr[6]=19 not 35. Sum 331. Let's recalc sum final: 32+36=68, +49=117, +20=137, +21=158, +87=245, +19=264, +41=305, +8=313, +18=331. Yes.
+
+But let's double-check all arithmetic with alternative if order of arr[4]=acc and arr[3:6] sorted maybe different. If arr[3:6] sorted before acc? Let's verify from code: There is line "arr[4:7] = sorted(arr[4:7])" then comments then "arr[3:6] = sorted(arr[3:6])"? Wait I need be absolutely sure about arr[4]=acc position. In the user code, after arr[4:7] there is a huge comment block, then line "arr[3:6] = sorted(arr[3:6])"? Then later line "arr[4] = acc(arr,5)%100"? Let's search in text for "arr[3:6] = sorted". I saw after a huge comment block following arr[4:7], there is line "arr[3:6] = sorted(arr[3:6])"? Actually in the excerpt after arr[4:7], I listed huge comments then arr[4]=acc, then more comments then arr[3:6]. But maybe the actual order is arr[3:6] before arr[4]=acc? Let's inspect the user code around "arr[3:6] = sorted(arr[3:6])". It appears after a comment block that includes "архив: запись 334 обработана, изменений нет"? Wait that comment block ended with arr[4]=acc. Then after arr[4]=acc, comments, then line "arr[3:6] = sorted(arr[3:6])". I saw in text:
+# архив: запись 334 обработана, изменений нет
+arr[4] = acc(arr, 5) % 100
+# замечание: arr[1] += 1 — не выполняется
+... many comments ...
+arr[3:6] = sorted(arr[3:6])
+
+Yes. So order H then I. Good.
+
+But what about line "arr[4:7] = sorted(arr[4:7])" and "arr[3:6] = sorted(arr[3:6])" maybe there is another actual "arr[4] = acc" before arr[4:7]? Search for "acc(arr, 5)" only once. It appears after huge comments following arr[4:7]? Yes.
+
+Need check if line "arr[2], arr[6] = arr[6], arr[2]" occurs after arr[3:6] sorted. Yes.
+
+Let's recompute with possible alternative if arr[4]=acc before arr[3:6]? We did. If acc before sorted, index4 becomes 87, then sorted [3:6] sorts 12,87,16 -> 12,16,87. Good. If sorted before acc, arr[4] would be 16 and acc sum first5 = 13+18+30+12+16=89? Then arr[4]=89, then maybe no second sort? But code has sort after acc, so our result likely.
+
+Need check if arr[4:7] sorted before arr[3] +=5? No, arr[3]+=5 earlier. Good.
+
+Let's maybe write a mini simulation in head with table to ensure no mistakes:
+Start after reverse: [13,2,27,7,16,14,18,28,18,18]
++arr[3]=5 -> [13,2,27,12,16,14,18,28,18,18]
+arr2[2]+=3 -> [13,2,30,12,16,14,18,28,18,18]
+swap 1 and 8 -> [13,18,30,12,16,14,18,28,2,18]
+sort 4:7 values [16,14,18] -> [14,16,18] => [13,18,30,12,14,16,18,28,2,18]
+acc first5 = 13+18+30+12+14=87 -> arr[4]=87 => [13,18,30,12,87,16,18,28,2,18]
+sort 3:6 values [12,87,16] -> [12,16,87] => [13,18,30,12,16,87,18,28,2,18]
+swap 2 and 6 -> [13,18,18,12,16,87,30,28,2,18]
+apply_twice index7 +8 -> [13,18,18,12,16,87,30,36,2,18]
+arr[1]*=2 -> [13,36,18,12,16,87,30,36,2,18]
+t973 = 36 and 18 -> 3618 mod97=29 -> [29,36,18,12,16,87,30,36,2,18]
+arr2[3]+=2 -> [29,36,18,14,16,87,30,36,2,18]
+arr[7]+=5 -> [29,36,18,14,16,87,30,41,2,18]
+t58 = 36 and 16 -> 3616 mod97=27 -> [27,36,18,14,16,87,30,41,2,18]
+arr2[3]+=6 -> [27,36,18,20,16,87,30,41,2,18]
+arr[8]+=1 -> [27,36,18,20,16,87,30,41,3,18]
+bump_all even +5 -> [32,36,23,20,21,87,35,41,8,18]
+arr[2]*=2 -> [32,36,46,20,21,87,35,41,8,18]
+arr[2]+=3 -> [32,36,49,20,21,87,35,41,8,18]
+s590 digits length 19 -> arr[6]=19 -> [32,36,49,20,21,87,19,41,8,18]
+
+Looks consistent.
+
+Need consider if bump_all range(0,len(a),2) includes index 0,2,4,6,8. Yes.
+
+Need consider if apply_twice uses bump(a,i,v) twice: a[i] += v; a[i] += v. Yes +8.
+
+Need consider if acc recursion sums first n elements inclusive? acc(a,n): if n<=0 return 0; return a[n-1]+acc(a,n-1). For n=5 sum indices 4,3,2,1,0. Yes.
+
+Need consider if re.sub no effect on arr. Yes.
+
+Need consider if TRAP variables maybe executed? They are just assignments to strings, no effect. MANUAL string unused.
+
+Need final answer strictly format:
+ARRAY: [numbers, comma separated]
+SUM: number
+
+Need ensure no extra text. Could include spaces after commas? User says numbers, comma separated. Example likely "ARRAY: [32, 36, ...]". Strictly as two lines. Use exactly.
+
+Before final, maybe we should think if there is any hidden actual statement in comments? No, comments start with #. Some lines like "# проверено: arr2[3] = 22 — не выполняется" are comments. Good.
+
+Potential issue: The code defines "arr2 = arr" first, then later "arr2[2] += 3". But there is also a line "arr2 = arr" after many comments before t58? We included second. What about line "arr2 = arr" after first arr[3]+=5 and before arr2[2]+=3? Yes first. Could there be a line "arr2 = arr" after t58 but before arr2[3]+=6? If not, alias still same. If there is a third, no effect except alias.
+
+Potential issue: There is line "arr2 = arr" near end after t973? We included. But if there is also line "arr2 = arr" after t58? It doesn't matter.
+
+Potential issue: The line "arr[4] = acc(arr, 5) % 100" might occur after arr[3:6] sorted? Let's verify by searching exact text around "arr[3:6] = sorted(arr[3:6])". In user code, I saw:
+# пометка: запись 424 обработана, изменений нет
+arr[3:6] = sorted(arr[3:6])
+# проверено: arr[7] = 33 — не выполняется
+...
+
+Where is line "arr[4] = acc"? It appears before that? In the text, after arr[4:7], there is a huge comment block, then line "arr[4] = acc(arr, 5) % 100", then comments, then line "arr[3:6] = sorted(arr[3:6])". Yes.
+
+Potential issue: There is line "arr[4:7] = sorted(arr[4:7])" maybe after arr[4]=acc? Let's search: The line "arr[4:7]" appears before the huge comment block that ends with arr[4]=acc? In text, after arr[1],arr[8] swap, comments, then line "arr[4:7] = sorted(arr[4:7])". Then comments, then arr[4]=acc. Yes.
+
+Potential issue: There is line "arr[2], arr[6] = arr[6], arr[2]" maybe before arr[3:6] sorted? Search: After arr[3:6] sorted, comments, then line "arr[2], arr[6] = ...". Yes.
+
+Potential issue: There is line "apply_twice(arr, 7, 4)" maybe before arr[2],arr[6] swap? Search: after swap comments then apply_twice. Yes.
+
+Potential issue: There is line "arr[1] *= 2" maybe before apply_twice? Search: after apply_twice comments then arr[1]*=2. Yes.
+
+Potential issue: There is line "t973 = str(arr[7]) + str(arr[2])" maybe before arr[1]*=2? We included after. If before, t973 uses arr[1]? no, uses 7 and 2; arr[1] not used. So no effect on t973 except if arr[1]*=2 before/after doesn't affect t973. But final arr[1] affected by later bump? index1 odd not bumped. If arr[1]*=2 before apply_twice? apply_twice index7 no effect. So order of arr[1]*=2 relative to t973 not matter for t973, but final same. Good.
+
+Potential issue: There is line "arr[0] = int(t973) % 97" before arr[1]*=2? If so t973 uses arr[1]? no. But final arr0 overwritten later by t58 anyway. So not matter? Actually if arr0 overwritten before t58, final overwritten anyway. Good.
+
+Potential issue: There is line "arr[7] += 5" before apply_twice? If so index7 final would be different because apply_twice +8 and +5 order commutative addition, same. But t973 uses arr[7]; if arr[7]+=5 before t973, t973 would use 41 instead of 36, affecting arr0 before t58, but final arr0 overwritten by t58. So no final effect except maybe if t973 used later? No. But we need actual order for correctness if any other uses. It doesn't affect final because arr0 overwritten and index7 addition commutative. Good.
+
+Potential issue: There is line "arr2[3]+=2" before arr[0]=int(t973)? It affects index3, not used in t973/t58. Final same if before/after as long as before bump_all. Good.
+
+Potential issue: There is line "arr2[3]+=6" maybe before t58? t58 uses index4,1; no effect. Final same.
+
+Potential issue: There is line "arr[7]+=5" maybe before t973? It would affect t973 and arr0 before t58, but final arr0 overwritten. Index7 final addition same. So robust.
+
+Potential issue: There is line "arr[4]=acc" maybe after arr[3:6] sorted? That would affect final index4 before bump_all? Let's see if order H/I swapped could change final? If arr[3:6] sorted before acc, then acc sum first5 after sort? Current after G and swap? Let's test alternative: After G arr [13,18,30,12,14,16,18,28,2,18]. If I sort 3:6 [12,14,16] unchanged? Actually values [12,14,16] sorted same. Then acc first5 = 13+18+30+12+14=87 set index4=87 -> arr [13,18,30,12,87,16,18...]. Then no second sort? But code has sort after acc in our order. If sort before acc and then maybe another sort? There is only one arr[3:6]. Final after J etc would differ: index4=87 instead of 16? Wait our final after H/I had index4=16, index5=87. If I before H, index4=87, index5=16. Then later swap index2/6 no effect, apply, arr1*2, t973 uses index7 and 2 unaffected, t58 uses index4 (would be 87) -> t58 string "3687" mod97? 3687 /97: 97*38=3686 remainder1, arr0=1 before bump, final arr0 after bump +5 =6 instead of 32. Sum different. So order critical. Need be certain H before I. Let's verify from code text more rigorously.
+
+Search for "arr[3:6] = sorted(arr[3:6])" in user message. It appears after a comment block that includes "архив: запись 334 обработана, изменений нет"? Wait that comment block ended with arr[4]=acc. Let's find the actual line sequence around there in the provided text (I can scroll from top in the prompt). After arr[4:7] line, there is a long comment block. I saw near the end of that block:
+# архив: запись 334 обработана, изменений нет
+arr[4] = acc(arr, 5) % 100
+# замечание: arr[1] += 1 — не выполняется
+... many comments ...
+# проверено: запись 865 обработана, изменений нет
+... many comments ...
+arr[3:6] = sorted(arr[3:6])
+
+Yes, because after arr[4]=acc there is another long comment block then arr[3:6]. So H before I. Good.
+
+Need check if there is an actual line "arr[4] = acc(arr, 5) % 100" maybe after arr[3:6]? No, the line appears before the comment block that ends with arr[3:6]. Good.
+
+Potential issue: There is line "arr[4:7] = sorted(arr[4:7])" maybe after arr[4]=acc? Let's search: The line "arr[4:7]" appears before the comment block that ends with arr[4]=acc? In text, after swap, comments, then line arr[4:7]. Then comments, then arr[4]=acc. Yes.
+
+Potential issue: There is line "arr[3:6] = sorted(arr[3:6])" maybe before arr[2],arr[6] swap? Yes after.
+
+Need maybe compute using a small mental script? Could there be hidden actual statements in the initial no-effect block that mutate arr? Lines like "tmp_0 = arr[8] + 48" no. "code_1 = re.sub..." no. "copy_3 = arr[2]" no. "note_12 = str(arr[7]) + str(arr[5])" no. "label_6 = ..." no. None assign to arr. Good.
+
+Need consider if functions acc, bump, bump_all, mix, apply_twice defined but not used except acc and apply_twice/bump_all. mix unused. Good.
+
+Need consider if MANUAL string contains assignments but not executed. Good.
+
+Need consider if TRAP variables are strings not executed. Good.
+
+Need final answer only. But before final, maybe we should include no explanation due strict format. Final:
+ARRAY: [32, 36, 49, 20, 21, 87, 19, 41, 8, 18]
+SUM: 331
+
+Double-check sum if final arr[6]=19. Yes.
+
+Let's maybe verify mod calculations:
+3618 /97: 97*37=3589, rem29. 3616 rem27. Good.
+If t58 string "3616" because arr[1]=36, arr[4]=16. Yes. If arr[4] after sorted is 16. Good.
+If arr[1] after swap and multiply: initial after reverse index1=2, swap with index8=18 -> 18, multiply by2 ->36. Good.
+If arr[4] after H/I: G set index4=14, H set 87, I sorted [3:6] values [12,87,16] -> [12,16,87], so index4=16. Good.
+If arr[7] after apply_twice: before apply index7=28? Let's track: after reverse index7=28? Reverse original index7=28? Original index7=27? Wait original [18,18,28,18,14,16,7,27,2,13]. Reverse: index0=13 (orig9), 1=2 (orig8), 2=27 (orig7), 3=7 (orig6), 4=16 (orig5), 5=14 (orig4), 6=18 (orig3), 7=28 (orig2), 8=18 (orig1), 9=18 (orig0). Yes index7=28. arr[3]+=5 index3=12. arr2[2]+=3 index2=30. swap 1 and8: index1=18, index8=2. sort 4:7 [16,14,18] -> [14,16,18], index7 remains 28. acc set index4=87. sort 3:6 [12,87,16] -> [12,16,87], index7 remains 28. swap 2 and6: index2=18, index6=30. apply_twice index7 +8 =>36. arr[1]*=2 =>36. t973 uses index7=36, index2=18. Good.
+
+What about arr[7]+=5 after t973: index7 41. Good.
+
+bump_all adds to index0,2,4,6,8. index0 after t58=27 ->32; index2 after t973? before bump index2=18? Wait after J swap index2=18, then no changes until bump? arr[1]*=2 no, t973 no, arr0 no, arr2[3] no, arr7 no, t58 no, arr0 no, arr2[3] no, arr8+1. So index2=18 before bump -> +5=23 -> *2=46 -> +3=49. Good.
+index4 before bump =16 -> +5=21. Good.
+index6 before bump =30? Wait after J swap index6=30, then no changes until bump? apply_twice index7, arr1, t973, arr0, arr2[3], arr7, t58, arr0, arr2[3], arr8. Index6 remains 30. bump +5=35. Then final set to 19. Good.
+index8 before bump: after swap index8=2, then no changes until arr[8]+=1 ->3, bump +5=8. Good.
+index9 remains 18 (reverse original index0? yes). No changes.
+
+Potential missed actual statement: "arr[9] = ..." all comments/traps no effect. Good.
+
+Potential missed actual statement: "arr[6] = len(re.findall(r'\d', s590)) % 50" uses s590 before arr[6] set to 19. If s590 length maybe includes negative? no. If any value is 0? no. Count digits: Let's count string carefully: "3236492021873541818". Count characters: group maybe 3 2 3 6 4 9 2 0 2 1 8 7 3 5 4 1 8 1 8 =19. Yes.
+
+Could re.findall(r'\d', s590) count digits in the string representation of list? No, s590 is joined elements, no brackets/commas. Good.
+
+Need final strict. Ensure no trailing spaces? Fine.
+
+Let's consider if there is actual line "arr[4] = acc(arr, 5) % 100" maybe uses arr after arr[3:6] sorted? We decided no. If wrong, final sum different. Let's maybe search in the code text for the exact order of "arr[3:6] = sorted(arr[3:6])" and "arr[4] = acc". In the prompt, after arr[4:7] line, there is a huge comment block. I can find the line "arr[3:6] = sorted(arr[3:6])" in the prompt: It appears after comments:
+# проверено: запись 865 обработана, изменений нет
+# ревизия: запись 796 обработана, изменений нет
+# справка: arr[4] *= 91 — не выполняется
+# ревизия: arr[2] = 89 — не выполняется
+... many comments ...
+arr[3:6] = sorted(arr[3:6])
+
+Before that, there is line "arr[4] = acc(arr, 5) % 100" after comment "архив: запись 334 обработана, изменений нет". Then after that comments include "замечание: arr[1] += 1", etc. So yes.
+
+Could there be actual line "arr[4] = acc(arr, 5) % 100" after arr[3:6] but before arr[2],arr[6]? Search for "acc(arr, 5)" only once. It appears in that position. Good.
+
+Potential missed actual statement: "arr[4:7] = sorted(arr[4:7])" maybe after arr[4]=acc? No.
+
+Let's think if there are any executable lines in the initial no-effect block that assign to arr indirectly via alias? No arr2 not defined yet. Functions not called. re.sub doesn't mutate. Good.
+
+Potential issue: The code uses "arr2 = arr" first, then later "arr2[2] += 3". But there is also line "arr2[3] += 2" after second alias. If alias arr2 references same list, okay. If arr2 reassigned to arr (same object) no copy. Good.
+
+Potential issue: In Python, slice assignment arr[4:7] = sorted(arr[4:7]) works with list length same. Yes.
+
+Potential issue: acc recursion depth n=5 fine.
+
+Potential issue: bump_all uses range(0, len(a), 2) includes len? no.
+
+Potential issue: apply_twice calls bump twice; bump mutates list. Good.
+
+Now final answer. Need not mention analysis. Ensure format exactly two lines. Could include comma space. User says "numbers, comma separated". Use [32, 36, ...]. Good.

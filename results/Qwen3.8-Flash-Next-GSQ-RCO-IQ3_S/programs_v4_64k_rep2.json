@@ -83,6 +83,158 @@
    "expected_array": "[38, 16, 44, 34, 20, 23, 20, 30, 21, 20]",
    "expected_sum": 266,
    "error": null
+  },
+  {
+   "file": "v4_seed302.py",
+   "ok": true,
+   "kind": "ok",
+   "arr_ok": true,
+   "sum_ok": true,
+   "latency_s": 784.2,
+   "finish": "stop",
+   "reasoning_chars": 170879,
+   "reasoning_tail": "\nLet's consider if there is actual line \"arr[4] = acc(arr, 5) % 100\" maybe uses arr after arr[3:6] sorted? We decided no. If wrong, final sum different. Let's maybe search in the code text for the exact order of \"arr[3:6] = sorted(arr[3:6])\" and \"arr[4] = acc\". In the prompt, after arr[4:7] line, there is a huge comment block. I can find the line \"arr[3:6] = sorted(arr[3:6])\" in the prompt: It appears after comments:\n# проверено: запись 865 обработана, изменений нет\n# ревизия: запись 796 обработана, изменений нет\n# справка: arr[4] *= 91 — не выполняется\n# ревизия: arr[2] = 89 — не выполняется\n... many comments ...\narr[3:6] = sorted(arr[3:6])\n\nBefore that, there is line \"arr[4] = acc(arr, 5) % 100\" after comment \"архив: запись 334 обработана, изменений нет\". Then after that comments include \"замечание: arr[1] += 1\", etc. So yes.\n\nCould there be actual line \"arr[4] = acc(arr, 5) % 100\" after arr[3:6] but before arr[2],arr[6]? Search for \"acc(arr, 5)\" only once. It appears in that position. Good.\n\nPotential missed actual statement: \"arr[4:7] = sorted(arr[4:7])\" maybe after arr[4]=acc? No.\n\nLet's think if there are any executable lines in the initial no-effect block that assign to arr indirectly via alias? No arr2 not defined yet. Functions not called. re.sub doesn't mutate. Good.\n\nPotential issue: The code uses \"arr2 = arr\" first, then later \"arr2[2] += 3\". But there is also line \"arr2[3] += 2\" after second alias. If alias arr2 references same list, okay. If arr2 reassigned to arr (same object) no copy. Good.\n\nPotential issue: In Python, slice assignment arr[4:7] = sorted(arr[4:7]) works with list length same. Yes.\n\nPotential issue: acc recursion depth n=5 fine.\n\nPotential issue: bump_all uses range(0, len(a), 2) includes len? no.\n\nPotential issue: apply_twice calls bump twice; bump mutates list. Good.\n\nNow final answer. Need not mention analysis. Ensure format exactly two lines. Could include comma space. User says \"numbers, comma separated\". Use [32, 36, ...]. Good.\n",
+   "repeat_max": 0,
+   "raw": "ARRAY: [32, 36, 49, 20, 21, 87, 19, 41, 8, 18]\nSUM: 331",
+   "raw_tail": "ARRAY: [32, 36, 49, 20, 21, 87, 19, 41, 8, 18]\nSUM: 331",
+   "server_timings": {
+    "cache_n": 0,
+    "prompt_n": 142525,
+    "prompt_ms": 58839.0,
+    "prompt_per_token_ms": 0.413,
+    "prompt_per_second": 2422.3,
+    "predicted_n": 61592,
+    "predicted_ms": 640132.7,
+    "predicted_per_token_ms": 10.393,
+    "predicted_per_second": 96.2,
+    "draft_n": 50306,
+    "draft_n_accepted": 40811
+   },
+   "usage": {
+    "prompt_tokens": 142525,
+    "completion_tokens": 61592,
+    "total_tokens": 204117,
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    }
+   },
+   "expected_array": "[32, 36, 49, 20, 21, 87, 19, 41, 8, 18]",
+   "expected_sum": 331,
+   "error": null
+  },
+  {
+   "file": "v4_seed303.py",
+   "ok": false,
+   "kind": "wrong",
+   "arr_ok": false,
+   "sum_ok": false,
+   "latency_s": 125.6,
+   "finish": "stop",
+   "reasoning_chars": 14382,
+   "reasoning_tail": "e. Good.\n\nPotential issue: `int(str(x) + '7') % 100` in mix not called. Good.\n\nNeed final answer only. Ensure sum correct: Let's recalc final sum: 19+19=38, +24=62, +63=125, +22=147, +44=191, +3=194, +19=213, +19=232, +97=329. Yes.\n\nLet's consider if there are any hidden executable statements in the huge block like `arr[0] += 6` appears twice? Search: There is line `arr[0] += 6` after `arr2[1] += 1`. Also earlier comments mention `arr[0] += ...` but with #. There is `arr[5] += 6` before arr2. There is `arr[8] *= 2`. There is `arr[4] -= 3`. There is `arr[0] += 1`. There is `arr[5] *= 2`. Good.\n\nCould there be line `arr.reverse()` twice? Yes after arr2[7]+=7 and after bump_all. We did.\n\nCould there be line `arr2 = arr` twice? Yes before arr2[7], before arr2[1]. No effect except alias.\n\nLet's maybe simulate using exact sequence with a table to ensure no missed mutation between t918 and t161: After arr[6],arr[8] swap, then many comments, then `t918 = str(arr[4]) + str(arr[9])`. Are there any executable statements between swap and t918? The code shows after swap a long list of comments only until t918. Good.\n\nBetween t918 and arr[8] assignment: comments only. Between arr[8] assignment and t161: comments only? There is `arr[5] += 6` before t161? Let's check order in provided code:\n...\narr[6], arr[8] = arr[8], arr[6]\n# comments...\nt918 = str(arr[4]) + str(arr[9])\n# comments...\narr[8] = int(t918) % 97\n# comments...\nt161 = str(arr[1]) + str(arr[1])\n# comments...\narr[9] = int(t161) % 97\n# comments...\narr[5] += 6\n# comments...\narr2 = arr\n...\nYes.\n\nNeed ensure t918 uses arr[9] before arr[9]=88, yes 17. Good.\n\nPotential issue: The initial huge variable assignments include `copy_15 = arr[4]` etc after initial arr but before modifications. They don't affect. But maybe some of these variables are used later? t250 uses arr directly, not copy. s554 uses arr. No.\n\nNow final answer. Need no analysis in final. Ensure strict format. Could include brackets with spaces after commas. Good.\n",
+   "repeat_max": 0,
+   "raw": "ARRAY: [19, 19, 24, 63, 22, 44, 3, 19, 19, 97]\nSUM: 329",
+   "raw_tail": "ARRAY: [19, 19, 24, 63, 22, 44, 3, 19, 19, 97]\nSUM: 329",
+   "server_timings": {
+    "cache_n": 0,
+    "prompt_n": 142149,
+    "prompt_ms": 58830.5,
+    "prompt_per_token_ms": 0.414,
+    "prompt_per_second": 2416.2,
+    "predicted_n": 6329,
+    "predicted_ms": 66438.3,
+    "predicted_per_token_ms": 10.497,
+    "predicted_per_second": 95.3,
+    "draft_n": 4200,
+    "draft_n_accepted": 3905
+   },
+   "usage": {
+    "prompt_tokens": 142149,
+    "completion_tokens": 6329,
+    "total_tokens": 148478,
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    }
+   },
+   "expected_array": "[19, 19, 24, 63, 22, 44, 3, 20, 19, 97]",
+   "expected_sum": 330,
+   "error": null
+  },
+  {
+   "file": "v4_seed304.py",
+   "ok": false,
+   "kind": "wrong",
+   "arr_ok": false,
+   "sum_ok": false,
+   "latency_s": 135.7,
+   "finish": "stop",
+   "reasoning_chars": 16345,
+   "reasoning_tail": "Double-check `bump_all(arr,5)` after arr[0]=16: It adds to indices 0,2,4,6,8. At that time A4 = [16,7,2,22,28,15,14,8,38,22]. After: [21,7,7,22,33,15,19,8,43,22]. Good.\n\nDouble-check `arr[8] -= 7`: after bump_all arr[8]=43 -> 36. Good.\n\nDouble-check swap 8 and 9: [..,36,22] -> [..,22,36]. Good.\n\nDouble-check slice sorted arr[5:8]: before A7 = [21,7,7,22,33,15,19,8,22,36]. Slice 5:8 = indices 5=15,6=19,7=8 -> sorted [8,15,19]. Assign -> index5=8,index6=15,index7=19. A8 = [21,7,7,22,33,8,15,19,22,36]. Good.\n\nDouble-check swap 8 and 2: index8=22 index2=7 -> A9 [21,7,22,22,33,8,15,19,7,36]. Good.\n\nDouble-check reverse: original A10 [21,7,5,22,33,8,15,19,7,36]. Reverse: index0=36 (orig9), 1=7 (orig8), 2=19 (orig7), 3=15 (orig6), 4=8 (orig5), 5=33 (orig4), 6=22 (orig3), 7=5 (orig2), 8=7 (orig1), 9=21 (orig0). Good.\n\nDouble-check t196: arr[6]=22, arr[3]=15 -> '2215'. Good.\n\nDouble-check modulo: 97*22=2134; 2215-2134=81. Good.\n\nDouble-check slice sorted arr[4:7]: before A12 [36,7,19,15,8,81,22,5,7,21]. Slice indices 4=8,5=81,6=22 -> sorted [8,22,81]. Assign -> index4=8,index5=22,index6=81. A13 [36,7,19,15,8,22,81,5,7,21]. Good.\n\nDouble-check arr2[8]+=7: arr[8]=7 -> 14. Good.\n\nDouble-check s206 digits: [36(2),7(1)=3,19=5,15=7,8=8,22=10,81=12,5=13,14=15,21=17]. Good.\n\nDouble-check arr[0]=17: A15 [17,...]. Reverse: [21,14,5,81,22,8,15,19,7,17]. Good.\n\nDouble-check arr[9]*=2: 34. arr[7]+=2: index7=19 ->21. Final [21,14,5,81,22,8,15,21,7,34]. Sum: let's recalc: 21+14=35; +5=40; +81=121; +22=143; +8=151; +15=166; +21=187; +7=194; +34=228. Yes.\n\nNeed answer strictly:\nARRAY: [numbers, comma separated]\nSUM: number\n\nShould we include spaces after commas? They said numbers, comma separated. Example in code print: `ARRAY: [21, 14, 5, 81, 22, 8, 15, 21, 7, 34]` likely acceptable. Need strict two lines. Could output exactly:\nARRAY: [21, 14, 5, 81, 22, 8, 15, 21, 7, 34]\nSUM: 228\n\nNeed ensure no extra explanation. Final only. But before final? Need final. Ensure no mention analysis. Done.\n",
+   "repeat_max": 0,
+   "raw": "ARRAY: [21, 14, 5, 81, 22, 8, 15, 21, 7, 34]\nSUM: 228",
+   "raw_tail": "ARRAY: [21, 14, 5, 81, 22, 8, 15, 21, 7, 34]\nSUM: 228",
+   "server_timings": {
+    "cache_n": 0,
+    "prompt_n": 142495,
+    "prompt_ms": 58398.1,
+    "prompt_per_token_ms": 0.41,
+    "prompt_per_second": 2440.1,
+    "predicted_n": 7481,
+    "predicted_ms": 77047.4,
+    "predicted_per_token_ms": 10.299,
+    "predicted_per_second": 97.1,
+    "draft_n": 5107,
+    "draft_n_accepted": 4715
+   },
+   "usage": {
+    "prompt_tokens": 142495,
+    "completion_tokens": 7481,
+    "total_tokens": 149976,
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    }
+   },
+   "expected_array": "[21, 6, 5, 81, 22, 19, 15, 10, 7, 32]",
+   "expected_sum": 218,
+   "error": null
+  },
+  {
+   "file": "v4_seed305.py",
+   "ok": true,
+   "kind": "ok",
+   "arr_ok": true,
+   "sum_ok": true,
+   "latency_s": 114.4,
+   "finish": "stop",
+   "reasoning_chars": 11787,
+   "reasoning_tail": "ed answer strictly format:\nARRAY: [numbers, comma separated]\nSUM: number\n\nCould include spaces? They said strictly as: ARRAY: [numbers, comma separated]\nSUM: number. Use exactly two lines. Ensure no extra explanation. Final should be concise.\n\nDouble-check if Python's re.findall(r'\\d', s356) on string with digits only counts all digits; yes. If numbers could be negative, '-' not digit but none negative before those counts. Good.\n\nPotential hidden issue: There are many lines like \"copy_3 = arr[2]\" etc. Could any of these variables later used to modify? No, only t692, s356, s275 used. apply_twice and bump_all use arr directly. No mix called. acc not called. bump not directly except apply_twice. No exec of MANUAL or TRAPs. Good.\n\nPotential hidden issue: The code includes \"arr[4] = int(t692) % 97\" after t692 defined as str(arr[6]) + str(arr[0]). But before that, many read-only assignments might have changed arr? No, they don't assign to arr. Need ensure no line among the long list accidentally assigns to arr? Let's scan initial block: It has lines like \"copy_3 = arr[2]\" etc. No \"arr[\" assignments until after comments? There are TRAP strings with arr[...] but not executed. The long block of tmp/copy/note/code/label includes no arr assignments except maybe \"arr[4] = int...\" later. Good.\n\nPotential hidden issue: Some lines in the huge list of comments include \"# черновик: arr2[7] = 88 — не выполняется\" etc. Comments ignored. Good.\n\nNeed maybe consider if code is executed as given with indentation? All top-level. Good.\n\nLet's think if there are any executable statements inside the MANUAL string? No, just string assignment. TRAP variables strings. No eval/exec.\n\nCould there be a line \"arr[2:5] = sorted(arr[2:5])\" after arr[0]+=6 but before swap etc. Yes.\n\nLet's maybe produce final answer. Ensure comma separated with spaces? They said [numbers, comma separated]. Example likely ARRAY: [18, 2, 33, 19, 20, 19, 19, 19, 19, 24]. Use Python list format. Sum line.\n\nNeed final only.\n",
+   "repeat_max": 0,
+   "raw": "ARRAY: [18, 2, 33, 19, 20, 19, 19, 19, 19, 24]\nSUM: 192",
+   "raw_tail": "ARRAY: [18, 2, 33, 19, 20, 19, 19, 19, 19, 24]\nSUM: 192",
+   "server_timings": {
+    "cache_n": 0,
+    "prompt_n": 142185,
+    "prompt_ms": 58433.6,
+    "prompt_per_token_ms": 0.411,
+    "prompt_per_second": 2433.3,
+    "predicted_n": 5353,
+    "predicted_ms": 55692.9,
+    "predicted_per_token_ms": 10.404,
+    "predicted_per_second": 96.1,
+    "draft_n": 3544,
+    "draft_n_accepted": 3327
+   },
+   "usage": {
+    "prompt_tokens": 142185,
+    "completion_tokens": 5353,
+    "total_tokens": 147538,
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    }
+   },
+   "expected_array": "[18, 2, 33, 19, 20, 19, 19, 19, 19, 24]",
+   "expected_sum": 192,
+   "error": null
   }
  ]
 }
