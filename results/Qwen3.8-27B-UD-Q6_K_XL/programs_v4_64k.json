@@ -224,6 +224,68 @@
    "expected_array": "[10, 17, 60, 26, 7, 25, 2, 70, 78, 90]",
    "expected_sum": 385,
    "error": null
+  },
+  {
+   "file": "v4_seed307.py",
+   "ok": true,
+   "kind": "ok",
+   "arr_ok": true,
+   "sum_ok": true,
+   "latency_s": 307.5,
+   "finish": "stop",
+   "reasoning_chars": 9478,
+   "reasoning_tail": ". We had after S10: [18,34,20,25,98,3,9,9,17,24]. arr[8]=17 arr[5]=3 -> 173. Yes.\n\nBut wait bump_all added 3 to index8 from 14 to 17. Then swap arr[0],arr[9] didn't change index8. acc arr[4] didn't change index8. arr[1]*=2 didn't. swap 2,6 didn't. So yes.\n\nNow need double-check all arithmetic, especially acc after final state. Let's recompute from beginning with possible overlooked modifications: There is \"arr[5] -= 7\" after many tmp assignments. But there are also function definitions bump_all etc. No calls before? There are no calls to bump except bump_all later. apply_twice not called. mix not called.\n\nThere are variables TRAP_... unused. MANUAL string unused.\n\nCould there be executable code hidden in comments? No, comments start with #. But note line \"# примечание: arr[6] = 87 — не выполняется\" etc ignored. Need not consider.\n\nCould there be non-comment lines like \"arr[0], arr[9] = arr[9], arr[0]\" that appear multiple times? Only one actual, others in comments. Need ensure we didn't miss any actual swap/assignment buried among comments. We should scan entire code for lines not starting with # and not variable tmp/copy/code/note/label assignments. Let's list all executable non-assignment-to-unused variables? The code after arr init has many lines like tmp_0 = ..., note_3 = ..., etc. Then later actual mutations. Need ensure no other mutation lines like \"bump(a...)\"? Only bump_all(arr,3). Maybe \"apply_twice\" not called. There might be line \"arr[5] -= 7\", \"arr[9] *= 2\", etc. We need be certain order and all. Let's parse systematically from the code text. I'll copy relevant segments mentally but huge. Need maybe use pattern: executable lines are those not starting with # and not just definitions/traps/manual/tmp assignments? But tmp assignments could call re.sub or str but no arr mutation. They don't change arr. But if an assignment like \"arr[0] = ...\" hidden among tmp? We need find all lines containing \"arr[\" on left side not comments. There are many in comments but",
+   "repeat_max": 0,
+   "raw": "ARRAY: [0, 10, 24, 79, 98, 6, 17, 18, 17, 34]\nSUM: 303",
+   "raw_tail": "ARRAY: [0, 10, 24, 79, 98, 6, 17, 18, 17, 34]\nSUM: 303",
+   "server_timings": {
+    "cache_n": 0,
+    "prompt_n": 142602,
+    "prompt_ms": 183456.587,
+    "prompt_per_token_ms": 1.2864937869034094,
+    "prompt_per_second": 777.3065133932749,
+    "predicted_n": 4145,
+    "predicted_ms": 120598.507,
+    "predicted_per_token_ms": 29.094935343787697,
+    "predicted_per_second": 34.37024307440224,
+    "draft_n": 3298,
+    "draft_n_accepted": 2496
+   },
+   "usage": null,
+   "expected_array": "[0, 10, 24, 79, 98, 6, 17, 18, 17, 34]",
+   "expected_sum": 303,
+   "error": null
+  },
+  {
+   "file": "v4_seed308.py",
+   "ok": true,
+   "kind": "ok",
+   "arr_ok": true,
+   "sum_ok": true,
+   "latency_s": 302.5,
+   "finish": "stop",
+   "reasoning_chars": 9008,
+   "reasoning_tail": "riginal after TRAPs:\narr = [6, 5, 13, 12, 12, 26, 17, 9, 6, 14]\n\ntmp_0 ... tmp_799 assignments. I see no arr modifications. But note there are lines like `label_8 = \"запись 8 не применялась\"` etc. No side effects.\n\nThen:\narr.reverse()\n# comments...\narr[6] += 4\n# comments...\narr[3] *= 2\n# comments...\narr[4] = acc(arr, 8) % 100\n# comments...\narr[7] *= 2\n# comments...\narr[7] = acc(arr, 5) % 100\n# comments...\narr[6] -= 8\n# comments...\narr2 = arr\n# comments...\narr2[2] += 7\n# comments...\narr[5] -= 6\n# comments...\napply_twice(arr, 4, 2)\n# comments...\nt280 = str(arr[2]) + str(arr[3])\n# comments...\narr[7] = int(t280) % 97\n# comments...\narr[6] *= 2\n# comments...\narr[6] += 2\n# comments...\napply_twice(arr, 6, 3)\n# comments...\narr[1] = acc(arr, 8) % 100\n# comments...\narr[0], arr[8] = arr[8], arr[0]\n# comments...\narr[0] = acc(arr, 5) % 100\n# comments...\nt132 = str(arr[4]) + str(arr[6])\n# comments...\narr[7] = int(t132) % 97\n# comments...\narr[0], arr[6] = arr[6], arr[0]\n# comments...\ns457 = ''.join(str(x) for x in arr)\n# comments...\narr[9] = len(re.findall(r'\\d', s457)) % 50\n# comments...\nif __name__ == \"__main__\":\n    print(\"ARRAY:\", arr)\n    print(\"SUM:\", sum(arr))\n\nNeed ensure order of `t280` assignment relative to `arr[7] *=2`? We had: after apply_twice(arr,4,2), then t280, comments, arr[7]=int(t280)%97, then arr[6]*=2, arr[6]+=2, apply_twice(arr,6,3). Let's verify in text:\nAfter `apply_twice(arr, 4, 2)`, huge comments. Then `t280 = str(arr[2]) + str(arr[3])` (yes). Then comments. Then `arr[7] = int(t280) % 97`. Then comments. Then `arr[6] *= 2`. Then comments. Then `arr[6] += 2`. Then comments. Then `apply_twice(arr, 6, 3)`. Yes.\n\nBut wait: There is a line `t132 = str(arr[4]) + str(arr[6])` after `arr[0] = acc(arr,5)%100` and before `arr[7] = int(t132)%97`. We used arr4=34 arr6=24 at that time. Need ensure index6 not changed between apply_twice(6,3) and t132? Sequence: apply_twice(6,3) -> arr6=24; then arr[1]=...; swap 0/8; arr0=acc; t132 uses arr4 and arr6. No changes to arr4",
+   "repeat_max": 0,
+   "raw": "ARRAY: [24, 16, 16, 34, 34, 6, 5, 29, 14, 17]\nSUM: 195",
+   "raw_tail": "ARRAY: [24, 16, 16, 34, 34, 6, 5, 29, 14, 17]\nSUM: 195",
+   "server_timings": {
+    "cache_n": 42,
+    "prompt_n": 142393,
+    "prompt_ms": 182955.279,
+    "prompt_per_token_ms": 1.2848614679092372,
+    "prompt_per_second": 778.2940223331844,
+    "predicted_n": 4145,
+    "predicted_ms": 116651.045,
+    "predicted_per_token_ms": 28.142592279855247,
+    "predicted_per_second": 35.53332934137024,
+    "draft_n": 3200,
+    "draft_n_accepted": 2545
+   },
+   "usage": null,
+   "expected_array": "[24, 16, 16, 34, 34, 6, 5, 29, 14, 17]",
+   "expected_sum": 195,
+   "error": null
   }
  ]
 }
