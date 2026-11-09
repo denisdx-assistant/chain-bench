@@ -78,7 +78,7 @@
 | Run | Overall (errors) | Median tokens/task | Test 1 en (correct) | Test 1 ru (correct) | Test 1 zh (correct) | Test 1 subsets 8 (all langs) | Test 2 (correct) |
 |---|---|---|---|---|---|---|---|
 | Qwen3.8-27B-UD-Q4_K_M | 442m14s · 30% err | 4144 | 108m21s 12/17 | 93m16s 11/17 | 91m48s 12/17 | 22m14s 12/24 | 148m49s 15/20 |
-| Qwen3.8-27B-UD-Q6_K_XL · t 0.3 · pen 0.2 | 154m57s · 38% err | 4100 | 14m14s 12/17 | 21m10s 10/17 | 19m10s 9/17 | 17m37s 10/16 (ru/zh only) | 100m23s 13/20 |
+| Qwen3.8-27B-UD-Q6_K_XL · t 0.3 · pen 0.2 | 154m57s · 38% err | 4100 | 14m14s 12/17 | 21m10s 10/17 | 19m10s 9/17 | 28m39s 14/24 | 100m23s 13/20 |
 | Qwen3.8-27B-UD-Q6_K_XL | 169m28s · 35% err | 4099 | 15m37s 12/17 | 17m22s 10.5/17 | 21m12s 12/17 | 22m21s 13/24 | 115m16s 12/20 |
 | Qwen3.8-27B-UD-Q8_K_XL | 146m44s · 33% err | 4100 | 14m14s 11/17 | 14m45s 10/17 | 17m43s 11.5/17 | 15m10s 13/24 | 100m03s 15/20 |
 | Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · unresolved 14 | 340m56s · 40% err | 8743 | 43m39s 12/17 | 56m48s 11/15 | 21m49s 11/17 | 22m50s 15/24 | 218m40s 0/8 |
