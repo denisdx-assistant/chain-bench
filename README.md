@@ -215,15 +215,10 @@ variants) are withdrawn from the tables and are being re-run with the fixed
 comparison; Q6's program score is reproducible from its stored answers.
 
 ## Published data
-## Published data
 
 The repository is public. It contains the frozen datasets, the harness and all
 results. Endpoint addresses in the scripts are placeholders for a local model
 server; no credentials, keys or private corpora are included.
-
-## License
-
-Code — MIT. Texts and datasets — CC BY 4.0.
 
 **Provocative tasks.** Chain 11 (ship-15 vs ship-18) and chain 12 (heron-09)
 ask about entities the document never lists; both are decided by rules, not by
@@ -237,3 +232,7 @@ score there is not a broken harness.
 The summary mixes two numbers that are easy to confuse: *tokens per task* is how much a
 model writes, not how fast. Measured prefill and generation speed, split by prompt size
 and taken from server timings only, are in [docs/speed.md](docs/speed.md).
+
+## License
+
+Code — MIT. Texts and datasets — CC BY 4.0.

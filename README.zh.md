@@ -91,21 +91,21 @@
 小数（`11.5/17`）：首次运行与复现运行都计入。
 
 <!-- summary:start -->
-| Run | Overall (errors) | Median tokens/task | Test 1 en (correct) | Test 1 ru (correct) | Test 1 zh (correct) | Test 1 subsets 8 (all langs) | Test 2 (correct) |
+| 运行 | 总计（错误） | 每题中位 token 数 | 测试 1 en（正确） | 测试 1 ru（正确） | 测试 1 zh（正确） | 测试 1 子集 8（全部语言） | 测试 2（正确） |
 |---|---|---|---|---|---|---|---|
-| Qwen3.8-27B-UD-Q4_K_M | 442m14s · 30% err | 4144 | 108m21s 12/17 | 93m16s 11/17 | 91m48s 12/17 | 22m14s 12/24 | 148m49s 15/20 |
-| Qwen3.8-27B-UD-Q6_K_XL · t 0.3 · pen 0.2 | 154m57s · 38% err | 4100 | 14m14s 12/17 | 21m10s 10/17 | 19m10s 9/17 | 28m39s 14/24 | 100m23s 13/20 |
-| Qwen3.8-27B-UD-Q6_K_XL | 169m28s · 35% err | 4099 | 15m37s 12/17 | 17m22s 10.5/17 | 21m12s 12/17 | 22m21s 13/24 | 115m16s 12/20 |
-| Qwen3.8-27B-UD-Q8_K_XL | 146m44s · 33% err | 4100 | 14m14s 11/17 | 14m45s 10/17 | 17m43s 11.5/17 | 15m10s 13/24 | 100m03s 15/20 |
-| ⚠ Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · unresolved 14 | 340m56s · 40% err | 8743 | 43m39s 12/17 | 56m48s 11/15 | 21m49s 11/17 | 22m50s 15/24 | 218m40s 0/8 |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · t 0.3 · pen 0.3 | 140m18s · 36% err | 5448 | 28m40s 12/17 | 26m18s 11/17 | 29m57s 11/17 | 17m31s 15/24 | 55m22s 11.5/20 |
-| Qwen3.8-Flash-Next-UD-IQ4_XS · pen 0.2 | 138m21s · 27% err | 5511 | 31m20s 11.5/17 | 27m22s 11/17 | 24m52s 12.5/17 | 18m21s 15.5/24 | 54m47s 16.5/20 |
-| Qwen3.8-Flash-Next-UD-Q4_K_XL · pen 0.2 | 154m10s · 27% err | 5616 | 34m18s 12.5/17 | 28m21s 11/17 | 33m41s 13.5/17 | 24m28s 15.5/24 | 57m50s 15/20 |
-| ⚠ Ripple-65B-Preview-Q6_K · unresolved 6 | 120m57s · 25% err | 4684 | 120m57s 12/16 | — | — | — | 121m49s 0/7 of 20 run |
-| ⚠ deepseek-v4.1-flash | 16m48s · 30% err | — | 7m04s 12/17 | — | — | — | 9m44s 14/20 |
-| gemma-4-31B-it-UD-Q8_K_XL | 168m44s · 58% err | 1601 | 11m40s 9/17 | 7m24s 10/17 | 8m22s 11/17 | 11m17s 14/24 | 141m18s 0/20 |
+| Qwen3.8-27B-UD-Q4_K_M | 442m14s · 30% 错误 | 4144 | 108m21s 12/17 | 93m16s 11/17 | 91m48s 12/17 | 22m14s 12/24 | 148m49s 15/20 |
+| Qwen3.8-27B-UD-Q6_K_XL · t 0.3 · pen 0.2 | 154m57s · 38% 错误 | 4100 | 14m14s 12/17 | 21m10s 10/17 | 19m10s 9/17 | 28m39s 14/24 | 100m23s 13/20 |
+| Qwen3.8-27B-UD-Q6_K_XL | 169m28s · 35% 错误 | 4099 | 15m37s 12/17 | 17m22s 10.5/17 | 21m12s 12/17 | 22m21s 13/24 | 115m16s 12/20 |
+| Qwen3.8-27B-UD-Q8_K_XL | 146m44s · 33% 错误 | 4100 | 14m14s 11/17 | 14m45s 10/17 | 17m43s 11.5/17 | 15m10s 13/24 | 100m03s 15/20 |
+| ⚠ Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · 未完成 14 | 340m56s · 40% 错误 | 8743 | 43m39s 12/17 | 56m48s 11/15 | 21m49s 11/17 | 22m50s 15/24 | 218m40s 0/8 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · t 0.3 · pen 0.3 | 140m18s · 36% 错误 | 5448 | 28m40s 12/17 | 26m18s 11/17 | 29m57s 11/17 | 17m31s 15/24 | 55m22s 11.5/20 |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · pen 0.2 | 138m21s · 27% 错误 | 5511 | 31m20s 11.5/17 | 27m22s 11/17 | 24m52s 12.5/17 | 18m21s 15.5/24 | 54m47s 16.5/20 |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · pen 0.2 | 154m10s · 27% 错误 | 5616 | 34m18s 12.5/17 | 28m21s 11/17 | 33m41s 13.5/17 | 24m28s 15.5/24 | 57m50s 15/20 |
+| ⚠ Ripple-65B-Preview-Q6_K · 未完成 6 | 120m57s · 25% 错误 | 4684 | 120m57s 12/16 | — | — | — | 121m49s 0/7 / 20 |
+| ⚠ deepseek-v4.1-flash | 16m48s · 30% 错误 | — | 7m04s 12/17 | — | — | — | 9m44s 14/20 |
+| gemma-4-31B-it-UD-Q8_K_XL | 168m44s · 58% 错误 | 1601 | 11m40s 9/17 | 7m24s 10/17 | 8m22s 11/17 | 11m17s 14/24 | 141m18s 0/20 |
 
-⚠ — not every task was computed for this row (missing sets, a short file, or tasks left unresolved): its quality percentages are not comparable with the others.
+⚠ — 该行并非所有题目都已计算（缺少部分集合、文件不完整或存在未完成题目）：其质量百分比无法与其他行比较。
 <!-- summary:end -->
 
 **细节。**
@@ -177,11 +177,6 @@ scripts/             生成器、运行器、循环检测、表格构建
 运行（Flash-Next 各变体）已从表格中撤回，并正以修正后的比较重新运行；Q6 的程序
 得分可由其保存的回答复现。
 
-## 许可
-## 许可
-
-代码 — MIT。文本与数据集 — CC BY 4.0。
-
 **挑衅性题目。** 第 11 题（ship-15 与 ship-18）和第 12 题（heron-09）问的是文档中并不存在的实体，
 两者都靠规则而非记录得出。它们被有意保留在题集中——见
 [docs/methodology.md](docs/methodology.md#provocative-tasks-frozen-in-the-dataset)。
@@ -191,3 +186,7 @@ scripts/             生成器、运行器、循环检测、表格构建
 
 汇总表中容易混淆两件事：「每任务 token 数」表示模型写了多少，而不是写得多快。按提示长度
 分组的预填充与生成速度（仅取自服务器计时）见 [docs/speed.md](docs/speed.md)。
+
+## 许可
+
+代码 — MIT。文本与数据集 — CC BY 4.0。
