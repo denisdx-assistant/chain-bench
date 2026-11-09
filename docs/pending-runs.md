@@ -9,7 +9,8 @@ Parked behind the pause:
 
 - large-context speed probes for the 27B trio, IQ1_M, gemma and Ripple;
 - the 5k prefill point for every model (all datasets start at ~14k tokens);
-- a full series for Orca Q1, which was never run;
+- a full series for Orca Q1 — **cancelled 2026-11-09**: the model is clearly too weak and
+  the existing run is reference enough;
 - Ripple: ruined by the decision above, so its missing languages and 13 programs will
   not be computed.
 
