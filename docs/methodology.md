@@ -237,3 +237,22 @@ window, so every task could only produce ~12.2k of reasoning before the window
 ended; five of the seven recorded tasks stopped exactly at that edge and two fell
 into a repetition loop. A 32k reasoning budget needs about 195k of context on this
 model. The summary reports what actually ran: `0/7 of 20 run`.
+
+## An unanswered reply is not a wrong answer
+
+A row counts as a failure only when something was parsed and compared: a number for the
+chains, an `ARRAY`/`SUM` pair for the programs.
+
+Two outcomes are **not** failures and stay out of the score's denominator:
+
+- `length` — the budget ended the reply; the task is queued for a retry at a bigger budget,
+  and only a retry that also fails turns it into a failure;
+- `no answer` — nothing parseable came back and the reply was not cut; same treatment.
+
+Runners record these rows with `kind = "no_answer"`. Tables mark them `?` or `L`, count only
+scored rows in the denominator, and add an `unresolved N` note to the row label so a shorter
+denominator is visible instead of silent.
+
+The rule exists because a small budget was turning thorough reasoning into a fake failure:
+the model did the work, ran out of room, and the row was scored as if it could not solve the
+task at all. The retry queue is where such rows actually get resolved.
