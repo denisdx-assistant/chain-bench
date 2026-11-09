@@ -1,0 +1,178 @@
+We need answer user's request. Need execute program mentally or compute. Need final array and sum. We have huge Python code with many comments and actual operations. Need carefully simulate only executable non-comment lines. Need ensure syntax? It defines functions, MANUAL etc, traps unused? Then arr initial, many tmp/note/code/copy/label assignments that read arr but do not modify. Then arr2 = arr (alias). Many comments ignored. Actual mutating statements interspersed. Need parse all actual code lines (not comments) after initial definitions and before main. Need track arr mutations in order, including aliases arr2 referencing same list, function calls apply_twice, acc, reverse, slice sorted, etc.
+
+We must be meticulous. Let's extract executable statements from the code. The user provided code in triple quotes? It starts with """Тест 2 v4: исполнить программу, назвать массив и сумму.""" then import re... It's a Python program. Need output final arr and sum. We need simulate.
+
+Let's list actual non-comment lines in order after initial arr = [20,12,12,1,16,12,17,27,29,14]. There are many assignments to tmp_*, note_*, code_*, copy_*, label_* that do not change arr. They may use re.sub etc but no mutation. Then:
+
+arr2 = arr
+# comments...
+arr2[8] += 2
+# comments...
+arr[1], arr[8] = arr[8], arr[1]
+# comments...
+arr2 = arr
+# comments...
+arr2[6] += 1
+# comments...
+arr.reverse()
+# comments...
+t681 = str(arr[2]) + str(arr[9])
+# comments...
+arr[1] = int(t681) % 97
+# comments...
+arr[9] += 2
+# comments...
+arr[1], arr[1] = arr[1], arr[1]
+# comments...
+arr[0] += 2
+# comments...
+apply_twice(arr, 0, 2)
+# comments...
+t494 = str(arr[2]) + str(arr[6])
+# comments...
+arr[8] = int(t494) % 97
+# comments...
+arr[4] = acc(arr, 6) % 100
+# comments...
+arr[9] = acc(arr, 7) % 100
+# comments...
+arr[1] += 6
+# comments...
+arr[0:3] = sorted(arr[0:3])
+# comments...
+arr[8] -= 3
+# comments...
+arr[4] *= 2
+# comments...
+arr.reverse()
+# comments...
+arr[5] -= 3
+# comments...
+arr[2] += 5
+# comments...
+t168 = str(arr[8]) + str(arr[8])
+# comments...
+arr[5] = int(t168) % 97
+
+Need verify no other non-comment mutating lines: There is MANUAL string, TRAP_* strings not executed. Functions defined. Many tmp assignments. There are lines like arr2 = arr (alias) not mutation but important for alias. apply_twice defined calls bump twice. bump modifies list in place. acc returns sum first n. Need simulate exactly.
+
+Need be careful with Python tuple assignment arr[1], arr[1] = arr[1], arr[1] no effect. arr2 = arr re-alias no effect since same list (already alias). arr2[8] +=2, arr2[6]+=1 modify same list.
+
+Let's simulate step-by-step with indexes 0-9.
+
+Initial arr A0 = [20, 12, 12, 1, 16, 12, 17, 27, 29, 14]
+arr2 references same.
+
+Before first mutation there are many tmp/copy assignments reading initial values but no change. Need ensure no function calls that mutate? bump not called yet. mix not called. apply_twice later. acc later. re.sub no mutation. So okay.
+
+Step 1: arr2[8] += 2 -> index8 29+2=31.
+A = [20,12,12,1,16,12,17,27,31,14]
+
+Step 2: arr[1], arr[8] = arr[8], arr[1]. Python evaluates RHS first: (arr[8]=31, arr[1]=12), then assigns arr[1]=31, arr[8]=12.
+A = [20,31,12,1,16,12,17,27,12,14]
+
+Step 3: arr2 = arr (still same).
+
+Step 4: arr2[6] += 1 -> index6 17+1=18.
+A = [20,31,12,1,16,12,18,27,12,14]
+
+Step 5: arr.reverse() -> reverse in place.
+Reverse of [20,31,12,1,16,12,18,27,12,14] = [14,12,27,18,12,16,1,12,31,20]
+Let's index:
+0 14
+1 12
+2 27
+3 18
+4 12
+5 16
+6 1
+7 12
+8 31
+9 20
+
+Step 6: t681 = str(arr[2]) + str(arr[9]) = '27' + '20' = '2720'.
+
+Step 7: arr[1] = int(t681) % 97. Compute 2720 mod 97. 97*28=2716, remainder 4. So arr[1]=4.
+A = [14,4,27,18,12,16,1,12,31,20]
+
+Step 8: arr[9] += 2 -> 20+2=22.
+A = [14,4,27,18,12,16,1,12,31,22]
+
+Step 9: arr[1], arr[1] = arr[1], arr[1]. Tuple assignment to same index twice. RHS evaluates (4,4), assign arr[1]=4 then arr[1]=4. no change.
+
+Step 10: arr[0] += 2 -> 14+2=16.
+A = [16,4,27,18,12,16,1,12,31,22]
+
+Step 11: apply_twice(arr, 0, 2): calls bump(a,0,2) twice -> arr[0]+=2 each time => +4.
+A index0 16+4=20.
+A = [20,4,27,18,12,16,1,12,31,22]
+
+Step 12: t494 = str(arr[2]) + str(arr[6]) = str(27)+str(1) = '271'.
+
+Step 13: arr[8] = int(t494) % 97. 271 mod 97. 97*2=194 remainder77; 97*3=291 too high. So 77.
+A = [20,4,27,18,12,16,1,12,77,22]
+
+Step 14: arr[4] = acc(arr, 6) % 100. acc(a,n): if n<=0 return0; return a[n-1]+acc(a,n-1). So sum first 6 elements indices 0..5. Current first six: [20,4,27,18,12,16]. Sum = 20+4=24; +27=51; +18=69; +12=81; +16=97. %100 = 97. arr[4]=97.
+A = [20,4,27,18,97,16,1,12,77,22]
+
+Step 15: arr[9] = acc(arr, 7) % 100. Sum first 7 indices 0..6: [20,4,27,18,97,16,1]. Sum: 20+4=24; +27=51; +18=69; +97=166; +16=182; +1=183. %100 = 83. arr[9]=83.
+A = [20,4,27,18,97,16,1,12,77,83]
+
+Step 16: arr[1] += 6 -> 4+6=10.
+A = [20,10,27,18,97,16,1,12,77,83]
+
+Step 17: arr[0:3] = sorted(arr[0:3]). Slice indices 0,1,2 = [20,10,27]. sorted -> [10,20,27]. Assign to slice length 3.
+A = [10,20,27,18,97,16,1,12,77,83]
+
+Step 18: arr[8] -= 3 -> 77-3=74.
+A = [10,20,27,18,97,16,1,12,74,83]
+
+Step 19: arr[4] *= 2 -> 97*2=194.
+A = [10,20,27,18,194,16,1,12,74,83]
+
+Step 20: arr.reverse() -> reverse list.
+Current: index0 10,1 20,2 27,3 18,4 194,5 16,6 1,7 12,8 74,9 83.
+Reverse -> [83,74,12,1,16,194,18,27,20,10]
+Let's index:
+0 83
+1 74
+2 12
+3 1
+4 16
+5 194
+6 18
+7 27
+8 20
+9 10
+
+Step 21: arr[5] -= 3 -> index5 currently? Need note after reverse, arr[5]=194. 194-3=191.
+A = [83,74,12,1,16,191,18,27,20,10]
+
+Step 22: arr[2] += 5 -> index2=12+5=17.
+A = [83,74,17,1,16,191,18,27,20,10]
+
+Step 23: t168 = str(arr[8]) + str(arr[8]) = str(20)+str(20)='2020'.
+
+Step 24: arr[5] = int(t168) % 97. 2020 mod 97. 97*20=1940 remainder80; 97*21=2037 too high. So 80.
+A = [83,74,17,1,16,80,18,27,20,10]
+
+Final array likely this. Sum compute: 83+74=157; +17=174; +1=175; +16=191; +80=271; +18=289; +27=316; +20=336; +10=346. Sum 346.
+
+Need ensure no overlooked executable lines: There are many lines before arr initial? The top string doc? It is a triple-quoted string statement maybe executed as expression no effect. import re. Function definitions. MANUAL = string, TRAP_0...TRAP_149 string assignments no effect. arr initial. Then many note/tmp assignments. Need check if any line like apply_twice? We included. Any call to bump, bump_all, mix? I see only apply_twice(arr,0,2) and acc calls. No bump_all/mix calls. No other function calls except re.sub in code_* assignments (not mutate). int, str, sorted, sum in main. Good.
+
+Need double-check actual non-comment lines in huge code: The comments are lines starting with '#'. But there are also non-comment lines like label_5 = "запись 5 не применялась" etc. No mutation. Need ensure some line not commented but maybe uses arr2? We listed arr2 = arr twice, arr2[8]+=2, arr2[6]+=1. There may be more arr2 mutating lines that are not comments? Need scan the provided code carefully for actual statements (not starting with #) involving arr or arr2. The code is huge, with many comment lines. It includes many variable assignments before first arr2 mutation. Need ensure there are not hidden executable lines after t168? There is final if __name__ main prints. We included all mutating? Let's systematically scan the text from "arr = [20..." to end. Since user pasted long, need verify by looking for lines without leading #. I can manually inspect segments.
+
+After arr initial:
+note_0 = str(arr[7]) + str(arr[8]) ... many assignments until tmp_799 = arr[6] + 8. Then arr2 = arr. Then comments, then arr2[8] += 2. Then comments, then arr[1], arr[8] = arr[8], arr[1]. Then comments, then arr2 = arr. Then comments, then arr2[6] += 1. Then comments, then arr.reverse(). Then comments, then t681 = ... Then comments, then arr[1] = int(t681) % 97. Then comments, then arr[9] += 2. Then comments, then arr[1], arr[1] = arr[1], arr[1]. Then comments, then arr[0] += 2. Then comments, then apply_twice(arr, 0, 2). Then comments, then t494 = ... Then comments, then arr[8] = int(t494) % 97. Then comments, then arr[4] = acc(arr, 6) % 100. Then comments, then arr[9] = acc(arr, 7) % 100. Then comments, then arr[1] += 6. Then comments, then arr[0:3] = sorted(arr[0:3]). Then comments, then arr[8] -= 3. Then comments, then arr[4] *= 2. Then comments, then arr.reverse(). Then comments, then arr[5] -= 3. Then comments, then arr[2] += 5. Then comments, then t168 = ... Then comments, then arr[5] = int(t168) % 97. Then comments. Then if main.
+
+Need be careful with line "arr2 = arr" after swap? It is not a mutation but if arr2 had been a different list? It was alias from first arr2=arr. No copy. But in Python, if there had been slice assignment or reverse in place, arr2 still same object. Reassign arr2 = arr no effect. Good.
+
+Need consider that the huge block of variable assignments before arr2[8]+=2 might include some that accidentally call bump? They are just tmp_x = arr[...] + number, note_x = str... code_x = re.sub(...), copy_x = arr[...], label_x = string. No mutation. But some variable names maybe shadow functions? They don't modify functions. No calls to bump. Good.
+
+Need verify arithmetic mod and sums. Let's re-evaluate from start to avoid off-by-one due to reverse and indexes.
+
+Initial: [20,12,12,1,16,12,17,27,29,14]
+arr2[8]+=2 -> [20,12,12,1,16,12,17,27,31,14]
+swap arr[1], arr[8] -> index1 31, index8 12 => [20,31,12,1,16,12,17,27,12,14]
+arr2[6]+=1 -> index6 18 => [20,31,12,1,16,12,18,27,12,14]
+reverse -> [14,12,27,18,12,16,1,12,31,20] (Check original index mapping: initial after mutations index0 20 -> last 9; index1 31 -> idx8; index2 12 -> idx7; index3 1 -> idx6; index4 16 -> idx5; index5 12 -> idx4; index6 18 -> idx3; index7 27 -> idx2; index8 12 -> idx1; index9 14 -> idx0. Yes [14,
