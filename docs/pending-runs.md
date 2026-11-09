@@ -98,3 +98,12 @@ subsets and all 20 programs. A first attempt at 32k ran 7 English tasks and was 
 - output: `chains_{en,ru,zh}_20k_64k_rep2.json`, `..._64k_rep2_8tasks.json`,
   `programs_v4_64k_rep2.json` — the first sample is never overwritten
 - the Q4_K_XL programs run at 64k is deferred behind this one, as the owner asked
+
+### Result of the IQ3_S replicate
+
+Two full samples, 32k and 64k budgets (the budget is only a cutoff, so they are comparable):
+Chains scored **49/75 in both**; programs 11/20 vs 12/20, so the averaged row reads 11.5/20.
+
+Task-level agreement is the useful number: **86 of 95 tasks gave the same verdict**, and 9
+flipped — en 7 and 13 swapped, zh 7 and 14 swapped, five programs changed. So the score is
+stable at the set level and noisy at the task level, at roughly one task in ten.

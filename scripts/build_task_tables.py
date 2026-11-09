@@ -191,8 +191,10 @@ def summary():
     groups = {}
     for r in chains + programs:
         cfg = cfg_for(r["folder"], r["file"])
+        # the loop guard is on for every canonical run, so it is not part of the identity;
+        # including it split otherwise identical samples into separate rows
         sig = (r["folder"], cfg.get("ctx"), cfg.get("yarn"), cfg.get("temp"),
-               cfg.get("penalty"), bool(cfg.get("guard")))
+               cfg.get("penalty"))
         groups.setdefault(sig, {"chains": [], "programs": [], "cfg": cfg})
         groups[sig]["programs" if r["file"].startswith("programs_") else "chains"].append(r)
 
@@ -217,7 +219,7 @@ def summary():
                 "runs": len(cells)}
 
     rows = []
-    for (folder, _ctx, _yarn, _temp, _pen, _guard), g in sorted(groups.items(), key=lambda kv: str(kv[0])):
+    for (folder, _ctx, _yarn, _temp, _pen), g in sorted(groups.items(), key=lambda kv: str(kv[0])):
         def pick(lang):
             """Every valid full run of the language; several runs average into one cell."""
             full = [r for r in g["chains"] if r["lang"] == lang and not r["subset"] and not r.get("partial")]
