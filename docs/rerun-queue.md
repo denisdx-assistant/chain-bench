@@ -78,5 +78,5 @@ Everything else was already retried and merged: Q4_K_XL programs 300/302/305, IQ
 chains ru 12 and program 313, IQ4_XS programs 302/313. DeepSeek had seven cuts at 32k,
 all retried at 64k (six solved) and the last one at 128k (solved). gemma had none.
 
-| 5 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `chains_en_20k_64k_rep2.json` | chain 17 | `finish=length` at 65 536, 65 536 tok | ▶ running — `_retries/chains_en_task17_retry_131k.json` |
-| 6 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `programs_v4_64k_rep2.json` | `v4_seed301.py` | `finish=length` at 65 536, 65 536 tok | ▶ running — `_retries/programs_v4_seed301_retry_131k.json` |
+| 5 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `chains_en_20k_64k_rep2.json` | chain 17 | `finish=length` at 65 536, 65 536 tok | ✅ done — 131k finished in 8 292 tokens, `finish=stop`, answer wrong: the cut hid a wrong answer, not a right one |
+| 6 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `programs_v4_64k_rep2.json` | `v4_seed301.py` | `finish=length` at 65 536, 65 536 tok | ✅ done — 131k finished in 7 004 tokens, `finish=stop`, answer wrong. Scored as wrong |
