@@ -62,9 +62,11 @@ cap, R aborted by the loop guard, · task not in this set.
 | Run | T1 | T2 | T3 | T6 | T7 | T9 | T13 | T17 | Score |
 |---|---|---|---|---|---|---|---|---|---|
 | Qwen3.8-27B-UD-Q4_K_M · en · 16k · 8tasks | 34s ✓ | 12s ✓ | 11s ✓ | 15s ✓ | 96s ✗ | 29s ✗ | 41s ✗ | 87s ✗ | 4/8 |
-| Qwen3.8-27B-UD-Q4_K_M · en · 16k · rep2_8tasks | 30s ✓ | 7s ✓ | 7s ✓ | 6s ✓ | 39s ✗ | 13s ✗ | 75s ✗ | · | 4/7 (partial 7/8) |
+| Qwen3.8-27B-UD-Q4_K_M · en · 16k · rep2_8tasks | 30s ✓ | 7s ✓ | 7s ✓ | 6s ✓ | 39s ✗ | 13s ✗ | 75s ✗ | 255s ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q4_K_M · ru · 16k · 8tasks | 43s ✓ | 19s ✓ | 11s ✓ | 12s ✓ | 88s ✗ | 94s ✗ | 92s ✗ | 87s ✗ | 4/8 |
+| Qwen3.8-27B-UD-Q4_K_M · ru · 16k · rep2_8tasks | 23s ✓ | 9s ✓ | 7s ✓ | 8s ✓ | 52s ✗ | 64s ✗ | 70s ✗ | 65s ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q4_K_M · zh · 16k · 8tasks | 88s ✓ | 16s ✓ | 14s ✓ | 13s ✓ | 109s ✗ | 105s ✗ | 110s ✗ | 108s ✗ | 4/8 |
+| Qwen3.8-27B-UD-Q4_K_M · zh · 16k · rep2_8tasks | 50s ✓ | 10s ✓ | 9s ✓ | 12s ✓ | 81s ✗ | 42s ✗ | 82s ✗ | 82s ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q6_K_XL · en · 16k · 8tasks | 33sw ✓ | 6sw ✓ | 5sw ✓ | 6sw ✓ | 70sw ✗ | 63sw ✗ | 71sw ✗ | 65sw ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q6_K_XL · en · 64k · 8tasks | 21s ✓ | 8s ✓ | 5s ✓ | 7s ✓ | 67s ✗ | 30s ✗ | 82s ✗ | 81s ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q6_K_XL · en · 64k · 8tasks_t03 | 23s ✓ | 7s ✓ | 5s ✓ | 6s ✓ | 75s ✗ | 25s ✗ | 442s ✗ | 79s ✗ | 4/8 |
