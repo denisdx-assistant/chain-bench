@@ -69,7 +69,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-27B-UD-Q6_K_XL · ru · 64k · 8tasks_t03 | 42s ✓ | 10s ✓ | 6s ✓ | 7s ✓ | 71s ✗ | 53s ✗ | 46s ✗ | 69s ✓ | 5/8 |
 | Qwen3.8-27B-UD-Q6_K_XL · zh · 16k · 8tasks | 40sw ✓ | 11sw ✓ | 9sw ✓ | 9sw ✓ | 37sw ✗ | 29sw ✗ | 79sw ✗ | 394sw ✓ | 5/8 |
 | Qwen3.8-27B-UD-Q6_K_XL · zh · 64k · 8tasks | 74s ✓ | 16s ✓ | 8s ✓ | 11s ✓ | 87s ✗ | 74s ✗ | 464s ✗ | 81s ✗ | 4/8 |
-| Qwen3.8-27B-UD-Q6_K_XL · zh · 64k · 8tasks_t03 | 34s ✓ | 15s ✓ | 8s ✓ | 7s ✓ | 81s ✗ | 446s ✗ | 78s ✗ | · | 4/7 (partial 7/8) |
+| Qwen3.8-27B-UD-Q6_K_XL · zh · 64k · 8tasks_t03 | 34s ✓ | 15s ✓ | 8s ✓ | 7s ✓ | 81s ✗ | 446s ✗ | 78s ✗ | 84s ✓ | 5/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · en · 16k · 8tasks | 22sw ✓ | 7sw ✓ | 5sw ✓ | 5sw ✓ | 76sw ✗ | 15sw ✗ | 56sw ✗ | 72sw ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · en · 32k · rerun_8tasks | 40s ✓ | 10s ✓ | 6s ✓ | 6s ✓ | 77s ✗ | 20s ✗ | 75s ✗ | 71s ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · 8tasks | 24sw ✓ | 10sw ✓ | 6sw ✓ | 6sw ✓ | 70sw ✗ | 49sw ✗ | 74sw ✗ | 75sw ✓ | 5/8 |
@@ -108,6 +108,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-27B-UD-Q4_K_M · - · 16k · default | 489s ✓ | 488s ✗ | 490s ✗ | 489s ✓ | 489s ✓ | 485s ✓ | 295s ✗ | 491s ✓ | 487s ✗ | 490s ✓ | 493s ✓ | 488s ✓ | 159s ✓ | 160s ✓ | 494s ✓ | 487s ✓ | 159s ✓ | 492s ✓ | 494s ✓ | 810s ✗ | 15/20 |
 | Qwen3.8-27B-UD-Q6_K_XL · - · 16k · default | 292sw ✓ | 306sw ✗ | 292sw ✗ | 288sw ✗ | 597sw ✓ | 294sw ✓ | 304sw ✓ | 292sw ✓ | 291sw ✓ | 595sw ✓ | 296sw ✗ | 306sw ✗ | 298sw ✗ | 296sw ✗ | 593sw ✓ | 292sw ✓ | 484sw ✗ | 294sw ✓ | 597sw ✗ | 292sw ✓ | 11/20 |
 | Qwen3.8-27B-UD-Q6_K_XL · - · 64k · default | 303s ✓ | 312s ✗ | 301s ✗ | 298s ✗ | 617s ✓ | 297s ✓ | 135s ✓ | 304s ✓ | 300s ✓ | 456s ✓ | 303s ✓ | 117s ✗ | 298s ✓ | 452s ✗ | 300s ✗ | 510s ✗ | 302s ✓ | 449s ✓ | 361s ✓ | 118s ✓ | 13/20 |
+| Qwen3.8-27B-UD-Q6_K_XL · - · 64k · default | 296s ✗ | 310s ✗ | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | · | 0/2 (partial 2/20) |
 | Qwen3.8-27B-UD-Q8_K_XL · - · 16k · default | 104s ✓ | 301s ✗ | 303s ✗ | 302s ✗ | 300s ✓ | 298s ✓ | 302s ✓ | 300s ✓ | 301s ✓ | 303s ✓ | 293s ✗ | 385s ✗ | 299s ✓ | 301s ✓ | 299s ✓ | 300s ✓ | 303s ✓ | 291s ✓ | 298s ✓ | 301s ✗ | 14/20 |
 | Qwen3.8-27B-UD-Q8_K_XL · - · 32k · default | 307s ✓ | 301s ✗ | 301s ✗ | 297s ✓ | 300s ✓ | 300s ✓ | 300s ✓ | 333s ✗ | 300s ✓ | 300s ✓ | 298s ✓ | 298s ✓ | 300s ✓ | 303s ✗ | 301s ✓ | 301s ✓ | 303s ✓ | 382s ✓ | 299s ✓ | 298s ✓ | 16/20 |
 | Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · - · 64k · default | 803s L | 820s L | 782s L | 834s L | 699s L | 615s ✗ | 339s ✗ | 807s L | 745s L | 824s L | 831s L | 758s L | 139s ✗ | 456s ✗ | 772s L | 778s ✗ | 341s ✗ | 784s ✗ | 201s ✗ | 792s L | 0/20 |
