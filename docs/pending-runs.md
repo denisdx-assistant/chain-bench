@@ -133,3 +133,20 @@ becomes a **separate row**:
 
 Both are complete sets (chains en/ru/zh, the three subsets, programs), so the table shows two
 rows for this model with different sampling rather than one averaged, misleading row.
+
+## Done by 2026-11-09 late evening
+
+- Q6_K_XL: second full sample at 64k on model defaults, plus a full row at `t 0.3 · pen 0.2`.
+  Both 95-task sets complete.
+- Q4_K_XL: programs at 64k (15/20).
+- Q4_K_M: the one unanswered chain (zh 17) retried on host 110 at 64k — answered wrong.
+- Large-context probes at 250k/500k/900k: IQ4_XS, Q4_K_XL, IQ3_S. Q6_K_XL at 250k, single
+  and two-client.
+- The rerun queue is empty; every cut is either retried or belongs to a dropped model.
+
+## Still parked (deliberately)
+
+- Large-context probes for Q4_K_M, Q8_K_XL, IQ1_M and gemma; Q6 has only the 250k point.
+- The 5k prefill point for every model — all datasets start at ~14k tokens.
+- Ripple and Orca: out of the programme.
+- deepseek-v4.1-flash has only en chains and programs; the rest was never planned.
