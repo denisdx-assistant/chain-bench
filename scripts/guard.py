@@ -153,6 +153,7 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
     req = urllib.request.Request(BASE + '/v1/chat/completions', data=body, headers=_hdr)
     t0 = time.time()
     content = []
+    last_data = time.time()
     reasoning = []
     timings = None
     usage = None
@@ -191,6 +192,14 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
             except Exception as exc:
                 msg = str(exc).lower()
                 if "timed out" in msg or isinstance(exc, TimeoutError):
+                    # a peer that closed the socket leaves us looping on timeouts until the
+                    # hour-long request limit; cut it once nothing has arrived for a while
+                    if time.time() - last_data > 240:
+                        try: r.close()
+                        except Exception: pass
+                        return {"content": ''.join(content), "loop": False, "timeout": False,
+                                "stalled": True, "error": "connection idle >240s",
+                                "latency": time.time() - t0, "finish": "stalled"}
                     if stall.is_set():
                         stop.set()
                         try: r.close()
@@ -227,6 +236,7 @@ def ask_guarded(prompt, model, max_tokens=65535, timeout=900, temperature=0.3,
             delta = ch.get('delta') or {}
             if delta.get('content'):
                 content.append(delta['content'])
+                last_data = time.time()
             if delta.get('reasoning_content'):
                 reasoning.append(delta['reasoning_content'])
             if ch.get('finish_reason'):
