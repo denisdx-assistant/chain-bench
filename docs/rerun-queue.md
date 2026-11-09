@@ -59,9 +59,9 @@ and only these three tasks will be re-run:
 | # | Model | Run | Task | Why | Status |
 |---|---|---|---|---|---|
 | 5 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 7 | `finish=length` at 16 384 tokens, 814 s | ✅ done — at 32k it looped in reasoning (297 s) until `frequency_penalty`/`presence_penalty` 0.3 were applied: then 1 180 s, 23 167 tokens, answer 5 = correct |
-| 6 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 9 | `finish=length` at 16 384 tokens, 814 s | ⬜ pending — needs the 175k build |
-| 7 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 12 | `finish=length` at 16 384 tokens, 815 s | ⬜ pending — needs the 175k build |
-| 8 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 13 | `finish=length` at 16 384 tokens, 816 s | ⬜ pending — needs the 175k build |
+| 6 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 9 | `finish=length` at 16 384 tokens, 814 s | ⛔ dropped — Ripple is out of the programme |
+| 7 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 12 | `finish=length` at 16 384 tokens, 815 s | ⛔ dropped — Ripple is out of the programme |
+| 8 | `Ripple-65B-Preview-Q6_K` | `chains_en_20k_16k.json` | chain 13 | `finish=length` at 16 384 tokens, 816 s | ⛔ dropped — Ripple is out of the programme |
 
 The remaining 14 tasks in that set finished with `stop`.
 
@@ -72,11 +72,15 @@ marked `finish=length` with an empty answer:
 
 | Model | Run | Task | Status |
 |---|---|---|---|
-| `Qwen3.8-Flash-Next-UD-Q4_K_XL` | `chains_en_20k_32k_rerun.json` | chain 12 (heron-09) | ⬜ pending — model is not loaded |
+| `Qwen3.8-Flash-Next-UD-Q4_K_XL` | `chains_en_20k_32k_rerun.json` | chain 12 (heron-09) | ✅ done 2026-11-09 — 131k answered wrong (`stop`); the cut hid a wrong answer |
 
 Everything else was already retried and merged: Q4_K_XL programs 300/302/305, IQ3_S
 chains ru 12 and program 313, IQ4_XS programs 302/313. DeepSeek had seven cuts at 32k,
 all retried at 64k (six solved) and the last one at 128k (solved). gemma had none.
 
+## IQ3_S replicate (2026-11-09)
+
+| # | Model | Run | Task | Why | Status |
+|---|---|---|---|---|---|
 | 5 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `chains_en_20k_64k_rep2.json` | chain 17 | `finish=length` at 65 536, 65 536 tok | ✅ done — 131k finished in 8 292 tokens, `finish=stop`, answer wrong: the cut hid a wrong answer, not a right one |
 | 6 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `programs_v4_64k_rep2.json` | `v4_seed301.py` | `finish=length` at 65 536, 65 536 tok | ✅ done — 131k finished in 7 004 tokens, `finish=stop`, answer wrong. Scored as wrong |
