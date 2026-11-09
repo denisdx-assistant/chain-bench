@@ -98,3 +98,9 @@ failure.
 | `Qwen3.8-Flash-Next-UD-IQ4_XS` | 1 | cut | ✅ retried, answered wrong |
 | `Qwen3.8-Flash-Next-UD-Q4_K_XL` | 1 | cut | ✅ retried, answered wrong |
 | `Ripple-65B-Preview-Q6_K` | 6 | cuts | ⛔ dropped with the model |
+
+## Open item (2026-11-10)
+
+| Model | Run | Task | Why | Status |
+|---|---|---|---|---|
+| `Qwen3.8-Flash-Next-UD-IQ4_XS` | `programs_v4_64k_rerun.json` | `v4_seed313.py` | `finish=length` at 65 536 tokens, 656 s — the budget ended it | ⬜ needs a 131k retry; the model is not loaded |

@@ -110,7 +110,7 @@ run more than once shows the mean over its valid runs, so a cell can be fraction
 | ⚠ deepseek-v4.1-flash | 16m48s · 30% err | — | 7m04s 12/17 | — | — | — | 9m44s 14/20 |
 | gemma-4-31B-it-UD-Q8_K_XL | 168m44s · 58% err | 1601 | 11m40s 9/17 | 7m24s 10/17 | 8m22s 11/17 | 11m17s 14/24 | 141m18s 0/20 |
 
-⚠ — not every task was computed for this row (missing sets or a short file): its quality percentages are not comparable with the others.
+⚠ — not every task was computed for this row (missing sets, a short file, or tasks left unresolved): its quality percentages are not comparable with the others.
 <!-- summary:end -->
 
 **Details.**
@@ -135,13 +135,17 @@ tables.
 
 | Model | Status |
 |---|---|
-| `Qwen3.8-27B-UD-Q6_K_XL` | measured |
-| `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S + YaRN 1m` | measured |
-| `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | measured |
-| `Qwen3.8-27B-UD-Q8_K_XL` | in progress |
-| `Qwen3.8-Flash-Next-UD-Q4_K_XL` | queued: YaRN 1M, 32k guarded |
-| `Qwen3.8-Flash-Next-UD-IQ4_XS` | queued: YaRN 1M, 32k guarded |
-| `Qwen3.8-Flash-Next-IQ3_M` | planned |
+| `Qwen3.8-27B-UD-Q4_K_M` | measured |
+| `Qwen3.8-27B-UD-Q6_K_XL` | measured, two rows: model defaults and `t 0.3 · pen 0.2` |
+| `Qwen3.8-27B-UD-Q8_K_XL` | measured, two samples averaged |
+| `Qwen3.8-Flash-Next-UD-IQ4_XS` | measured, two samples averaged |
+| `Qwen3.8-Flash-Next-UD-Q4_K_XL` | measured |
+| `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | measured, two samples averaged |
+| `Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M` | measured; understands Russian, answers in English |
+| `gemma-4-31B-it-UD-Q8_K_XL` | measured |
+| `Ripple-65B-Preview-Q6_K` | dropped: too heavy for this hardware and too weak to be worth it |
+| `deepseek-v4.1-flash` | partial: English chains and programs only |
+| Orca Q1 | dropped: clearly weak, the existing run is reference enough |
 
 ## 4. Reproducing a run
 
@@ -167,7 +171,6 @@ value. Generators are deterministic by seed.
   queue time.
 - The 8-task trilingual subset is a legacy cross-check, not a full translation
   of the first generation.
-- The three planned quantisations have no runs yet.
 
 ## 6. Repository layout
 

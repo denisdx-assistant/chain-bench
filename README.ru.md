@@ -107,7 +107,7 @@ YaRN, температурой или бюджетом — контекст по
 | ⚠ deepseek-v4.1-flash | 16m48s · 30% err | — | 7m04s 12/17 | — | — | — | 9m44s 14/20 |
 | gemma-4-31B-it-UD-Q8_K_XL | 168m44s · 58% err | 1601 | 11m40s 9/17 | 7m24s 10/17 | 8m22s 11/17 | 11m17s 14/24 | 141m18s 0/20 |
 
-⚠ — not every task was computed for this row (missing sets or a short file): its quality percentages are not comparable with the others.
+⚠ — not every task was computed for this row (missing sets, a short file, or tasks left unresolved): its quality percentages are not comparable with the others.
 <!-- summary:end -->
 
 **Детали.**

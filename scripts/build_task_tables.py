@@ -412,8 +412,9 @@ def summary():
             fmt(r["cells"]["t1_zh"]), fmt(r["cells"].get("t1_subs")), fmt(r["cells"]["t2"])))
     if any(r["label"].startswith("⚠") for r in rows):
         lines.append("")
-        lines.append("⚠ — not every task was computed for this row (missing sets or a short "
-                     "file): its quality percentages are not comparable with the others.")
+        lines.append("⚠ — not every task was computed for this row (missing sets, a short file, "
+                     "or tasks left unresolved): its quality percentages are not comparable "
+                     "with the others.")
     return "\n".join(lines)
 
 
