@@ -121,3 +121,15 @@ Chains scored **49/75 in both**; programs 11/20 vs 12/20, so the averaged row re
 Task-level agreement is the useful number: **86 of 95 tasks gave the same verdict**, and 9
 flipped — en 7 and 13 swapped, zh 7 and 14 swapped, five programs changed. So the score is
 stable at the set level and noisy at the task level, at roughly one task in ten.
+
+### Q6_K_XL: two rows, on purpose
+
+The rerun was first launched with sampling 0.3 and penalties 0.2 — a different mode from the
+original run, which used the model's defaults. Instead of discarding the finished work, it
+becomes a **separate row**:
+
+- `*_64k.json` — second sample at 64k with model-default sampling, comparable to the first run;
+- `*_64k_t03.json` — full run at 64k with 0.3 / 0.2, published as its own configuration.
+
+Both are complete sets (chains en/ru/zh, the three subsets, programs), so the table shows two
+rows for this model with different sampling rather than one averaged, misleading row.
