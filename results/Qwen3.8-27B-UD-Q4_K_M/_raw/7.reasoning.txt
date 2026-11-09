@@ -1,123 +1,136 @@
-We need answer in Russian likely. User asks: "На сколько метров птица-11 летает выше птицы-22? Ответь одним целым числом." We need parse massive document with many irrelevant repeated statements and some relevant facts. Need compute flight heights of bird-11 and bird-22 using rules. Need be careful with contradictory base height values, birds attributes, rules. Need output integer only.
+We need answer Chinese. Need solve question: "11 号鸟比 22 号鸟飞得高多少米？只回答一个整数。" Need parse provided text. It's a large messy log with repeated irrelevant statement and many records. We need compute flight heights of bird #11 and #22? Need infer rules.
 
-Let's extract relevant facts about birds, heights, colors, diving, wingspan, weight, etc.
+We need analyze carefully. We have many records: birds, weights, colors, wingspans, diving? general rules: baseline flight heights multiple conflicting? "基准飞行高度为 80 米。" "基准飞行高度为 100 米。" "基准飞行高度为 60 米。" Need determine which applies? Maybe latest? There are multiple baseline statements. Need understand likely puzzle: file contains records, some earlier periods not affect current computation. General description about approval order etc repeated. We need extract relevant facts and rules, compute difference in flight height between bird 11 and bird 22.
 
-From text:
-- "Птицы, умеющие нырять, летают на 15 метров ниже базовой высоты."
-- "Все белые птицы летают на 7 метров ниже базовой высоты."
-- "Базовая высота полёта — 60 метров." appears. Later "Базовая высота полёта — 80 метров." and later "Базовая высота полёта — 100 метров." Contradictory base heights. Need determine which applies? Maybe all base height statements? Could be conflicting; need infer maybe latest? Or maybe different contexts? Need inspect. There are multiple: 
-"Базовая высота полёта — 60 метров."
-"Базовая высота полёта — 80 метров."
-"Базовая высота полёта — 100 метров."
-Also "Серебристые птицы летают на 5 метров выше базовой высоты."
-"Птицы с размахом крыла больше 120 сантиметров летают на 10 метров выше базовой высоты."
-"Все птицы тяжелее 150 граммов летают на 12 метров выше базовой высоты."
-"Soyka-30 flies 10 m above stork-40" etc but for bird-11/22?
+Need identify all relevant statements about birds #11 and #22, baseline flight height, adjustments based on weight/color/diving/wingspan/species? Also relative statements: "乌鸦-33 比 松鸦-08 飞得高 4 米。" "30 号松鸦比 40 号苍鹭飞得高 10 米。" "21 号乌鸦比 30 号松鸦飞得高 30 米。" "猎鹰-14 比 乌鸦-33 飞得高 6 米。" "40 号苍鹭在 20 米的高度飞行。" "松鸦-08 比 苍鹭-51 飞得高 3 米。" But question asks number birds: 11号鸟 and 22号鸟. There are records:
+- "22 号鸟：不会潜水，翼展 110 厘米。"
+- "11 号鸟：白色，体重 120 克。"
+- "11 号鸟：体重 180 克，白色。" (contradiction? Maybe two records for same ID? Could be earlier/later? Need determine current?)
+- "22 号鸟：白色，体重 90 克。"
+- "22 号鸟：体重 140 克，灰色。"
+- "11 号鸟：会潜水，翼展 130 厘米。"
+Also maybe species? No species for #11/#22 except "鸟". There are named birds: 松鸦-...乌鸦... etc. Maybe numbers correspond to birds with attributes? Need identify 11号鸟 and 22号鸟 records. Multiple conflicting attributes for same number: #11 has white weight 120; weight 180 white; dives wingspan 130. #22: not dive wingspan 110; white weight 90; weight 140 gray. Need determine which records are valid/current. Text says "部分记录涉及较早时期，不影响当前计算。" Also "按出现顺序（不是按日期）最后一条关于 约翰14 土地操作的记录是错误的，不应计入。" Specific invalid record for John14 not relevant? Maybe similar: some records erroneous? Need infer data cleaning rules.
 
-Bird facts:
-- "Птица-22: масса 140 граммов, окрас серый."
-- "Птица-22: не умеет нырять, размах крыла 110 сантиметров."
-- "Птица-11: белая, масса 120 граммов."
-- "Птица-11: умеет нырять, размах крыла 130 сантиметров."
-- "Птица-22: белая, масса 90 граммов." Wait conflicting: bird-22 mass 140 gray earlier and white mass 90 later. Also maybe multiple entries? Need handle contradictions.
-Also "Птица-33: масса 180 граммов, окрас серый." irrelevant.
+Need parse whole file? The prompt begins with repeated "文件中还包含关于审批顺序、准备时间和参与人员的一般说明。部分记录涉及较早时期，不影响当前计算。" Many times. Then records. It may be an artificial dataset where we need answer a question by applying rules, ignoring irrelevant/repeated noise, handling contradictions maybe by last occurrence? Need deduce intended logic.
 
-Need determine height of птица-11 and птица-22.
+Question: "11 号鸟比 22 号鸟飞得高多少米？只回答一个整数。" So need compute difference in flight altitude: height(11) - height(22). Likely based on baseline plus modifiers for attributes (weight, color, diving, wingspan) and maybe species? For #11 and #22 only generic bird attributes.
 
-Rules:
-- base flight altitude maybe one of 60,80,100. Could be multiple contradictory. Maybe there is a rule about conflicting statements? The document contains many repeated generic remarks but no explicit conflict resolution except some specific: "В предпоследней записи документа Джон14 ошибочно назван Йохан15." "Последняя по порядку упоминания в документе (а не по дате) запись об операциях Джона14 с землёй ошибочна и не должна учитываться." "Все операции с землёй, которые совершал Джон14, перечислены в этом документе." etc. But for birds maybe not.
+Let's list relevant rules:
+- "基准飞行高度为 80 米。"
+- "基准飞行高度为 100 米。"
+- "基准飞行高度为 60 米." (multiple baseline)
+Maybe each applies to different entity? But says baseline flight height. Could be conflicting records; need choose correct based on "current"? Maybe later overrides? Occurrence order: 80 appears after many, then 100, then 60. Last is 60? But there are also "所有重于 150 克的鸟，飞行高度比基准高 12 米。" "银色鸟的飞行高度比基准高 5 米。" "所有白色的鸟，飞行高度比基准低 7 米。" "翼展大于 120 厘米的鸟，飞行高度比基准高 10 米。" "会潜水的鸟，飞行高度比基准低 15 米。"
+Also species-specific weight comparisons? "所有乌鸦都比所有苍鹭重 20 克。" "所有松鸦都比所有乌鸦重 30 克。" Maybe not needed unless identify species from names? #11/#22 are generic birds, maybe not species.
 
-Could be a benchmark with distractors and conflicting facts; need apply some implicit rules? We need infer expected answer. The question only asks difference in meters bird-11 above bird-22. Maybe height rules use base height and modifiers, but contradictory base heights could affect both equally if same base? Difference may independent of base if both use same base? Let's see: If both birds get modifiers relative to base, difference is modifier11 - modifier22, independent of base if same base applies to both. But if different rules apply maybe base cancels. However some birds may be silver? Need determine. Base contradictions may not matter for difference if both use same base and no absolute statements. But there are relative statements with specific birds? None directly for 11/22 except maybe via colors/diving/wingspan/weight. So difference likely independent of base. But if a rule sets absolute? No.
+Need know if attributes of #11/#22 are weight/color/diving/wingspan. There are contradictory records. Need decide which attributes to use. Maybe each record is an operation? For variables, operations apply sequentially. For facts like bird attributes maybe later records override earlier? But "部分记录涉及较早时期，不影响当前计算" suggests some records are historical and don't affect current; perhaps only latest current state? Need identify current values maybe by last occurrence in file (appearance order), except erroneous John14 record. Also "按出现顺序（不是按日期）最后一条关于 约翰14 土地操作的记录是错误的，不应计入。" That specific indicates for John14 land operations, the last by appearance (not date) is wrong and should not count. This might be a general pattern: There may be false records indicated by "误称为"? Let's inspect John14 records:
+- "1999 年，约翰14 拥有 100 英亩土地。"
+- "2008 年 3 月 8 日，约翰14 卖掉了自己土地的一半。"
+- "2016 年 6 月 20 日，约翰14 购买了 30 英亩土地。"
+- "2004 年底，约翰15 购买了 60 英亩土地。" (John15 not John14)
+- "2010 年，约翰 卖出了 40 英亩土地。" (John no number?)
+- "在本文件的倒数第二条记录中，约翰14 被误称为 约翰15。" This says in the second-to-last record, John14 was misnamed John15. Wait second-to-last record? The record "2004 年底，约翰15 购买了 60 英亩土地。" might actually be John14, not John15? It says倒数第二条记录 (second to last record) John14 misnamed as John15. Which is second-to-last among all records? Need check near end? There are many repeated general statements after records? Actually after main records, there is huge repeated general description at end. The "倒数第二条记录" may refer to file records before trailing noise? Hmm.
+- "约翰14 进行的所有土地操作都记录在本文件中。"
+- "按出现顺序（不是按日期）最后一条关于 约翰14 土地操作的记录是错误的，不应计入。" This says last John14 land operation by appearance is wrong, exclude. Which one? If John15 record is misnamed John14? Need maybe not relevant to birds.
 
-Need calculate modifiers for bird-11 and bird-22 based on attributes. Need resolve attributes contradictions: Bird-11 has white, mass 120, can dive, wingspan 130. Bird-22 has mass 140 gray, cannot dive, wingspan 110; later white mass 90. Which facts valid? Could be multiple records? "Птица-22: масса 140 граммов, окрас серый." and "Птица-22: не умеет нырять, размах крыла 110 сантиметров." and "Птица-22: белая, масса 90 граммов." Contradiction. Could be one is erroneous? Need maybe use all? If both apply? Maybe latest? In such puzzles, later statements override earlier? There is no explicit but maybe natural: repeated records can be inconsistent; need determine based on "last mentioned"? The document includes explicit for John14 last land operation erroneous, not general. But maybe we should treat each record as separate object? "Птица-22" multiple attributes could combine unless conflicting. If conflicting color/mass, maybe choose latest? Need think.
+This puzzle may be generated with many irrelevant facts and corrections. Need answer only integer. We need robustly infer intended current attributes for 11 and 22.
 
-The prompt is likely generated with many irrelevant facts and a question requiring reasoning over a set of rules. It may have hidden inconsistencies to test robustness? We need produce one integer. Need identify intended answer likely from consistent subset. Let's list all relevant facts in order as given (after long repeated notes). The user text begins with repeated generic remarks, then list of facts. We need maybe parse sequence. The question at end: bird-11 above bird-22 by how many meters? Answer integer.
-
-Let's extract all relevant bird/height lines in order:
-1 Птицы, умеющие нырять, летают на 15 метров ниже базовой высоты.
-2 Показатель variable... irrelevant.
+Let's extract all bird-related statements in order (appearance) from the visible main block. I'll copy relevant lines:
+At top after repeated noise:
+"松鸦-13：体重 170 克，白色。"
+... variable ops ...
+"所有重于 150 克的鸟，飞行高度比基准高 12 米。"
+"乌鸦-33 比 松鸦-08 飞得高 4 米。"
 ...
-All objects with indices multiple of ... irrelevant.
+"22 号鸟：不会潜水，翼展 110 厘米。"
 ...
-Птица-22: масса 140 граммов, окрас серый.
+"30 号松鸦比 40 号苍鹭飞得高 10 米。"
 ...
-Все белые птицы летают на 7 метров ниже базовой высоты.
+"33 号鸟：体重 180 克，灰色。"
+"11 号鸟：白色，体重 120 克。"
 ...
-Базовая высота полёта — 60 метров.
-Птица-22: не умеет нырять, размах крыла 110 сантиметров.
+"所有重于 100 克的白色鸟具有“银色”属性。"
 ...
-Птица-11: умеет нырять, размах крыла 130 сантиметров.
-Автомобиль-11... irrelevant
+"松鸦-12：体重 200 克，白色。"
 ...
-Сойка-08 летает выше цапли-51 на 3 метра.
+"松鸦-16：体重 150 克，白色。"
 ...
-Все сойки тяжелее всех ворон на 30 граммов.
+"所有松鸦都比所有乌鸦重 30 克。"
 ...
-Птицы с размахом крыла больше 120 сантиметров летают на 10 метров выше базовой высоты.
+"银色鸟的飞行高度比基准高 5 米。"
 ...
-Сойка-30 летает на 10 метров выше цапли-40.
+"11 号鸟：体重 180 克，白色。"
 ...
-Все белые птицы тяжелее 100 граммов обладают свойством «серебристые».
+"基准飞行高度为 80 米。"
 ...
-Базовая высота полёта — 80 метров.
+"22 号鸟：白色，体重 90 克。"
 ...
-Птица-22: белая, масса 90 граммов.
-Все птицы тяжелее 150 граммов летают на 12 метров выше базовой высоты.
+"x_a17 = 27; bx4 = 7; x_var4 = -99; x_arr = [1, 3, 5, 9]。"
 ...
-Цапля-40 летает на высоте 20 метров? Actually earlier "Цапля-40 летает на высоте 20 метров." yes.
+"松鸦-14：体重 190 克，灰色。"
 ...
-Серебристые птицы летают на 5 метров выше базовой высоты.
+"松鸦-15：体重 160 克，白色。"
 ...
-Базовая высота полёта — 100 метров.
+"基准飞行高度为 100 米。"
 ...
-Ворона-33 летает выше сойки-08 на 4 метра.
+"21 号乌鸦比 30 号松鸦飞得高 30 米。"
 ...
-Ворон-21 летает на 30 метров выше сойки-30.
+"2010 年，约翰 卖出了 40 英亩土地。"
 ...
-Сокол-14 летает выше вороны-33 на 6 метров.
+"基准飞行高度为 60 米。" (appears later after "指标 variable292..."? Actually yes: after "11号鸟：会潜水，翼展 130厘米"? Let's locate: in text: 
+"11 号鸟：会潜水，翼展 130 厘米。
+指标 variable226 ...
+罗莎 ...
+指标 variable795 ...
+指标 variable261 ...
+基准飞行高度为 60 米。
+指标 variable292 ..."
+So baseline 60 after #11 diving record.
 ...
-Считаются птицы, которые одновременно тяжелее 160 граммов и имеют белый окрас. (irrelevant? maybe defines counted birds not height)
+"翼展大于 120 厘米的鸟，飞行高度比基准高 10 米。"
+"所有白色的鸟，飞行高度比基准低 7 米。"
+...
+"40 号苍鹭在 20 米的高度飞行。"
+...
+"统计同时满足“重于 160 克”和“白色”两个条件的鸟。" (question? irrelevant)
+...
+"22 号鸟：体重 140 克，灰色。" at very end of main block before repeated noise.
 
-Need compute height for bird-11: attributes: white, mass 120, dives, wingspan 130. Also maybe "white birds heavier than 100g are silver" -> bird-11 white mass 120 >100 => silver. So rules that can apply:
-- diving: base -15
-- white: base -7
-- wingspan >120: base +10
-- silver: base +5
-- weight >150? no (120)
-Could multiple apply? The question likely expects sum all applicable modifiers? Or maybe one of rules? Need infer. It says "летают на ... ниже/выше базовой высоты". If multiple rules apply, do we add? Usually in these synthetic tasks, you add all applicable offsets. But could be conflicting and need priority? No priority given. For birds with multiple attributes, likely sum all applicable modifiers. Need check with examples? There are other birds with relative statements maybe can validate. But only question 11 vs 22.
+Also "所有乌鸦都比所有苍鹭重 20 克。" maybe species weight. "07 号松鸦重 150 克." etc.
 
-Bird-22 attributes: conflicting. If combine non-conflicting: mass 140 gray, cannot dive, wingspan 110; later white mass 90. If latest color white mass90? Then attributes: white, mass90, no dive? wingspan110? If combine all: color both gray and white? impossible. Could maybe multiple records are different observations; need choose valid? Maybe the later "Птица-22: белая, масса 90 граммов." overrides earlier color/mass? But if so mass 90, white, cannot dive, wingspan110. If earlier still mass140 gray? conflict. Could be "part of records relate to past periods and don't affect current calculations" from repeated notes: "Отмечено, что часть записей относится к прошлым периодам и не влияет на текущие расчёты." This could imply some records are past and shouldn't count. But which? No markers except maybe object records "относится к другому набору и не учитывается". For birds no such.
+Need compute heights. Need determine baseline flight height: likely one of 80/100/60. Which is current? Could be latest record? But maybe baseline can change over time? If records involve earlier periods not affect current, perhaps latest baseline applies. Last baseline is 60 m. But there are also relative height statements that anchor some birds to absolute height: "40 号苍鹭在 20 米的高度飞行。" and relative differences could imply baseline? Let's see: If baseline is 60, many adjustments could make 40号苍鹭 height maybe not 20? But if 40号苍鹭 is a specific bird with known attributes? We don't know weight/color. It might be an absolute anchor that overrides computed baseline? Could use to determine actual baseline? Hmm.
 
-Maybe the document is intentionally noisy; question can be answered without resolving contradictions if difference same? Let's test scenarios.
+Maybe these records are not all simultaneous; some are "earlier period" and do not affect current computation. The question asks current difference between #11 and #22. We may need use only rules and current attributes, ignore historical absolute statements? But "40号苍鹭在20米" could be a current fact. It might conflict with baseline rules; perhaps indicates baseline is not used? Need reason.
 
-Case A: Use latest for conflicting: bird-22 white mass90, no dive, wingspan110. Bird-11 white mass120 dive wingspan130, silver (white >100). Modifiers:
-Base B unknown.
-Bird11: diving -15, white -7, wingspan +10, silver +5 = -7 relative? Sum = -15-7+10+5=-7. Height B-7.
-Bird22: white -7 only (mass90 not >100 so not silver; no dive; wingspan110 not >120; weight not >150). Height B-7. Difference 0. If mass90 white, same as bird11? Bird11 has additional -7? Wait bird11 sum -7, bird22 -7 => diff 0.
+The text includes many variable operations and metric labels irrelevant. There are also specific operations like "已执行：x_a17 += bx4; x_arr[0] += x_arr[3]。" and later "x_a17 = 27; ..." and rule "所有以 x_ 为前缀且具有偶数整数值的变量都减半；对数组则逐元素执行该操作。" This is a programming-like task mixed with natural language. But question only bird height. Maybe this is a benchmark for reasoning with inconsistent data; need ignore variables.
 
-If use all non-conflicting but color conflict ignored? Bird22 maybe gray? Let's scenarios:
-Bird22 early: mass140 gray, no dive, wingspan110. No white, no silver (not white), no dive, wingspan no, weight not >150. Modifier 0 => B. Difference bird11 (B-7) above bird22? -7 - 0 = -7, i.e. bird11 lower by 7; question asks how many meters higher, maybe -7? But expects integer maybe 0 or 7? Need determine.
+Need identify intended answer. Let's systematically model possible interpretations.
 
-If bird22 later white mass90 plus no dive/wingspan: modifier -7; diff 0.
-If combine both masses? Bird22 mass maybe 140 and 90? Could be total? No. If gray+white? If color conflict, maybe neither white? Then modifier 0. If white and mass140 (combine later color white, earlier mass140): white -7, silver because white >100 +5 => -2. Diff bird11 -7 vs -2 = -5 (bird11 lower 5). If white mass90 (latest) => 0. If gray mass140 => -7. If gray mass90? no.
+Entities: birds with IDs: 11, 22, 30, 33, 40, etc. Some are species-named: 松鸦-13, 乌鸦-33, 苍鹭-51, etc. Maybe "11号鸟" is a bird ID; could also be "11号鸟" attributes multiple lines. We need flight height. General formula likely:
+height = baseline + adjustments based on properties:
+- if weight > 150: +12
+- if color white: -7
+- if silver attribute: +5 (silver derived: all white birds heavier than 100g have silver)
+- if wingspan > 120: +10
+- if can dive: -15
+Maybe also "所有重于 150 克的鸟" uses >150, not >=. "重于 100 克的白色鸟" >100. "翼展大于 120". Baseline maybe 80/100/60.
+Need current weight/color/diving/wingspan for #11 and #22. There are conflicting records: maybe latest by appearance overrides. Let's list by appearance:
+#11:
+A: "11 号鸟：白色，体重 120 克。" (early)
+B: "11 号鸟：体重 180 克，白色。" (middle)
+C: "11 号鸟：会潜水，翼展 130 厘米。" (later)
+No explicit color/weight in C. If latest full record overrides previous? But C only diving/wingspan, maybe adds attribute not overriding color/weight. In such datasets, each statement can update a field; if field not mentioned, unchanged. Then current #11: white, weight 180 (from B over A), diving yes, wingspan 130. If instead each record is a complete description and last record replaces entire object, #11 would only know diving/wingspan, color/weight unknown; unlikely. So field update model plausible.
+#22:
+A: "22 号鸟：不会潜水，翼展 110 厘米。"
+B: "22 号鸟：白色，体重 90 克。"
+C: "22 号鸟：体重 140 克，灰色。"
+Current by field update: diving no (A), wingspan 110, color gray (C overrides white), weight 140 (C overrides 90). So #22: gray, weight 140, no dive, wingspan 110.
+If instead last complete record: #22 gray 140, no dive/wingspan unknown; but A earlier might still apply? Usually facts persist unless contradicted. For attributes not mentioned, keep. So #22 as above.
+For #11: A white 120; B weight 180 white; C diving yes wingspan 130. Current white 180 dives wingspan130.
 
-Need infer intended from generated puzzle. There are many "Показатель variable..." irrelevant, "Все объекты с индексами..." irrelevant. The question likely from a dataset where facts are randomly generated and one question requires multi-hop reasoning. They may include contradictory facts accidentally? Or deliberate? Need solve according to some hidden conventions. Let's examine structure: It includes many generic repeated statements at top and bottom, maybe filler. Then a list of random facts. Some are inconsistent (base height 60/80/100, bird-22 color/mass, ship base capacity 50/40, rules for ships multiple). This looks like an adversarial document with contradictions. Need perhaps identify "current" facts? The repeated note: "часть записей относится к прошлым периодам и не влияет на текущие расчёты." But no way to know which. Maybe all contradictory base heights are past? The latest? In temporal reasoning, if no date, maybe last mentioned is current? But explicit for John14 says last land operation erroneous, not general.
+Now baseline: multiple statements "基准飞行高度为 X". If field update, latest baseline = 60. But there may be corrections? No explicit correction for baseline. Could be 60. Then compute:
+#11: baseline 60 + weight>150? 180>150 => +12; white => -7; silver? white and weight>100 => silver +5; wingspan>120? 130>120 => +10; dives? yes => -15. Total = 60+12-7+5+10-15 = 65.
+#22: baseline 60 + weight>150? 140 no; white? gray no; silver? no (not white); wingspan>120? 110 no; dives? no. Total=60. Difference #11 - #22 = 5. Answer 5.
 
-Maybe the correct approach is to ignore irrelevant contradictions and focus on relative difference: base cancels. But color/mass contradiction for bird-22 affects difference. Need decide likely intended answer. Let's search mental patterns: These tasks from benchmarks maybe require extracting from long noisy text, with many irrelevant statements, sometimes contradictory. The expected answer might be computed by a program that applies all facts in order with overwriting? Or uses a knowledge graph where later facts overwrite earlier for same property? Need emulate likely. If generated by an LLM, it might not ensure consistency; expected answer maybe from a hidden canonical solution. We need infer from wording.
+If baseline latest 60 but maybe "silver" rule applies to #11 and #22? #22 not white. Difference 5. If baseline 80: same difference 5 because both use same baseline (unless #22 gets other adjustments? no). If baseline 100: difference 5. So if attributes as above, difference independent of baseline! Great. Unless #22 white in some interpretation or #11 not silver etc. But likely answer 5.
 
-Question: "На сколько метров птица-11 летает выше птицы-22?" It asks difference. There are explicit rules:
-- Птицы, умеющие нырять, летают на 15 метров ниже базовой высоты.
-- Все белые птицы летают на 7 метров ниже базовой высоты.
-- Серебристые птицы летают на 5 метров выше базовой высоты.
-- Птицы с размахом крыла больше 120 сантиметров летают на 10 метров выше базовой высоты.
-- Все птицы тяжелее 150 граммов летают на 12 метров выше базовой высоты.
-- Все белые птицы тяжелее 100 граммов обладают свойством «серебристые».
-
-Bird-11: white, mass 120, dives, wingspan 130. So it's white, diving, wingspan >120, silver (white >100). Height = base -15 -7 +5 +10 = base -7.
-Bird-22: There are two sets: mass 140 gray; not diving, wingspan 110; white mass90. If we take all facts as true (inconsistent) maybe bird-22 is both gray and white? In classical logic inconsistent, but in puzzle maybe all facts can coexist? If white and gray? Color conflict. If it is white, then white rule; mass could be 140 or 90. If mass140, silver; if mass90 not silver. Diving? "не умеет нырять" explicit no dive. Wingspan110 no. Weight >150? if 140 no, if 90 no. So possible heights: B-7 (white only), B-2 (white+silver), B? (gray only). Difference with B-7: 0, -5, -7. Which integer likely? Need more clues.
-
-Maybe "Птица-22: масса 140 граммов, окрас серый." and "Птица-22: белая, масса 90 граммов." are separate records; one may be past period not affecting current. The note says part of records relate to past periods and don't affect current calculations. How identify? Maybe records with "относится к другому набору и не учитывается" are excluded. But bird-22 not marked. Maybe the repeated note is just filler, not applicable.
-
-Could there be a rule that if object has multiple attributes, use all, but contradictions are resolved by "latest mentioned"? In many NLP knowledge base tasks, later statements override earlier. Let's test if latest for base height would be 100. But difference unaffected. For bird-22, latest color/mass white 90 overrides earlier gray 140. Then answer 0. This seems plausible: use most recent fact for conflicting attribute. The document order: early "Птица-22: масса 140 граммов, окрас серый." then later "Птица-22: белая, масса 90 граммов." So latest says white 90. Then bird22 height B-7, bird11 B-7, difference 0. Is that too trivial? Maybe intended trick: both fly same height due to different modifiers. Answer 0.
-
-But need be careful: Bird-11 also has "Птица-11: белая, масса 120 граммов." and "Птица-11: умеет нырять, размах крыла 130 сантиметров." No conflict. It is white >100 => silver. The rules maybe don't stack? Maybe each bird has one category based on most specific? Let's examine language: "Птицы, умеющие нырять, летают на 15 метров ниже базовой высоты." "Все белые птицы летают на 7 метров ниже базовой высоты." "Серебристые птицы летают на 5 метров выше..." "Птицы с размахом крыла больше 120..." If multiple, could be additive. But if not additive, which rule takes precedence? Could be each statement independent; to compute height you may need combine? In real world, a bird cannot have multiple independent altitude offsets unless rules are cumulative. Synthetic tasks often use "all applicable" summing. Need see if there are examples with multiple rules for other birds that could validate
+Need check if #11 weight current maybe 120 not 180? If last complete record C doesn't include weight, maybe unknown; but if use A (white 120) + C diving wingspan, weight 120: #11 adjustments: baseline + white -7 + silver? weight>100 white => +5; wingspan +10; dive -15; no >150 => -7? Total baseline -7+5+10-15 = baseline -7. #22 current maybe
