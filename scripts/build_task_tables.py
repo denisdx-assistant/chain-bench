@@ -15,6 +15,7 @@ import re
 import statistics
 
 OK, BAD, LEN, LOOP, NA = "✓", "✗", "L", "R", "·"
+UNANS = "?"  # no answer at all: not scored either way
 
 RUN_CONFIGS = {}
 if os.path.exists("results/run-configs.json"):
@@ -82,8 +83,12 @@ def load(path):
             tid = "S" + str(r["seed"])
         else:
             continue
+        # a reply with no parseable answer is unresolved, not a failure: "?" keeps it out of
+        # both the numerator and the denominator until a retry at a bigger budget decides
         mark = OK if r.get("ok") else (LOOP if r.get("kind") == "loop"
-                                      else (LEN if r.get("finish") == "length" else BAD))
+                                      else (LEN if r.get("finish") == "length"
+                                            else (UNANS if (r.get("kind") == "no_answer"
+                                                           or unanswered(r)) else BAD)))
         lat = r.get("latency_s")
         gen = None
         st = r.get("server_timings") or {}
@@ -94,6 +99,28 @@ def load(path):
         out[str(tid)] = (mark, round(lat) if isinstance(lat, (int, float)) else None, gen, tok)
     meta = {} if isinstance(d, list) else d
     return out, meta
+
+
+def unanswered(r):
+    """True when the reply carried no answer at all, which is not the same as a wrong one.
+
+    Older files stored such rows as plain failures, so the mark is derived from the data
+    rather than from the recorded kind: a chain row without a parsed integer, or a program
+    row with neither a ten-number array nor a SUM, never answered.
+    """
+    if r.get("ok") or r.get("finish") == "length" or r.get("kind") in ("loop", "timeout", "error"):
+        return False
+    if "got_array" in r or "got_sum" in r:
+        if r.get("got_array") is not None or r.get("got_sum") is not None:
+            return False
+    if "arr_ok" in r or "sum_ok" in r:
+        text = r.get("raw") or ""
+        has_arr = any(len(re.findall(r"-?\d+", b)) == 10
+                      for b in re.findall(r"\[([^\[\]]{0,200})\]", text))
+        has_sum = bool(re.search(r"\b(sum|total)\b[^0-9\-]{0,20}-?\d+", text, re.I))
+        return not (has_arr or has_sum)
+    return r.get("got") is None
+
 
 
 def collect():
@@ -202,7 +229,10 @@ def summary():
         t = sum(((v[2] if len(v) > 2 and v[2] is not None else v[1]) or 0)
                 for v in r["tasks"].values())
         ok = sum(1 for v in r["tasks"].values() if v[0] == OK)
-        return {"t": t, "ok": ok, "n": len(r["tasks"])}
+        # unanswered rows stay out of the denominator: no answer is not a wrong answer
+        # both a cut and a silent reply are unresolved: they need a retry, not a verdict
+        n = sum(1 for v in r["tasks"].values() if v[0] in (OK, BAD, LOOP))
+        return {"t": t, "ok": ok, "n": n}
 
     def avg_cells(cells):
         """Mean over repeated runs of the same configuration: a cell may be fractional."""
@@ -295,7 +325,13 @@ def summary():
                 continue
             for _v in _r["tasks"].values():
                 pass
-        rows.append({"label": "%s · %s" % (folder, cfg_label(g["cfg"], budget)),
+        # say out loud how many rows are unresolved, so a shorter denominator is explained
+        unresolved = sum(1 for r in (g["chains"] + g["programs"])
+                         for v in r["tasks"].values() if v[0] in (LEN, UNANS))
+        label = "%s · %s" % (folder, cfg_label(g["cfg"], budget))
+        if unresolved:
+            label += " · unresolved %d" % unresolved
+        rows.append({"label": label,
                      "median_tokens": round(statistics.median(_toks)) if _toks else None,
                      "cells": cells, "overall": (total_t, total_ok, total_n)})
 

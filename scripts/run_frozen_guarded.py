@@ -183,9 +183,12 @@ def main():
             ok, ok_arr, ok_sum, got_arr, got_sum = False, False, False, None, None
         else:
             ok, ok_arr, ok_sum, got_arr, got_sum = score_program(exp, out.get("content") or "")
-        kind = "ok" if ok else ("loop" if out.get("loop") else
-                                ("timeout" if out.get("timeout") else
-                                 ("error" if out.get("error") else "wrong")))
+        kind = ("ok" if ok else ("loop" if out.get("loop") else
+                                 ("timeout" if out.get("timeout") else
+                                  ("error" if out.get("error") else
+                                   # neither ARRAY nor SUM parsed and not cut by the budget
+                                   ("no_answer" if got_arr is None and got_sum is None
+                                    and out.get("finish") != "length" else "wrong")))))
         rows.append({"file": os.path.basename(path), "ok": ok, "kind": kind,
                      "arr_ok": ok_arr, "sum_ok": ok_sum,
                      "latency_s": round(out.get("latency", 0), 1),

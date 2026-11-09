@@ -91,9 +91,12 @@ def main():
             raise SystemExit("schema error: task %s has no answer field" % t.get("id"))
         got = parse_int(out.get("content"))
         ok = (got == t["answer"])
-        kind = "ok" if ok else ("loop" if out.get("loop") else
-                                ("timeout" if out.get("timeout") else
-                                 ("error" if out.get("error") else "wrong")))
+        kind = ("ok" if ok else ("loop" if out.get("loop") else
+                                 ("timeout" if out.get("timeout") else
+                                  ("error" if out.get("error") else
+                                   # nothing parseable and not cut: unresolved, not wrong
+                                   ("no_answer" if got is None and out.get("finish") != "length"
+                                    else "wrong"))))) 
         rows.append({"id": t["id"], "answer": t["answer"], "got": got, "ok": ok,
                      "kind": kind, "latency_s": round(out.get("latency", 0), 1),
                      "finish": out.get("finish"), "error": out.get("error"),

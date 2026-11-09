@@ -84,3 +84,17 @@ all retried at 64k (six solved) and the last one at 128k (solved). gemma had non
 |---|---|---|---|---|---|
 | 5 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `chains_en_20k_64k_rep2.json` | chain 17 | `finish=length` at 65 536, 65 536 tok | ✅ done — 131k finished in 8 292 tokens, `finish=stop`, answer wrong: the cut hid a wrong answer, not a right one |
 | 6 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | `programs_v4_64k_rep2.json` | `v4_seed301.py` | `finish=length` at 65 536, 65 536 tok | ✅ done — 131k finished in 7 004 tokens, `finish=stop`, answer wrong. Scored as wrong |
+
+## Unanswered rows (audited 2026-11-09)
+
+Scanned every canonical file with the new rule: an unanswered reply is unresolved, not a
+failure.
+
+| Model | Rows | Kind | Status |
+|---|---|---|---|
+| `Qwen3.8-27B-UD-Q4_K_M` | zh chain 17 | empty reply at 16k | ⬜ needs a 64k retry — the only true "no answer" in the corpus |
+| `Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M` | 14 | 12 programs + 2 chains cut at 64k | ⬜ budget, not silence: the model writes 64k and does not stop |
+| `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | 2 | cuts | ✅ both already retried at 131k, both answered wrong |
+| `Qwen3.8-Flash-Next-UD-IQ4_XS` | 1 | cut | ✅ retried, answered wrong |
+| `Qwen3.8-Flash-Next-UD-Q4_K_XL` | 1 | cut | ✅ retried, answered wrong |
+| `Ripple-65B-Preview-Q6_K` | 6 | cuts | ⛔ dropped with the model |
