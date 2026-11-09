@@ -1,5 +1,18 @@
 # Pending runs
 
+**Status 2026-09-11: paused, not finished.** The owner stopped the programme until Qwen4
+ships ("на днях"). Nothing should start on its own. Ripple-65B is dropped for good: too
+heavy for the hardware and not smart enough to be worth the hours — revisit only if it
+becomes interesting again.
+
+Parked behind the pause:
+
+- large-context speed probes for the 27B trio, IQ1_M, gemma and Ripple;
+- the 5k prefill point for every model (all datasets start at ~14k tokens);
+- a full series for Orca Q1, which was never run;
+- Ripple: ruined by the decision above, so its missing languages and 13 programs will
+  not be computed.
+
 Work agreed with the owner and not yet executed. Kept here so nothing is lost
 between sessions.
 
