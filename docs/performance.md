@@ -36,7 +36,7 @@ made before the fields were captured show —.
 | Qwen3.8-27B-UD-Q6_K_XL · chains zh · 64k | 8tasks | 8 | 53.2 | 48.3 | — | 0 | 2870 | 38141 | 59 s |
 | Qwen3.8-27B-UD-Q6_K_XL · chains zh · 64k | t03 | 17 | 53.8 | 50.2 | 1329.8 | 1 | 4100 | 38359 | 81 s |
 | Qwen3.8-27B-UD-Q6_K_XL · programs · 16k · v4_16k | default | 20 | — | — | — | 0 | — | — | — |
-| Qwen3.8-27B-UD-Q6_K_XL · programs · 64k · v4_64k | default | 4 | 35.9 | 35.3 | 775.9 | 2 | 4146 | 142552 | 118 s |
+| Qwen3.8-27B-UD-Q6_K_XL · programs · 64k · v4_64k | default | 20 | 36.2 | 35.2 | 777.6 | 9 | 4146 | 142558 | 119 s |
 | Qwen3.8-27B-UD-Q8_K_XL · chains en · 16k | default | 17 | — | — | — | 0 | — | — | — |
 | Qwen3.8-27B-UD-Q8_K_XL · chains en · 16k | 8tasks | 8 | — | — | — | 0 | — | — | — |
 | Qwen3.8-27B-UD-Q8_K_XL · chains en · 32k | rerun | 17 | 64.0 | 57.8 | — | 0 | 4099 | 14062 | 70 s |
