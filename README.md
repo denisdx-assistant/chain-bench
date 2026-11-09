@@ -27,12 +27,32 @@ is computed by code. Difficulty was calibrated on
 the 50% target. Series were then run for three Flash-Next configurations and for
 `Qwen3.8-27B-UD-Q8_K_XL`.
 
-**What it shows.** On chains the models are **not** separated: Q6 10/17,
-Flash-Next 12/17 at a large budget and 10/17 at 32k, Q8 10/17 on Russian and
-11/17 on English — one or two tasks apart on a 17-task set, well inside the
-interval. YaRN 1M and the 262k base differ by one program, also inside noise.
-Degenerate loops are rare and are contained by a streaming guard rather than by
-a bigger budget.
+**What it shows.** These tests are noisy. With 17 chains per language and 20 programs, a
+difference of one or two tasks means nothing: repeated runs of the same model agree to within a
+task at set level while individual tasks flip about once in ten. A confidence interval would be
+dishonest here — the tests are heterogeneous and identical repeats are too few — so read the
+table as an ordering, not as a measurement.
+
+Within that limit, four findings:
+
+- **4-bit quantisation costs nothing measurable.** On the same host Q4_K_M, Q6_K_XL and Q8_K_XL
+  land at 35, 34 and 32 correct chains of 51, and 15, 13 and 15 programs of 20. Q4_K_M even
+  leads, but it has a single complete run in this mode: a repeat is queued and the lead may be
+  a small-sample fluke.
+- **The 1-bit coder build collapses where coding lives.** IQ1_M holds 34/51 on short-context
+  chains, but finished only 8 of 20 programs — 12 hit the budget and every finished one was
+  wrong. It understands Russian but answers in English, so its ru chains measure reasoning,
+  not language.
+- **Flash-Next matches the dense 27B on quality and beats it on speed, decisively at long
+  context.** IQ4_XS: 35/51 chains and 16.5/20 programs, the same as Q4_K_M's 35 and 15 — but
+  85-96 t/s generation against 23-26, 2427 t/s prefill at 250k against 431, and 84 t/s
+  generation at 250k against about 10.
+- **Programs discriminate; chains do not.** Six models sit between 32 and 35 of 51 on chains,
+  while programs span 0 to 18 of 20. A program run means a long prompt with real code — the
+  closest thing here to coding work, and the column to trust for it.
+
+The full argument, the noise estimate and the caveats are in
+[docs/conclusions.md](docs/conclusions.md).
 
 ## 1. Methodology
 
