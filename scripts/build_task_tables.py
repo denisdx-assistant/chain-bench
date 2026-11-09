@@ -368,6 +368,12 @@ def summary():
             label += " · unresolved %d" % unresolved
         if not any(cells.get(k) for k in cells) and not complete_programs:
             continue
+        # a row is complete only if every expected pool is there and none is short
+        pools = [cells.get("t1_" + l) for l in ("en", "ru", "zh")]
+        short = any(r.get("partial") for r in (g["chains"] + g["programs"]))
+        complete = all(pools) and len(complete_programs) > 0 and not short
+        if not complete:
+            label = "⚠ " + label
         rows.append({"label": label,
                      "median_tokens": round(statistics.median(_toks)) if _toks else None,
                      "cells": cells, "overall": (total_t, total_ok, total_n)})
@@ -400,6 +406,10 @@ def summary():
             ("%d" % r["median_tokens"]) if r.get("median_tokens") else "—",
             fmt(r["cells"]["t1_en"]), fmt(r["cells"]["t1_ru"]),
             fmt(r["cells"]["t1_zh"]), fmt(r["cells"].get("t1_subs")), fmt(r["cells"]["t2"])))
+    if any(r["label"].startswith("⚠") for r in rows):
+        lines.append("")
+        lines.append("⚠ — not every task was computed for this row (missing sets or a short "
+                     "file): its quality percentages are not comparable with the others.")
     return "\n".join(lines)
 
 
