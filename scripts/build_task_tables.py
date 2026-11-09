@@ -28,25 +28,23 @@ def cfg_for(folder, file):
 
 
 def cfg_label(cfg, budget):
-    if not cfg:
-        return "budget %s" % budget
-    parts = ["ctx %s" % cfg.get("ctx", "?"),
-             "YaRN" if cfg.get("yarn") else "no YaRN"]
-    # a sampling value that is the default says nothing; only a deviation is worth a column
-    if cfg.get("temp") not in (None, "", "default"):
-        parts.append("T %s" % cfg["temp"])
-    pen = cfg.get("penalty", "-")
-    if pen and pen != "-":
-        parts.append("pen %s" % pen)
-    # budget is a cap, not a comparison parameter: recorded in results/run-configs.json
+    """Only what differs from the plain model: context and YaRN are details, not labels.
 
-    # the loop guard is on for every canonical run now, so it is not a distinction
-    if cfg.get("note"):
-        parts.append(cfg["note"])
+    A run on the model's own defaults carries no label at all; a run with a changed sampler
+    says which sampler, nothing else. Everything else lives in results/run-configs.json and
+    the detailed pages.
+    """
+    if not cfg:
+        return ""
+    parts = []
+    temp = cfg.get("temp")
+    if temp not in (None, "", "default"):
+        parts.append("t %s" % temp)
+    pen = cfg.get("penalty")
+    if pen and pen != "-" and re.fullmatch(r"[0-9.\s/]+", str(pen)):
+        parts.append("pen %s" % pen)
     if cfg.get("reasoning") not in (None, "default"):
         parts.append("reasoning %s" % cfg["reasoning"])
-    if cfg.get("provenance") == "inferred":
-        parts.append("provenance inferred")
     return " · ".join(parts)
 
 
@@ -364,9 +362,12 @@ def summary():
         # say out loud how many rows are unresolved, so a shorter denominator is explained
         unresolved = sum(1 for r in (g["chains"] + g["programs"])
                          for v in r["tasks"].values() if v[0] in (LEN, UNANS))
-        label = "%s · %s" % (folder, cfg_label(g["cfg"], budget))
+        extras = cfg_label(g["cfg"], budget)
+        label = folder if not extras else "%s · %s" % (folder, extras)
         if unresolved:
             label += " · unresolved %d" % unresolved
+        if not any(cells.get(k) for k in cells) and not complete_programs:
+            continue
         rows.append({"label": label,
                      "median_tokens": round(statistics.median(_toks)) if _toks else None,
                      "cells": cells, "overall": (total_t, total_ok, total_n)})

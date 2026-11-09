@@ -77,17 +77,17 @@
 <!-- summary:start -->
 | Run | Overall (errors) | Median tokens/task | Test 1 en (correct) | Test 1 ru (correct) | Test 1 zh (correct) | Test 1 subsets 8 (all langs) | Test 2 (correct) |
 |---|---|---|---|---|---|---|---|
-| Qwen3.8-27B-UD-Q4_K_M · ctx 200k · no YaRN · 1 GPU · tuned for 3090 | 442m14s · 30% err | 4144 | 108m21s 12/17 | 93m16s 11/17 | 91m48s 12/17 | 22m14s 12/24 | 148m49s 15/20 |
-| Qwen3.8-27B-UD-Q6_K_XL · ctx 262k · no YaRN | 165m59s · 35% err | 4099 | 14m06s 13/17 | 13m30s 10/17 | 16m44s 12/17 | 20m11s 13/24 | 121m39s 11/20 |
-| Qwen3.8-27B-UD-Q6_K_XL · budget 64 | 54m34s · 39% err | 4099 | 14m14s 12/17 | 21m10s 10/17 | 19m10s 9/17 | — | — |
-| Qwen3.8-27B-UD-Q8_K_XL · ctx 262k · no YaRN | 146m44s · 33% err | 4100 | 14m14s 11/17 | 14m45s 10/17 | 17m43s 11.5/17 | 15m10s 13/24 | 100m03s 15/20 |
-| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · ctx ? · no YaRN · understands Russian but answers in English; ru chains measure capability, not language · unresolved 14 | 340m56s · 40% err | 8743 | 43m39s 12/17 | 56m48s 11/15 | 21m49s 11/17 | 22m50s 15/24 | 218m40s 0/8 |
-| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · ctx 1M · YaRN · T 0.3 · pen 0.3 · unresolved 1 | 140m18s · 35% err | 5448 | 28m40s 12/17 | 26m18s 11/17 | 29m57s 11/17 | 17m31s 15/24 | 55m22s 11.5/20 |
-| Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · pen 0.2 · unresolved 1 | 138m21s · 28% err | 5511 | 31m20s 11.5/17 | 27m22s 11/17 | 24m52s 12.5/17 | 18m21s 15.5/24 | 54m47s 16/20 |
-| Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · pen 0.2 · 2 runs averaged | 154m10s · 27% err | 5616 | 34m18s 12.5/17 | 28m21s 11/17 | 33m41s 13.5/17 | 24m28s 15.5/24 | 57m50s 15/20 |
-| Ripple-65B-Preview-Q6_K · ctx 175k · no YaRN · pen mixed (0 / 0.3) · chains: 12 tasks at 16k pen 0, 5 at 32k pen 0.3; programs all at 32k pen 0.3 · unresolved 6 | 120m57s · 25% err | 4684 | 120m57s 12/16 | — | — | — | 121m49s 0/7 of 20 run |
-| deepseek-v4.1-flash · ctx 1M · no YaRN | 16m48s · 30% err | — | 7m04s 12/17 | — | — | — | 9m44s 14/20 |
-| gemma-4-31B-it-UD-Q8_K_XL · ctx 262k · no YaRN | 168m44s · 58% err | 1601 | 11m40s 9/17 | 7m24s 10/17 | 8m22s 11/17 | 11m17s 14/24 | 141m18s 0/20 |
+| Qwen3.8-27B-UD-Q4_K_M | 442m14s · 30% err | 4144 | 108m21s 12/17 | 93m16s 11/17 | 91m48s 12/17 | 22m14s 12/24 | 148m49s 15/20 |
+| Qwen3.8-27B-UD-Q6_K_XL · t 0.3 · pen 0.2 | 54m34s · 39% err | 4099 | 14m14s 12/17 | 21m10s 10/17 | 19m10s 9/17 | — | — |
+| Qwen3.8-27B-UD-Q6_K_XL | 165m59s · 35% err | 4099 | 14m06s 13/17 | 13m30s 10/17 | 16m44s 12/17 | 20m11s 13/24 | 121m39s 11/20 |
+| Qwen3.8-27B-UD-Q8_K_XL | 146m44s · 33% err | 4100 | 14m14s 11/17 | 14m45s 10/17 | 17m43s 11.5/17 | 15m10s 13/24 | 100m03s 15/20 |
+| Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · unresolved 14 | 340m56s · 40% err | 8743 | 43m39s 12/17 | 56m48s 11/15 | 21m49s 11/17 | 22m50s 15/24 | 218m40s 0/8 |
+| Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · t 0.3 · pen 0.3 · unresolved 1 | 140m18s · 35% err | 5448 | 28m40s 12/17 | 26m18s 11/17 | 29m57s 11/17 | 17m31s 15/24 | 55m22s 11.5/20 |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · pen 0.2 · unresolved 1 | 138m21s · 28% err | 5511 | 31m20s 11.5/17 | 27m22s 11/17 | 24m52s 12.5/17 | 18m21s 15.5/24 | 54m47s 16/20 |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · pen 0.2 | 154m10s · 27% err | 5616 | 34m18s 12.5/17 | 28m21s 11/17 | 33m41s 13.5/17 | 24m28s 15.5/24 | 57m50s 15/20 |
+| Ripple-65B-Preview-Q6_K · unresolved 6 | 120m57s · 25% err | 4684 | 120m57s 12/16 | — | — | — | 121m49s 0/7 of 20 run |
+| deepseek-v4.1-flash | 16m48s · 30% err | — | 7m04s 12/17 | — | — | — | 9m44s 14/20 |
+| gemma-4-31B-it-UD-Q8_K_XL | 168m44s · 58% err | 1601 | 11m40s 9/17 | 7m24s 10/17 | 8m22s 11/17 | 11m17s 14/24 | 141m18s 0/20 |
 <!-- summary:end -->
 
 **细节。**
