@@ -1,0 +1,211 @@
+We need answer final array and sum after running given Python program. Need analyze carefully. We can simulate mentally or logically. User asks execute program, name array and sum. Need output strict format.
+
+We need process huge script with many comments (not executed) and active statements. Need ignore TRAP variables? They define TRAP_0... but not used in execution? They are strings assigned; no effect on arr. MANUAL string no effect. Functions defined. Then huge active code:
+
+arr = [7,15,4,6,1,21,21,10,8,13]
+
+Then many tmp/copy/note/code/label assignments based on arr values but not mutating arr. Need note if any function calls mutate? Only active statements that mutate arr:
+- arr[0], arr[4] = arr[4], arr[0]
+- arr2 = arr (alias)
+- arr2[2] += 5
+- s131 = ''.join(str(x) for x in arr)
+- arr[9] = len(re.findall(r'\d', s131)) % 50
+- arr[0], arr[2] = arr[2], arr[0]
+- arr[4] += 3
+- arr[2], arr[5] = arr[5], arr[2]
+- arr[5], arr[5] = arr[5], arr[5] (no effect)
+- arr[0] *= 2
+- arr[0], arr[6] = arr[6], arr[0]
+- arr[5] += 1
+- arr2 = arr (alias again)
+- arr2[8] += 4
+- s240 = ''.join(str(x) for x in arr)
+- arr[4], arr[2] = arr[2], arr[4]
+- arr[6] = len(re.findall(r'\d', s240)) % 50
+- arr[2] += 2
+- s858 = ''.join(str(x) for x in arr)
+- arr[9] = len(re.findall(r'\d', s858)) % 50
+- s44 = ''.join(str(x) for x in arr)
+- arr[5] = len(re.findall(r'\d', s44)) % 50
+- arr[2], arr[3] = arr[3], arr[2]
+- s13 = ''.join(str(x) for x in arr)
+- arr[7] = len(re.findall(r'\d', s13)) % 50
+- arr[3] = acc(arr, 7) % 100
+- apply_twice(arr, 4, 5)
+
+Need ensure any other active statements? There are code_x = re.sub... tmp_x = ... label_x... no mutation. Some note assignments. arr2 aliases and arr2[...] mutates arr. Need identify exact order among active statements in source. Need be careful with s variables computed at certain times and used later to set values. Also re.findall(r'\d', s) counts digits in concatenated decimal representation of array elements at that time. All elements likely non-negative small ints. len count = sum of number of decimal digits of elements. Need compute modulo 50.
+
+Let's extract active statements in order precisely from code after initial definitions and before if __main__. We need list them. Let's parse from given code. It starts:
+
+MANUAL = ...
+TRAP_0... etc (no effect)
+arr = [7, 15, 4, 6, 1, 21, 21, 10, 8, 13]
+
+Then lines code_0..., tmp_1..., etc up to tmp_799? all read-only. Then:
+
+arr[0], arr[4] = arr[4], arr[0]
+# comments...
+arr2 = arr
+# comments...
+arr2[2] += 5
+# comments...
+s131 = ''.join(str(x) for x in arr)
+# comments...
+arr[9] = len(re.findall(r'\d', s131)) % 50
+# comments...
+arr[0], arr[2] = arr[2], arr[0]
+# comments...
+arr[4] += 3
+# comments...
+arr[2], arr[5] = arr[5], arr[2]
+# comments...
+arr[5], arr[5] = arr[5], arr[5]
+# comments...
+arr[0] *= 2
+# comments...
+arr[0], arr[6] = arr[6], arr[0]
+# comments...
+arr[5] += 1
+# comments...
+arr2 = arr
+# comments...
+arr2[8] += 4
+# comments...
+s240 = ''.join(str(x) for x in arr)
+# comments...
+arr[4], arr[2] = arr[2], arr[4]
+# comments...
+arr[6] = len(re.findall(r'\d', s240)) % 50
+# comments...
+arr[2] += 2
+# comments...
+s858 = ''.join(str(x) for x in arr)
+# comments...
+arr[9] = len(re.findall(r'\d', s858)) % 50
+# comments...
+s44 = ''.join(str(x) for x in arr)
+# comments...
+arr[5] = len(re.findall(r'\d', s44)) % 50
+# comments...
+arr[2], arr[3] = arr[3], arr[2]
+# comments...
+s13 = ''.join(str(x) for x in arr)
+# comments...
+arr[7] = len(re.findall(r'\d', s13)) % 50
+# comments...
+arr[3] = acc(arr, 7) % 100
+# comments...
+apply_twice(arr, 4, 5)
+# comments...
+if __name__ == "__main__": print...
+
+Need verify if any other active statements like code_x with re.sub no mutation. Yes.
+
+Let's simulate. Start arr = [7,15,4,6,1,21,21,10,8,13]
+Indices 0..9.
+
+Step 1: arr[0], arr[4] = arr[4], arr[0]. Swap index0 and4.
+Initial: [7,15,4,6,1,21,21,10,8,13]
+After: index0=1, index4=7 => [1,15,4,6,7,21,21,10,8,13]
+
+Step 2: arr2 = arr (alias)
+Step 3: arr2[2] += 5 -> arr[2]+=5. arr[2]=4+5=9.
+arr = [1,15,9,6,7,21,21,10,8,13]
+
+Step 4: s131 = join str(arr) at this state. Need count digits:
+Elements: 1 (1),15(2),9(1),6(1),7(1),21(2),21(2),10(2),8(1),13(2). Sum digits = 1+2+1+1+1+2+2+2+1+2 = 15? Let's sum: 1+2=3, +1=4,+1=5,+1=6,+2=8,+2=10,+2=12,+1=13,+2=15. Yes.
+arr[9] = 15 % 50 = 15. So arr[9]=15 (was 13).
+arr = [1,15,9,6,7,21,21,10,8,15]
+
+Step 5: arr[0], arr[2] = arr[2], arr[0]. Swap 0 and2.
+arr = [9,15,1,6,7,21,21,10,8,15]
+
+Step 6: arr[4] += 3: index4 7+3=10.
+arr = [9,15,1,6,10,21,21,10,8,15]
+
+Step 7: arr[2], arr[5] = arr[5], arr[2]. Swap 2 and5. index2=1,index5=21 -> [9,15,21,6,10,1,21,10,8,15]
+
+Step 8: arr[5], arr[5] = arr[5], arr[5] no change.
+
+Step 9: arr[0] *= 2: index0=9*2=18.
+arr = [18,15,21,6,10,1,21,10,8,15]
+
+Step 10: arr[0], arr[6] = arr[6], arr[0]. Swap 0 and6: index0=21,index6=18.
+arr = [21,15,21,6,10,1,18,10,8,15]
+
+Step 11: arr[5] += 1: index5=1+1=2.
+arr = [21,15,21,6,10,2,18,10,8,15]
+
+Step 12: arr2 = arr alias.
+Step 13: arr2[8] += 4: index8=8+4=12.
+arr = [21,15,21,6,10,2,18,10,12,15]
+
+Step 14: s240 = join str(arr) current.
+Digits: 21(2),15(2),21(2),6(1),10(2),2(1),18(2),10(2),12(2),15(2). Sum=2+2+2+1+2+1+2+2+2+2 =? 2+2=4,+2=6,+1=7,+2=9,+1=10,+2=12,+2=14,+2=16,+2=18. So s240 length digits = 18.
+
+Step 15: arr[4], arr[2] = arr[2], arr[4]. Swap index4 and2: index4=10,index2=21 -> [21,15,10,6,21,2,18,10,12,15]
+
+Step 16: arr[6] = len(digits(s240)) % 50 = 18 % 50 = 18. index6 already 18. No change.
+arr = [21,15,10,6,21,2,18,10,12,15]
+
+Step 17: arr[2] += 2: index2=10+2=12.
+arr = [21,15,12,6,21,2,18,10,12,15]
+
+Step 18: s858 = join str(arr) current.
+Digits: 21(2),15(2),12(2),6(1),21(2),2(1),18(2),10(2),12(2),15(2). Sum=2+2+2+1+2+1+2+2+2+2 = 18? 4,6,7,9,10,12,14,16,18 yes.
+Step 19: arr[9] = 18 % 50 = 18. index9=18 (was 15).
+arr = [21,15,12,6,21,2,18,10,12,18]
+
+Step 20: s44 = join str(arr) current.
+Digits: 21(2),15(2),12(2),6(1),21(2),2(1),18(2),10(2),12(2),18(2). Sum again 18. All two-digit except 6,2. Count = 8*2? Actually elements: indices 0,1,2,4,6,7,8,9 are two-digit (8) =16; indices3=6 (1),5=2(1) total18. Yes.
+Step 21: arr[5] = 18 % 50 = 18. index5=18 (was 2).
+arr = [21,15,12,6,21,18,18,10,12,18]
+
+Step 22: arr[2], arr[3] = arr[3], arr[2]. Swap index2 and3: index2=6,index3=12.
+arr = [21,15,6,12,21,18,18,10,12,18]
+
+Step 23: s13 = join str(arr) current.
+Digits: 21(2),15(2),6(1),12(2),21(2),18(2),18(2),10(2),12(2),18(2). Count: two-digit elements all except index2=6? Indices 0,1,3,4,5,6,7,8,9 =9*2=18 plus 1 =19. So length=19.
+Step 24: arr[7] = 19 % 50 = 19. index7=19 (was10).
+arr = [21,15,6,12,21,18,18,19,12,18]
+
+Step 25: arr[3] = acc(arr, 7) % 100. acc(a,n) sums first n elements: indices 0 through n-1. n=7 => sum arr[0..6]. Current arr before setting index3: [21,15,6,12,21,18,18,19,12,18]. Sum first 7 = 21+15+6+12+21+18+18. Compute: 21+15=36; +6=42; +12=54; +21=75; +18=93; +18=111. 111 % 100 = 11. So arr[3]=11.
+arr = [21,15,6,11,21,18,18,19,12,18]
+
+Step 26: apply_twice(arr,4,5): bump(a,i,v) twice: arr[4] +=5; arr[4]+=5 -> +10. index4=21+10=31.
+arr = [21,15,6,11,31,18,18,19,12,18]
+
+Sum: 21+15=36; +6=42; +11=53; +31=84; +18=102; +18=120; +19=139; +12=151; +18=169. Sum = 169.
+
+Need ensure no other active statements before initial huge tmp assignments might mutate? The huge block includes only assignments to variables, but some variable names maybe shadow functions? No. But check: code_0 = re.sub(r'[0-9]', '#', str(arr[4])) etc. It reads arr. No mutation. Some labels strings. There are variables named copy_x = arr[i] no effect. Some note_x strings. OK.
+
+Need verify active statements order exactly. Need ensure s131 is computed after arr2[2]+=5 and before arr[9]=... yes. There are many comments but no code. Need verify there isn't an active statement `arr[0], arr[4] = arr[4], arr[0]` appears earlier? The code after TRAP: initial arr, then hundreds of tmp lines, then first mutation as above. But note MANUAL string includes operations but is a string, not executed. TRAP strings no effect.
+
+Need double-check all active statements from provided code. The code is huge with comments. Let's scan in the prompt for active non-comment lines after initial definitions:
+
+- import re
+- def acc...
+- def bump...
+- def bump_all...
+- def mix...
+- def apply_twice...
+- MANUAL = ...
+- TRAP_0.. etc (assignments)
+- arr = [7, 15, 4, 6, 1, 21, 21, 10, 8, 13]
+- code_0 = ...
+... many up to tmp_799
+- arr[0], arr[4] = arr[4], arr[0]
+- comments block
+- arr2 = arr
+- comments block
+- arr2[2] += 5
+- comments block
+- s131 = ...
+- comments block
+- arr[9] = len(re.findall(r'\d', s131)) % 50
+- comments block
+- arr[0], arr[2] = arr[2], arr[0]
+- comments block
+- arr[4] += 3
+- comments block
+- arr[2], arr[5] = arr[5], arr[
