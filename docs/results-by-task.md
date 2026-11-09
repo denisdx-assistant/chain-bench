@@ -16,7 +16,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-27B-UD-Q6_K_XL · ru · 16k · default | 23sw ✓ | 78sw ✗ | 10sw ✓ | 8sw ✓ | 9sw ✓ | 7sw ✓ | 73sw ✗ | 9sw ✓ | 68sw ✗ | 51sw ✓ | 73sw ✓ | 70sw ✓ | 62sw ✗ | 73sw ✗ | 61sw ✗ | 74sw ✓ | 61sw ✗ | 10/17 |
 | Qwen3.8-27B-UD-Q6_K_XL · ru · 64k · default | 19s ✓ | 76s ✗ | 8s ✓ | 6s ✓ | 7s ✓ | 7s ✓ | 89s ✗ | 20s ✓ | 74s ✗ | 77s ✓ | 77s ✓ | 74s ✗ | 76s ✗ | 77s ✗ | 76s ✓ | 433s ✓ | 74s ✗ | 10/17 |
 | Qwen3.8-27B-UD-Q6_K_XL · zh · 16k · default | 103s ✓ | 82s ✓ | 7s ✓ | 8s ✓ | 8s ✓ | 7s ✓ | 75s ✓ | 31s ✓ | 77s ✗ | 52s ✓ | 81s ✗ | 75s ✗ | 78s ✓ | 78s ✓ | 84s ✗ | 80s ✓ | 78s ✗ | 12/17 |
-| Qwen3.8-27B-UD-Q6_K_XL · zh · 64k · default | 110s ✗ | 83s ✓ | 9s ✓ | 9s ✓ | 10s ✓ | 8s ✓ | 83s ✗ | 52s ✓ | 82s ✗ | 103s ✓ | 84s ✗ | 87s ✗ | 84s ✗ | · | · | · | · | 7/13 (partial 13/17) |
+| Qwen3.8-27B-UD-Q6_K_XL · zh · 64k · default | 110s ✗ | 83s ✓ | 9s ✓ | 9s ✓ | 10s ✓ | 8s ✓ | 83s ✗ | 52s ✓ | 82s ✗ | 103s ✓ | 84s ✗ | 87s ✗ | 84s ✗ | 87s ✗ | 87s ✓ | 88s ✓ | 84s ✗ | 9/17 |
 | Qwen3.8-27B-UD-Q8_K_XL · en · 16k · default | 70sw ✓ | 78sw ✗ | 7sw ✓ | 7sw ✓ | 7sw ✓ | 11sw ✓ | 75sw ✗ | 13sw ✓ | 77sw ✗ | 12sw ✓ | 79sw ✗ | 75sw ✗ | 70sw ✗ | 76sw ✓ | 73sw ✓ | 80sw ✓ | 72sw ✓ | 11/17 |
 | Qwen3.8-27B-UD-Q8_K_XL · en · 32k · rerun | 27s ✓ | 69s ✓ | 4s ✓ | 6s ✓ | 8s ✓ | 9s ✓ | 76s ✗ | 10s ✓ | 75s ✗ | 25s ✓ | 75s ✗ | 73s ✗ | 72s ✗ | 74s ✓ | 74s ✓ | 76s ✓ | 72s ✗ | 11/17 |
 | Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · default | 32sw ✓ | 80sw ✗ | 9sw ✓ | 8sw ✓ | 10sw ✓ | 8sw ✓ | 74sw ✗ | 14sw ✓ | 75sw ✗ | 76sw ✓ | 82sw ✓ | 76sw ✗ | 81sw ✗ | 78sw ✗ | 80sw ✓ | 82sw ✓ | 75sw ✗ | 10/17 |
@@ -59,6 +59,7 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-27B-UD-Q4_K_M · ru · 16k · 8tasks | 43s ✓ | 19s ✓ | 11s ✓ | 12s ✓ | 88s ✗ | 94s ✗ | 92s ✗ | 87s ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q4_K_M · zh · 16k · 8tasks | 88s ✓ | 16s ✓ | 14s ✓ | 13s ✓ | 109s ✗ | 105s ✗ | 110s ✗ | 108s ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q6_K_XL · en · 16k · 8tasks | 33sw ✓ | 6sw ✓ | 5sw ✓ | 6sw ✓ | 70sw ✗ | 63sw ✗ | 71sw ✗ | 65sw ✗ | 4/8 |
+| Qwen3.8-27B-UD-Q6_K_XL · en · 64k · 8tasks | 23s ✓ | 7s ✓ | 5s ✓ | 6s ✓ | 75s ✗ | 25s ✗ | 442s ✗ | · | 4/7 (partial 7/8) |
 | Qwen3.8-27B-UD-Q6_K_XL · ru · 16k · 8tasks | 44sw ✓ | 8sw ✓ | 6sw ✓ | 5sw ✓ | 46sw ✗ | 46sw ✗ | 70sw ✗ | 59sw ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q6_K_XL · zh · 16k · 8tasks | 40sw ✓ | 11sw ✓ | 9sw ✓ | 9sw ✓ | 37sw ✗ | 29sw ✗ | 79sw ✗ | 394sw ✓ | 5/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · en · 16k · 8tasks | 22sw ✓ | 7sw ✓ | 5sw ✓ | 5sw ✓ | 76sw ✗ | 15sw ✗ | 56sw ✗ | 72sw ✗ | 4/8 |

@@ -24,7 +24,7 @@ depend on the cache, so every run of the right size counts there.
 | Model | Prefill 5k | Prefill 20k | Prefill 60k | Prefill 150k | Prefill 250k | Prefill 500k | Prefill 1M | Gen 5k | Gen 20k | Gen 60k | Gen 150k | Gen 250k | Gen 500k | Gen 1M | Tokens/task | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Qwen3.8-27B-UD-Q4_K_M | — | 922 t/s | 862 t/s | 433 t/s | — | — | — | — | 23 t/s | 23 t/s | 26 t/s | — | — | — | 4144 | host A, single GPU |
-| Qwen3.8-27B-UD-Q6_K_XL | — | 1557 t/s | 1342 t/s | — | — | — | — | — | 62 t/s | 54 t/s | — | — | — | — | 4099 | host A |
+| Qwen3.8-27B-UD-Q6_K_XL | — | 1568 t/s | 1336 t/s | — | — | — | — | — | 59 t/s | 52 t/s | — | — | — | — | 4099 | host A |
 | Qwen3.8-27B-UD-Q8_K_XL | — | 1327 t/s | — | 721 t/s | — | — | — | — | 58 t/s | 53 t/s | 40 t/s | — | — | — | 4100 | host A |
 | Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M | — | 1899 t/s | 2412 t/s | 2723 t/s | — | — | — | — | 85 t/s | 81 t/s | 86 t/s | — | — | — | 8743 | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S | — | 1500 t/s | 2078 t/s | 2443 t/s | 2538 t/s | 2367 t/s | 2101 t/s | — | 89 t/s | 89 t/s | 97 t/s | 87 t/s | — | 53 t/s | 5448 | host A |
