@@ -150,3 +150,11 @@ rows for this model with different sampling rather than one averaged, misleading
 - The 5k prefill point for every model — all datasets start at ~14k tokens.
 - Ripple and Orca: out of the programme.
 - deepseek-v4.1-flash has only en chains and programs; the rest was never planned.
+
+## Q4_K_M: second sample (queued)
+
+Its lead over Q6/Q8 may be a small-sample fluke: in this mode Q4_K_M has one complete run
+while the others have two. `/tmp/series_q4km_rep2.sh` reruns the whole set at the original
+settings (16k budget, model defaults, no penalties) and averages into the same row.
+
+Needs `local-only` pointed at Q4_K_M.
