@@ -123,6 +123,37 @@ def unanswered(r):
 
 
 
+def retry_verdicts(folder):
+    """Verdicts from a folder's `_retries` files: the authoritative second attempt.
+
+    A row that was cut by the budget or produced no answer is unresolved in the main file.
+    If a retry exists and it did produce an answer, that verdict is the one to use.
+    """
+    verdicts = {}
+    for path in glob.glob(os.path.join(folder, "_retries", "*.json")):
+        try:
+            data = json.load(open(path))
+        except Exception:
+            continue
+        rows = data if isinstance(data, list) else (data.get("rows") or [])
+        for r in rows:
+            if not isinstance(r, dict):
+                continue
+            key = r.get("id")
+            if key is None and r.get("file"):
+                key = str(r["file"]).split("/")[-1]
+            if key is None or r.get("finish") == "length":
+                continue
+            if r.get("ok"):
+                verdicts[str(key)] = OK
+            elif r.get("got") is not None or r.get("ok") is False:
+                # a parsed answer, or an explicit miss, is a real verdict
+                if r.get("got") is not None:
+                    verdicts[str(key)] = BAD
+    return verdicts
+
+
+
 def collect():
     chains, programs = [], []
     for path in sorted(glob.glob("results/*/*.json")):
@@ -136,6 +167,11 @@ def collect():
         tasks, meta = load(path)
         if not tasks:
             continue
+        # an unresolved row with a retry gets the retry's verdict
+        fixes = retry_verdicts("results/" + folder)
+        for key, mark in list(tasks.items()):
+            if mark[0] in (LEN, UNANS) and str(key) in fixes:
+                tasks[key] = (fixes[str(key)],) + tuple(mark[1:])
         row = {"model": meta.get("resolved_model") or folder, "folder": folder,
                "lang": lang, "budget": budget, "subset": subset,
                "variant": variant, "tasks": tasks, "file": os.path.basename(path),

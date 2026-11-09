@@ -92,7 +92,7 @@ failure.
 
 | Model | Rows | Kind | Status |
 |---|---|---|---|
-| `Qwen3.8-27B-UD-Q4_K_M` | zh chain 17 | empty reply at 16k | ⬜ needs a 64k retry — the only true "no answer" in the corpus |
+| `Qwen3.8-27B-UD-Q4_K_M` | zh chain 17 | empty reply at 16k | ✅ done on host 110 at 64k — answered 80, expected 110: wrong, so the 16k silence hid a wrong answer. Host 110 reports `llama_local` without a quant, so the quant is unverified |
 | `Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M` | 14 | 12 programs + 2 chains cut at 64k | ⬜ budget, not silence: the model writes 64k and does not stop |
 | `Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S` | 2 | cuts | ✅ both already retried at 131k, both answered wrong |
 | `Qwen3.8-Flash-Next-UD-IQ4_XS` | 1 | cut | ✅ retried, answered wrong |
