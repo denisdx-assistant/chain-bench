@@ -29,14 +29,17 @@ made before the fields were captured show —.
 | Qwen3.8-27B-UD-Q6_K_XL · chains ru · 16k | 8tasks | 8 | — | — | — | 0 | — | — | — |
 | Qwen3.8-27B-UD-Q6_K_XL · chains ru · 64k | default | 17 | 61.8 | 54.2 | — | 0 | 4100 | 19260 | 71 s |
 | Qwen3.8-27B-UD-Q6_K_XL · chains ru · 64k | 8tasks | 8 | 61.8 | 56.3 | — | 0 | 2552 | 19112 | 45 s |
+| Qwen3.8-27B-UD-Q6_K_XL · chains ru · 64k | 8tasks_t03 | 8 | 61.2 | 59.3 | 1529.9 | 1 | 2125 | 19112 | 37 s |
 | Qwen3.8-27B-UD-Q6_K_XL · chains ru · 64k | t03 | 17 | 61.3 | 56.2 | — | 0 | 4100 | 19260 | 73 s |
 | Qwen3.8-27B-UD-Q6_K_XL · chains zh · 16k | default | 17 | 63.9 | 54.3 | 1341.9 | 1 | 4099 | 38359 | 75 s |
 | Qwen3.8-27B-UD-Q6_K_XL · chains zh · 16k | 8tasks | 8 | — | — | — | 0 | — | — | — |
 | Qwen3.8-27B-UD-Q6_K_XL · chains zh · 64k | default | 17 | 55.0 | 48.0 | — | 0 | 4099 | 38359 | 85 s |
 | Qwen3.8-27B-UD-Q6_K_XL · chains zh · 64k | 8tasks | 8 | 53.2 | 48.3 | — | 0 | 2870 | 38141 | 59 s |
+| Qwen3.8-27B-UD-Q6_K_XL · chains zh · 64k | 8tasks_t03 | 8 | 54.0 | 50.5 | — | 0 | 1847 | 38141 | 44 s |
 | Qwen3.8-27B-UD-Q6_K_XL · chains zh · 64k | t03 | 17 | 53.8 | 50.2 | 1329.8 | 1 | 4100 | 38359 | 81 s |
 | Qwen3.8-27B-UD-Q6_K_XL · programs · 16k · v4_16k | default | 20 | — | — | — | 0 | — | — | — |
 | Qwen3.8-27B-UD-Q6_K_XL · programs · 64k · v4_64k | default | 20 | 36.2 | 35.2 | 777.6 | 9 | 4146 | 142558 | 119 s |
+| Qwen3.8-27B-UD-Q6_K_XL · programs · 64k · v4_64k_t03 | default | 20 | 37.5 | 36.7 | 777.8 | 9 | 4145 | 142558 | 113 s |
 | Qwen3.8-27B-UD-Q8_K_XL · chains en · 16k | default | 17 | — | — | — | 0 | — | — | — |
 | Qwen3.8-27B-UD-Q8_K_XL · chains en · 16k | 8tasks | 8 | — | — | — | 0 | — | — | — |
 | Qwen3.8-27B-UD-Q8_K_XL · chains en · 32k | rerun | 17 | 64.0 | 57.8 | — | 0 | 4099 | 14062 | 70 s |
