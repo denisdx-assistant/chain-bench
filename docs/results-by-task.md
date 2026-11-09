@@ -65,8 +65,9 @@ cap, R aborted by the loop guard, · task not in this set.
 | Qwen3.8-27B-UD-Q6_K_XL · en · 64k · 8tasks | 21s ✓ | 8s ✓ | 5s ✓ | 7s ✓ | 67s ✗ | 30s ✗ | 82s ✗ | 81s ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q6_K_XL · en · 64k · 8tasks_t03 | 23s ✓ | 7s ✓ | 5s ✓ | 6s ✓ | 75s ✗ | 25s ✗ | 442s ✗ | · | 4/7 (partial 7/8) |
 | Qwen3.8-27B-UD-Q6_K_XL · ru · 16k · 8tasks | 44sw ✓ | 8sw ✓ | 6sw ✓ | 5sw ✓ | 46sw ✗ | 46sw ✗ | 70sw ✗ | 59sw ✗ | 4/8 |
-| Qwen3.8-27B-UD-Q6_K_XL · ru · 64k · 8tasks | 36s ✓ | 13s ✓ | 6s ✓ | 6s ✓ | 75s ✗ | 68s ✓ | · | · | 5/6 (partial 6/8) |
+| Qwen3.8-27B-UD-Q6_K_XL · ru · 64k · 8tasks | 36s ✓ | 13s ✓ | 6s ✓ | 6s ✓ | 75s ✗ | 68s ✓ | 78s ✗ | 73s ✗ | 5/8 |
 | Qwen3.8-27B-UD-Q6_K_XL · zh · 16k · 8tasks | 40sw ✓ | 11sw ✓ | 9sw ✓ | 9sw ✓ | 37sw ✗ | 29sw ✗ | 79sw ✗ | 394sw ✓ | 5/8 |
+| Qwen3.8-27B-UD-Q6_K_XL · zh · 64k · 8tasks | 74s ✓ | 16s ✓ | 8s ✓ | 11s ✓ | 87s ✗ | 74s ✗ | 464s ✗ | · | 4/7 (partial 7/8) |
 | Qwen3.8-27B-UD-Q8_K_XL · en · 16k · 8tasks | 22sw ✓ | 7sw ✓ | 5sw ✓ | 5sw ✓ | 76sw ✗ | 15sw ✗ | 56sw ✗ | 72sw ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · en · 32k · rerun_8tasks | 40s ✓ | 10s ✓ | 6s ✓ | 6s ✓ | 77s ✗ | 20s ✗ | 75s ✗ | 71s ✗ | 4/8 |
 | Qwen3.8-27B-UD-Q8_K_XL · ru · 16k · 8tasks | 24sw ✓ | 10sw ✓ | 6sw ✓ | 6sw ✓ | 70sw ✗ | 49sw ✗ | 74sw ✗ | 75sw ✓ | 5/8 |
