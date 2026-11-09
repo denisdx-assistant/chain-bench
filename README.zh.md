@@ -83,7 +83,7 @@
 | Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · ctx ? · no YaRN · understands Russian but answers in English; ru chains measure capability, not language | 340m56s · 52% err | 8743 | 43m39s 12/17 | 56m48s 11/17 | 21m49s 11/17 | 22m50s 15/24 | 218m40s 0/20 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · ctx 1M · YaRN · T 0.3 · pen 0.3 | 140m18s · 36% err | 5448 | 28m40s 12/17 | 26m18s 11/17 | 29m57s 11/17 | 17m31s 15/24 | 55m22s 11.5/20 |
 | Qwen3.8-Flash-Next-UD-IQ4_XS · ctx 1M · YaRN · pen 0.2 | 138m21s · 28% err | 5511 | 31m20s 11.5/17 | 27m22s 11/17 | 24m52s 12.5/17 | 18m21s 15.5/24 | 54m47s 16/20 |
-| Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · pen 0.2 · 2 runs averaged | 155m06s · 27% err | 5211 | 34m18s 12.5/17 | 28m21s 11/17 | 33m41s 13.5/17 | 24m28s 15.5/24 | 58m46s 15/20 |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · ctx 1M · YaRN · pen 0.2 · 2 runs averaged | 154m10s · 27% err | 5616 | 34m18s 12.5/17 | 28m21s 11/17 | 33m41s 13.5/17 | 24m28s 15.5/24 | 57m50s 15/20 |
 | Ripple-65B-Preview-Q6_K · ctx 175k · no YaRN · pen mixed (0 / 0.3) · chains: 12 tasks at 16k pen 0, 5 at 32k pen 0.3; programs all at 32k pen 0.3 | 120m57s · 29% err | 4684 | 120m57s 12/17 | — | — | — | 121m49s 0/7 of 20 run |
 | deepseek-v4.1-flash · ctx 1M · no YaRN | 16m48s · 30% err | — | 7m04s 12/17 | — | — | — | 9m44s 14/20 |
 | gemma-4-31B-it-UD-Q8_K_XL · ctx 262k · no YaRN | 168m44s · 58% err | 1601 | 11m40s 9/17 | 7m24s 10/17 | 8m22s 11/17 | 11m17s 14/24 | 141m18s 0/20 |

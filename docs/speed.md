@@ -29,7 +29,7 @@ depend on the cache, so every run of the right size counts there.
 | Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M | — | 1899 t/s | 2412 t/s | 2723 t/s | — | — | — | — | 85 t/s | 81 t/s | 86 t/s | — | — | — | 8743 | — |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S | — | 1500 t/s | 2078 t/s | 2443 t/s | 2538 t/s | 2367 t/s | 2101 t/s | — | 89 t/s | 89 t/s | 97 t/s | 87 t/s | — | 53 t/s | 5448 | host A |
 | Qwen3.8-Flash-Next-UD-IQ4_XS | — | 1480 t/s | 2029 t/s | 2389 t/s | 2427 t/s | 2278 t/s | 2058 t/s | — | 86 t/s | 88 t/s | 96 t/s | 84 t/s | 111 t/s | 50 t/s | 5511 | host A (2xV100) |
-| Qwen3.8-Flash-Next-UD-Q4_K_XL | — | 1132 t/s | 1530 t/s | 1796 t/s | 1836 t/s | 1748 t/s | 1615 t/s | — | 78 t/s | 79 t/s | 83 t/s | 72 t/s | — | 80 t/s | 5211 | host A (2xV100) |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL | — | 1132 t/s | 1530 t/s | 1793 t/s | 1836 t/s | 1748 t/s | 1615 t/s | — | 78 t/s | 79 t/s | 84 t/s | 72 t/s | — | 80 t/s | 5616 | host A (2xV100) |
 | Ripple-65B-Preview-Q6_K | — | 482 t/s | — | 372 t/s | — | — | — | — | 20 t/s | — | 14 t/s | — | — | — | 10428 | host A (2xV100) |
 | gemma-4-31B-it-UD-Q8_K_XL | — | 1041 t/s | — | 494 t/s | — | — | — | — | 71 t/s | 60 t/s | 43 t/s | — | — | — | 1601 | host A (2xV100) |
 

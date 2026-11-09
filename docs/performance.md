@@ -90,6 +90,7 @@ made before the fields were captured show —.
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · chains zh · 32k | rerun_8tasks | 8 | 87.0 | 81.3 | 1528.9 | 1 | 1061 | 38141 | 13 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · programs · 16k · v4_16k | default | 20 | 88.8 | 84.2 | 1802.7 | 19 | 6961 | 142558 | 81 s |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · programs · 32k · v4_32k_rerun | default | 20 | 86.6 | 83.1 | 1800.8 | 18 | 6795 | 142558 | 83 s |
+| Qwen3.8-Flash-Next-UD-Q4_K_XL · programs · 64k · v4_64k_rerun | default | 20 | 86.1 | 83.6 | 1801.3 | 20 | 7096 | 142558 | 86 s |
 | Ripple-65B-Preview-Q6_K · chains en · 16k | default | 17 | 20.6 | 20.5 | 482.4 | 1 | 4684 | 12913 | 230 s |
 | Ripple-65B-Preview-Q6_K · programs · 16k · v4_16k | default | 7 | 13.7 | 13.7 | 371.9 | 3 | 12358 | 162746 | 902 s |
 | deepseek-v4.1-flash · chains en · 16k | default | 17 | — | — | — | 0 | — | — | — |
