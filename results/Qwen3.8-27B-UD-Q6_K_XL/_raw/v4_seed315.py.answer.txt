@@ -1,0 +1,231 @@
+": ...
+```
+
+Need be cautious: Some of the tmp assignments before t109 could include calls to functions? They are like `code_6 = re.sub(...)` no mutation. No bump calls. Good.
+
+Need consider Python's `re.findall(r'\d', s848)` on string of concatenated ints: If any value negative, '-' not counted; but none negative. Good.
+
+Need maybe digit count for two-digit values like 70 is 2; yes.
+
+Let's double-check all computations step by step with possible off-by-one due to initial arr values after tmp? The tmp assignments don't modify arr but could be dependent on arr; no issue. But some local variables named `copy_... = arr[0]` no effect.
+
+Potential trap: The huge block of `TRAP_*` strings includes assignment statements? They are just variables with string literals, no execution of string content. Good.
+
+Potential trap: The `MANUAL` string contains operations but not executed. Good.
+
+Potential trap: Comments contain text like "arr[7] = 50 — не выполняется" but comments ignored. Good.
+
+Need ensure sequence of active statements maybe includes `arr[0] = int(t109) % 97` after t109; t109 uses arr before any modifications since initial. yes.
+
+Let's re-evaluate with a small script mentally? Could use no actual Python, but can manually verify. Let's maybe create a table and recompute from start to ensure no missed active statement like `arr[5] -= 8` occurs after s848? We listed. Need verify ordering: In code snippet:
+```
+t109 = str(arr[7]) + str(arr[4])
+# ... comments
+arr[0] = int(t109) % 97
+# ... comments
+arr[4] += 6
+# ... comments
+arr[5] -= 8
+# ... comments
+s848 = ''.join(str(x) for x in arr)
+# ... comments
+arr[3] = len(re.findall(r'\d', s848)) % 50
+```
+Yes.
+
+Then `s718` after many comments; before it no other mutation? There is no active. Then `arr[7]=...`. Then `t851`; then arr[1]; then swap; reverse; s16; arr[7]; s678; arr[9]; arr[5]+=9; s480; arr[3]; arr[5]*=2; arr[9]-=6; bump_all; arr[6]+=8; s502; arr[0]; arr[9]+=8; slice sorted; s399; arr[3]. Good.
+
+Let's recalc digit counts with exact strings to be safe.
+
+Initial: [14,23,14,11,1,12,19,21,2,3]
+t109 = str(21)+str(1) = '21'+'1'='211'. int 211 %97: 97*2=194 remainder 17. arr0=17.
+arr4 +=6: initial arr4=1 ->7.
+arr5-=8: initial arr5=12 ->4.
+Now A = [17,23,14,11,7,4,19,21,2,3]. s848 = '17' '23' '14' '11' '7' '4' '19' '21' '2' '3' = "1723141174192123"? Let's count: 2+2+2+2+1+1+2+2+1+1=16. arr3=16.
+A = [17,23,14,16,7,4,19,21,2,3]. s718 string: "17" "23" "14" "16" "7" "4" "19" "21" "2" "3": digit count 2+2+2+2+1+1+2+2+1+1=16. arr7=16.
+A = [17,23,14,16,7,4,19,16,2,3]. t851 = str(16)+str(7) = "167". 167%97=70. arr1=70.
+A = [17,70,14,16,7,4,19,16,2,3]. swap idx6 (19) and idx9 (3): [17,70,14,16,7,4,3,16,2,19]. reverse -> [19,2,16,3,7,4? Wait reverse of [17,70,14,16,7,4,3,16,2,19] is [19,2,16,3,4? Let's check old indices carefully: old0=17 old1=70 old2=14 old3=16 old4=7 old5=4 old6=3 old7=16 old8=2 old9=19. Reverse: new0=old9=19, new1=old8=2, new2=old7=16, new3=old6=3, new4=old5=4, new5=old4=7, new6=old3=16, new7=old2=14, new8=old1=70, new9=old0=17. I earlier wrote [19,2,16,3,7,4,16,14,70,17] which has idx4=7 idx5=4. That is wrong! Let's correct! I made a mistake: after swap, old4=7, old5=4. Reverse new4=old5=4, new5=old4=7. I had [19,2,16,3,7,4,...], which is swapped at idx4/5. Need correct from step 8 onward. Important! Let's recompute carefully.
+
+Initial before reverse after swap:
+index:0 17
+1 70
+2 14
+3 16
+4 7
+5 4
+6 3
+7 16
+8 2
+9 19
+Reverse -> [19,2,16,3,4,7,16,14,70,17]. Yes idx4=4, idx5=7. I previously used [19,2,16,3,7,4,...] which would affect digit counts? Both 4 and 7 single digits so digit count unchanged until arr[5] changes. But later operations on arr[5] differ: step 11 arr[5] += 9; if correct arr[5]=7 -> becomes 16, not 13. Also step 13 arr[5]*=2 -> 32. This changes final. Need recompute from reverse onward with correct array. Good catch.
+
+Let's recalc from step 8 correctly.
+
+Step 1-7 same: after swap A_pre_reverse = [17,70,14,16,7,4,3,16,2,19]. Reverse -> A_rev = [19,2,16,3,4,7,16,14,70,17].
+
+Step 9: s16 = join: values 19(2),2(1),16(2),3(1),4(1),7(1),16(2),14(2),70(2),17(2) total still 16. arr[7] = 16. A: [19,2,16,3,4,7,16,16,70,17].
+
+Step 10: s678 digit count: 19(2),2(1),16(2),3(1),4(1),7(1),16(2),16(2),70(2),17(2) total 16. arr[9]=16. A: [19,2,16,3,4,7,16,16,70,16].
+
+Step 11: arr[5] += 9 => idx5=7+9=16. A: [19,2,16,3,4,16,16,16,70,16].
+
+Step 12: s480 = join. Values: 19(2),2(1),16(2),3(1),4(1),16(2),16(2),16(2),70(2),16(2). Total: 2+1=3, +2=5,+1=6,+1=7,+2=9,+2=11,+2=13,+2=15,+2=17. arr[3]=17. A: [19,2,16,17,4,16,16,16,70,16].
+
+Step 13: arr[5] *= 2 => idx5=16*2=32. A: [19,2,16,17,4,32,16,16,70,16].
+
+Step 14: arr[9] -= 6 => idx9=16-6=10. A: [19,2,16,17,4,32,16,16,70,10].
+
+Step 15: bump_all even indices +3: idx0 22; idx2 19; idx4 4+3=7; idx6 16+3=19; idx8 70+3=73. A: [22,2,19,17,7,32,19,16,73,10].
+
+Step 16: arr[6] += 8 => idx6=27. A: [22,2,19,17,7,32,27,16,73,10].
+
+Step 17: s502 digit count: values 22(2),2(1),19(2),17(2),7(1),32(2),27(2),16(2),73(2),10(2). Total: 2+1=3,+2=5,+2=7,+1=8,+2=10,+2=12,+2=14,+2=16,+2=18. arr[0]=18 %50 = 18. A: [18,2,19,17,7,32,27,16,73,10].
+
+Step 18: arr[9] +=8 => idx9=18. A: [18,2,19,17,7,32,27,16,73,18].
+
+Step 19: arr[5:8] = sorted(arr[5:8]). Slice idx5=32, idx6=27, idx7=16 -> sorted [16,27,32]. A: [18,2,19,17,7,16,27,32,73,18].
+
+Step 20: s399 digit count: 18(2),2(1),19(2),17(2),7(1),16(2),27(2),32(2),73(2),18(2). Total: 2+1=3,+2=5,+2=7,+1=8,+2=10,+2=12,+2=14,+2=16,+2=18. arr[3]=18. A final: [18,2,19,18,7,16,27,32,73,18].
+
+Sum: 18+2=20; +19=39; +18=57; +7=64; +16=80; +27=107; +32=139; +73=212; +18=230. Final sum 230.
+
+Need verify no further effect from step 9/10 due to arr[7] changed from 14 to 16 but digit count same. Good.
+
+But we must be absolutely sure reverse order and subsequent operations. Let's perhaps simulate with exact indices using a table. Also check if `arr[6], arr[9] = arr[9], arr[6]` before reverse uses arr after t851, yes. Could there be an earlier active statement `arr[4] += 6` and `arr[5] -= 8` after t109 but before s848. Yes.
+
+Let's re-evaluate initial operations to ensure arr[4] before t109? t109 uses arr[4]=1. Good. arr[7]=21. Good.
+
+Potential issue: The code's first active mutation `arr[0] = int(t109) % 97` might be preceded by some of the `tmp_...` assignments that use `arr` but also maybe there are active `bump(a, i, v)` calls? I saw functions defined, but in the long list there are only assignments like `tmp_0 = arr[0] + 40`, `note_5 = ...`, `code_6 = re.sub...`, `label_7 = ...`, etc. No function calls. Need scan for any line not starting with #, tmp_, note_, code_, label_, copy_, or s? The long block includes all these patterns. It ends with `tmp_799 = arr[9] + 9`. Then t109. So no mutation.
+
+Could `re.sub` in code lines mutate? no.
+
+Potential issue: The `TRAP_0` etc are strings like "arr[1] = 330" but not executed. Good.
+
+Potential issue: The program may be run as a module? `if __name__ == "__main__": print` so when executed, prints. We just need final array and sum.
+
+Need maybe output format exactly:
+ARRAY: [numbers, comma separated]
+SUM: number
+They likely expect no spaces? They say strictly as:
+ARRAY: [numbers, comma separated]
+SUM: number
+Could output `ARRAY: [18, 2, 19, 18, 7, 16, 27, 32, 73, 18]` and `SUM: 230`. Spaces after commas likely acceptable. If strict maybe no spaces? "numbers, comma separated" could be with spaces? The example in code prints Python list with spaces: `print("ARRAY:", arr)` yields `ARRAY: [18, 2, 19, 18, 7, 16, 27, 32, 73, 18]`. They ask answer strictly as ARRAY: [numbers, comma separated]. I'll use spaces after commas to match Python. Sum line `SUM: 230`.
+
+But before final, let's do a thorough audit for any hidden mutation due to slice assignment `arr[5:8] = sorted(arr[5:8])` length remains 3, no size change. Good.
+
+Need consider Python modulo with negative? none. `len(re.findall(r'\d', s))` for string of numbers: If arr element is 0, str(0) digit count 1. None zero? final has no zero. Good.
+
+Let's maybe manually run a condensed version in head again from corrected reverse:
+
+Start: [14,23,14,11,1,12,19,21,2,3]
+t109=211 -> arr0=17: [17,23,14,11,1,12,19,21,2,3]
+arr4+=6: [17,23,14,11,7,12,19,21,2,3]
+arr5-=8: [17,23,14,11,7,4,19,21,2,3]
+s848 digit count 16 -> arr3=16: [17,23,14,16,7,4,19,21,2,3]
+s718 count 16 -> arr7=16: [17,23,14,16,7,4,19,16,2,3]
+t851=167 -> arr1=70: [17,70,14,16,7,4,19,16,2,3]
+swap 6/9: [17,70,14,16,7,4,3,16,2,19]
+reverse: [19,2,16,3,4,7,16,14,70,17]
+s16 count 16 -> arr7=16: [19,2,16,3,4,7,16,16,70,17]
+s678 count 16 -> arr9=16: [19,2,16,3,4,7,16,16,70,16]
+arr5+=9: [19,2,16,3,4,16,16,16,70,16]
+s480 count? Let's count string: "19" "2" "16" "3" "4" "16" "16" "16" "70" "16": 2+1+2+1+1+2+2+2+2+2 = 17. arr3=17: [19,2,16,17,4,16,16,16,70,16]
+arr5*=2: idx5 32: [19,2,16,17,4,32,16,16,70,16]
+arr9-=6: idx9 10: [19,2,16,17,4,32,16,16,70,10]
+bump_all +3 even: idx0 22, idx2 19, idx4 7, idx6 19, idx8 73: [22,2,19,17,7,32,19,16,73,10]
+arr6+=8: [22,2,19,17,7,32,27,16,73,10]
+s502 count: "22" 2 + "2"1=3 + "19"2=5 + "17"2=7 + "7"1=8 + "32"2=10 + "27"2=12 + "16"2=14 + "73"2=16 + "10"2=18. arr0=18: [18,2,19,17,7,32,27,16,73,10]
+arr9+=8: [18,2,19,17,7,32,27,16,73,18]
+slice 5:8 values idx5=32 idx6=27 idx7=16 sorted [16,27,32]: [18,2,19,17,7,16,27,32,73,18]
+s399 count: 18(2)+2(1)=3+19(2)=5+17(2)=7+7(1)=8+16(2)=10+27(2)=12+32(2)=14+73(2)=16+18(2)=18. arr3=18: [18,2,19,18,7,16,27,32,73,18]
+sum: 18+2=20; +19=39; +18=57; +7=64; +16=80; +27=107; +32=139; +73=212; +18=230.
+
+Looks solid.
+
+But let's be paranoid: Did `arr[5] -= 8` occur before or after `s848`? Yes code order: arr[4]+=6, then comments, arr[5]-=8, then s848. Good. If order different? Let's inspect snippet: 
+```
+arr[0] = int(t109) % 97
+# comments many
+arr[4] += 6
+# comments many
+arr[5] -= 8
+# comments many
+s848 = ''.join(str(x) for x in arr)
+```
+Yes.
+
+What about `arr[3] = len(re.findall(r'\d', s848)) % 50`: s848 variable name maybe string has digit count 16, but `re.findall(r'\d', s848)` returns list of each digit char; length is total digits. Yes.
+
+What about `s718` after arr[3]=16: arr values all positive. Good.
+
+Potential issue: `t851 = str(arr[3]) + str(arr[4])` after arr[7] assignment; arr[3]=16, arr[4]=7 -> "167". Good. If arr[4] had been changed by reverse? No t851 before reverse.
+
+Potential issue: `arr[6], arr[9] = arr[9], arr[6]` after arr[1] assignment; yes.
+
+Potential issue: `arr.reverse()` is in-place, not `arr = reversed`; yes.
+
+Potential issue: After reverse, `s16 = ''.join(str(x) for x in arr)` and then `arr[7] = len(...) % 50`. The variable name s16 might suggest length 16? We computed 16. Good.
+
+Potential issue: After arr[7]=16, s678 digit count maybe changed if 14 -> 16 both two digits, no change. Good.
+
+Potential issue: `arr[5] += 9` after s678. Correct index after reverse is 7 (old idx4) or? Let's verify reverse one more time: Pre-reverse list indices:
+0:17
+1:70
+2:14
+3:16
+4:7
+5:4
+6:3
+7:16
+8:2
+9:19
+Reverse order from last to first: 19 (idx0), 2 (idx1), 16 (idx2), 3 (idx3), 4 (idx4), 7 (idx5), 16 (idx6), 14 (idx7), 70 (idx8), 17 (idx9). Yes. So arr[5]=7. Good.
+
+Potential issue: `bump_all` uses `range(0, len(a), 2)` after reverse and modifications; adds to even indices in current orientation. We applied to current indices 0,2,4,6,8. Good.
+
+Potential issue: `arr[5:8] = sorted(arr[5:8])` after arr[9]+=8. Slice indices 5,6,7 inclusive? Python slice end 8 exclusive, so indices 5,6,7. We used [32,27,16] before sorting? Let's check before slice: after arr0 assignment and arr9+=8:
+[18,2,19,17,7,32,27,16,73,18]
+Indices: 0=18,1=2,2=19,3=17,4=7,5=32,6=27,7=16,8=73,9=18. Yes sorted [16,27,32]. Good.
+
+Potential issue: `s399` after slice; digit count 18. arr[3]=18. Good.
+
+Need maybe final array printed by program would include spaces: `[18, 2, 19, 18, 7, 16, 27, 32, 73, 18]`. Sum `sum(arr)` = 230. Good.
+
+Let's consider if there is any effect from the `MANUAL` string? It's a multiline string assigned to MANUAL, not executed. It contains operations but no effect. Good.
+
+Could the code include non-ASCII comments with em dash; no issue.
+
+Now final answer should be only two lines. No extra explanation. Ensure strict format. Use `ARRAY: [18, 2, 19, 18, 7, 16, 27, 32, 73, 18]` and `SUM: 230`. If they expect no spaces maybe still okay? "numbers, comma separated" could be `[18,2,...]`. The phrase "strictly as: ARRAY: [numbers, comma separated]" might allow spaces. To be safe, maybe no spaces? But Python print includes spaces. The instruction says "ARRAY: [numbers, comma separated]" not "Python list repr". It says answer strictly as:
+ARRAY: [numbers, comma separated]
+SUM: number
+If I output with spaces after commas, it's still comma separated. If an automated checker expects exact maybe maybe they expect no spaces? Need infer from similar tasks. They often require format exactly but accept spaces? The line `ARRAY: [numbers, comma separated]` could mean replace numbers with list entries separated by commas, likely no spaces? However the program's print would be `ARRAY: [18, 2, ...]` because `print("ARRAY:", arr)` adds space after colon and Python list has spaces. The user says "Answer strictly as: ARRAY: [numbers, comma separated]". They might compare normalized. I'd include spaces after commas to be human-readable. But if strict, maybe they want no extra spaces? Let's parse: "ARRAY: [numbers, comma separated]" includes a space after comma in template? It shows `[numbers, comma separated]` with comma and space between placeholder words. That suggests spaces okay. The program output line has a space after colon: `ARRAY: [...]`. They ask strictly as with colon and space. I'll use that.
+
+Double-check sum one more time: 18+2=20; 19=39; 18=57; 7=64; 16=80; 27=107; 32=139; 73=212; 18=230. Yes.
+
+Let's also consider if `re.findall(r'\d', s)` on a string like '18' returns ['1','8'] length 2. Yes.
+
+Potential hidden active line: At very top, after TRAP assignments, there is blank line then arr. The TRAP variables are just strings; no effect. Functions defined; no side effects. Good.
+
+Potential hidden active line in long block: Some lines like `code_6 = re.sub(r'[0-9]', '#', str(arr[6]))` use `re.sub` but not mutate. Good.
+
+Potential hidden active line: `label_7 = "запись 7 не применялась"` no. All local assignments.
+
+Potential hidden active line: There might be a line `apply_twice(a, i, v)`? No, function defined only. I scanned no calls to bump or apply_twice except bump_all. The long block includes variable names `copy_...`, not calls. Good.
+
+Let's maybe search mentally for `bump(` in active code: function definitions include `def bump(a, i, v): a[i] += v` and `def apply_twice(a, i, v): bump(a,i,v)...`. No calls. `bump_all(arr, 3)` is the only call. Good.
+
+Could `mix` be called? no.
+
+Potential issue: Python's list slice assignment `arr[5:8] = sorted(arr[5:8])` if sorted returns list of ints; okay.
+
+Potential issue: The final `arr[3] = len(re.findall(r'\d', s399)) % 50` after s399. s399 computed after slice, before final assignment. We used that. Good.
+
+Let's think if any `s` variable names are reused? no effect.
+
+Could there be an active statement `arr[5:8] = sorted(arr[5:8])` and then later comments but no more mutations. yes.
+
+Now final answer only. Ensure no analysis in final. Use exact lines.
+</think>
+
+ARRAY: [18, 2, 19, 18, 7, 16, 27, 32, 73, 18]
+SUM: 230
