@@ -142,12 +142,15 @@ def retry_verdicts(folder):
                 key = str(r["file"]).split("/")[-1]
             if key is None or r.get("finish") == "length":
                 continue
-            if r.get("ok"):
-                verdicts[str(key)] = OK
-            elif r.get("got") is not None or r.get("ok") is False:
-                # a parsed answer, or an explicit miss, is a real verdict
-                if r.get("got") is not None:
-                    verdicts[str(key)] = BAD
+            verdict = OK if r.get("ok") else (BAD if (r.get("got") is not None
+                                                     or r.get("arr_ok") is not None) else None)
+            if verdict is None:
+                continue
+            verdicts[str(key)] = verdict
+            # a program row is keyed S313 in the table but v4_seed313.py in the retry file
+            m = re.search(r"seed(\d+)", str(key))
+            if m:
+                verdicts["S" + m.group(1)] = verdict
     return verdicts
 
 
@@ -371,7 +374,8 @@ def summary():
         # a row is complete only if every expected pool is there and none is short
         pools = [cells.get("t1_" + l) for l in ("en", "ru", "zh")]
         short = any(r.get("partial") for r in (g["chains"] + g["programs"]))
-        complete = all(pools) and len(complete_programs) > 0 and not short
+        # unresolved rows count too: the task was never computed, so percentages shift
+        complete = all(pools) and len(complete_programs) > 0 and not short and unresolved == 0
         if not complete:
             label = "⚠ " + label
         rows.append({"label": label,
