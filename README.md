@@ -104,7 +104,7 @@ run more than once shows the mean over its valid runs, so a cell can be fraction
 | Qwen3.8-27B-UD-Q8_K_XL | 146m44s · 33% err | 4100 | 14m14s 11/17 | 14m45s 10/17 | 17m43s 11.5/17 | 15m10s 13/24 | 100m03s 15/20 |
 | ⚠ Qwen3.8-Flash-Next-Abiray-Coder-IQ1_M · unresolved 14 | 340m56s · 40% err | 8743 | 43m39s 12/17 | 56m48s 11/15 | 21m49s 11/17 | 22m50s 15/24 | 218m40s 0/8 |
 | Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S · t 0.3 · pen 0.3 | 140m18s · 36% err | 5448 | 28m40s 12/17 | 26m18s 11/17 | 29m57s 11/17 | 17m31s 15/24 | 55m22s 11.5/20 |
-| ⚠ Qwen3.8-Flash-Next-UD-IQ4_XS · pen 0.2 · unresolved 1 | 138m21s · 28% err | 5511 | 31m20s 11.5/17 | 27m22s 11/17 | 24m52s 12.5/17 | 18m21s 15.5/24 | 54m47s 16/20 |
+| Qwen3.8-Flash-Next-UD-IQ4_XS · pen 0.2 | 138m21s · 27% err | 5511 | 31m20s 11.5/17 | 27m22s 11/17 | 24m52s 12.5/17 | 18m21s 15.5/24 | 54m47s 16.5/20 |
 | Qwen3.8-Flash-Next-UD-Q4_K_XL · pen 0.2 | 154m10s · 27% err | 5616 | 34m18s 12.5/17 | 28m21s 11/17 | 33m41s 13.5/17 | 24m28s 15.5/24 | 57m50s 15/20 |
 | ⚠ Ripple-65B-Preview-Q6_K · unresolved 6 | 120m57s · 25% err | 4684 | 120m57s 12/16 | — | — | — | 121m49s 0/7 of 20 run |
 | ⚠ deepseek-v4.1-flash | 16m48s · 30% err | — | 7m04s 12/17 | — | — | — | 9m44s 14/20 |

@@ -103,4 +103,4 @@ failure.
 
 | Model | Run | Task | Why | Status |
 |---|---|---|---|---|
-| `Qwen3.8-Flash-Next-UD-IQ4_XS` | `programs_v4_64k_rerun.json` | `v4_seed313.py` | `finish=length` at 65 536 tokens, 656 s — the budget ended it | ⬜ needs a 131k retry; the model is not loaded |
+| `Qwen3.8-Flash-Next-UD-IQ4_XS` | `programs_v4_64k_rerun.json` | `v4_seed313.py` | `finish=length` at 65 536 tokens, 656 s — the budget ended it | ✅ done at 96k — `finish=stop`, 17 496 tokens, 381 s, answer correct. The 64k cut was hiding a solvable task |
