@@ -211,14 +211,10 @@ scripts/             generators, runners, loop guard, table builder
 **Note on program scores.** An earlier guarded runner compared answers against
 `array`/`sum` keys while the datasets store `expected_array`/`expected_sum`, so
 every program in those runs was scored wrong. The affected runs (Flash-Next
-variants) are withdrawn from the tables and are being re-run with the fixed
-comparison; Q6's program score is reproducible from its stored answers.
+variants) were withdrawn and have since been re-run with the fixed comparison, so the program
+column now comes from correctly scored runs.
 
-## Published data
-
-The repository is public. It contains the frozen datasets, the harness and all
-results. Endpoint addresses in the scripts are placeholders for a local model
-server; no credentials, keys or private corpora are included.
+## 7. Notes
 
 **Provocative tasks.** Chain 11 (ship-15 vs ship-18) and chain 12 (heron-09)
 ask about entities the document never lists; both are decided by rules, not by
@@ -232,6 +228,12 @@ score there is not a broken harness.
 The summary mixes two numbers that are easy to confuse: *tokens per task* is how much a
 model writes, not how fast. Measured prefill and generation speed, split by prompt size
 and taken from server timings only, are in [docs/speed.md](docs/speed.md).
+
+## Published data
+
+The repository is public. It contains the frozen datasets, the harness and all
+results. Endpoint addresses in the scripts are placeholders for a local model
+server; no credentials, keys or private corpora are included.
 
 ## License
 
