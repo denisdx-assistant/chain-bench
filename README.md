@@ -35,10 +35,11 @@ table as an ordering, not as a measurement.
 
 Within that limit, four findings:
 
-- **4-bit quantisation costs nothing measurable.** On the same host Q4_K_M, Q6_K_XL and Q8_K_XL
-  land at 35, 34 and 32 correct chains of 51, and 15, 13 and 15 programs of 20. Q4_K_M even
-  leads, but it has a single complete run in this mode: a repeat is queued and the lead may be
-  a small-sample fluke.
+- **4-bit quantisation costs nothing measurable.** On the same host Q4_K_M, Q6_K_XL and
+  Q8_K_XL land at 34.5, 34 and 32.5 correct chains of 51, and 12.5, 13 and 15 programs of 20.
+  Q4_K_M's apparent lead did not reproduce: a second full run gave 34 chains and 10 programs,
+  so the ladder is flat within noise. Programs turned out to be the least stable part — 7 of
+  20 tasks flipped between the two Q4_K_M runs, against roughly one in ten on chains.
 - **The 1-bit coder build collapses where coding lives.** IQ1_M holds 34/51 on short-context
   chains, but finished only 8 of 20 programs — 12 hit the budget and every finished one was
   wrong. It understands Russian but answers in English, so its ru chains measure reasoning,
@@ -118,8 +119,8 @@ run more than once shows the mean over its valid runs, so a cell can be fraction
 <!-- summary:start -->
 | Run | Overall (errors) | Median tokens/task | Test 1 en (correct) | Test 1 ru (correct) | Test 1 zh (correct) | Test 1 subsets 8 (all langs) | Test 2 (correct) |
 |---|---|---|---|---|---|---|---|
+| Qwen3.8-27B-UD-Q4_K_M · NCCL, 2 GPUs | 141m00s · 38% err | 4099 | 17m20s 12/17 | 18m24s 10/17 | 21m19s 12/17 | 18m18s 12/24 | 83m57s 10/20 |
 | Qwen3.8-27B-UD-Q4_K_M | 442m14s · 30% err | 4144 | 108m21s 12/17 | 93m16s 11/17 | 91m48s 12/17 | 22m14s 12/24 | 148m49s 15/20 |
-| Qwen3.8-27B-UD-Q4_K_M | 141m00s · 38% err | 4099 | 17m20s 12/17 | 18m24s 10/17 | 21m19s 12/17 | 18m18s 12/24 | 83m57s 10/20 |
 | Qwen3.8-27B-UD-Q6_K_XL · t 0.3 · pen 0.2 | 154m57s · 38% err | 4100 | 14m14s 12/17 | 21m10s 10/17 | 19m10s 9/17 | 28m39s 14/24 | 100m23s 13/20 |
 | Qwen3.8-27B-UD-Q6_K_XL | 169m28s · 35% err | 4099 | 15m37s 12/17 | 17m22s 10.5/17 | 21m12s 12/17 | 22m21s 13/24 | 115m16s 12/20 |
 | Qwen3.8-27B-UD-Q8_K_XL | 146m44s · 33% err | 4100 | 14m14s 11/17 | 14m45s 10/17 | 17m43s 11.5/17 | 15m10s 13/24 | 100m03s 15/20 |
@@ -156,7 +157,7 @@ tables.
 
 | Model | Status |
 |---|---|
-| `Qwen3.8-27B-UD-Q4_K_M` | measured |
+| `Qwen3.8-27B-UD-Q4_K_M` | measured, two rows: one GPU and NCCL across two |
 | `Qwen3.8-27B-UD-Q6_K_XL` | measured, two rows: model defaults and `t 0.3 · pen 0.2` |
 | `Qwen3.8-27B-UD-Q8_K_XL` | measured, two samples averaged |
 | `Qwen3.8-Flash-Next-UD-IQ4_XS` | measured, two samples averaged |

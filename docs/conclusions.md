@@ -16,8 +16,9 @@ Two independent measurements of the same model quantify the noise:
 | Q6_K_XL, 16k vs 64k, 95 tasks | 48/75 vs 47/75 | — |
 | Q8_K_XL, 16k vs 32k | identical per language | — |
 
-Set-level scores repeat to within one task; individual tasks flip about once in ten. That is
-the resolution of the whole table.
+Set-level chain scores repeat to within one task of seventeen; individual chain tasks flip
+about once in ten. Program scores are less stable — see section 2 — so a one- or two-program
+difference is not evidence either.
 
 **Why there is no confidence interval.** A proper interval needs either many repeats of the
 same configuration or a homogeneous pool of tasks. We have neither: most models were run once
@@ -36,18 +37,25 @@ All three quantisations ran on the same host with the same tasks.
 
 | Model | Chains (51) | Subsets (24) | Programs (20) |
 |---|---|---|---|
-| Q4_K_M | **35** | 12 | 15 |
-| Q6_K_XL | 34 | 13 | 13 |
-| Q8_K_XL | 32 | 13 | 15 |
+| Q4_K_M (two runs averaged) | **34.5** | 12 | 12.5 |
+| Q6_K_XL (two runs averaged) | 34 | 13 | 13 |
+| Q8_K_XL (two runs averaged) | 32.5 | 13 | 15 |
 
 The expected monotone ladder does not appear: Q4_K_M leads on chains, ties Q8 on programs and
 is one behind on subsets. Every gap is one to three tasks, i.e. inside the flip rate.
 
-**The Q4_K_M lead is suspicious and may be a fluke.** In this mode it has one complete run,
-while Q6 and Q8 have two samples each and Q8's programs score also comes from two runs. A
-single run that lands two tasks high is exactly what the flip rate predicts. A repeat at the
-original settings is queued; until it lands, the honest reading is "4-bit quantisation costs
-nothing measurable on these tasks", not "4-bit is better".
+**The Q4_K_M lead did not reproduce.** Its first run scored 35 chains and 15 programs; a
+second full run at identical settings scored 34 and 10, so the average sits level with Q6 and
+behind Q8 on programs. The first run's lead was a small-sample effect, exactly as the flip
+rate predicted.
+
+**Programs are the least reproducible part of the suite.** Between the two Q4_K_M runs 7 of 20
+programs changed verdict (five lost, two gained), against one or two of 17 on the chains. A
+program answer depends on tracing a long chain of state changes without a single slip, so a
+small perturbation in sampling or in the runtime flips the result. The practical consequence:
+a single program score is weak evidence, and comparing two models on programs needs several
+runs per model. The second run also ran on a different runtime (two accelerators under NCCL),
+which may add its own variance on top of sampling.
 
 That is itself the useful finding: at this task difficulty, going from 8 bits to 4 bits does
 not buy or cost quality, while it does move speed and memory.

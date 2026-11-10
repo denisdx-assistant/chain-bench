@@ -43,6 +43,8 @@ def cfg_label(cfg, budget):
     pen = cfg.get("penalty")
     if pen and pen != "-" and re.fullmatch(r"[0-9.\s/]+", str(pen)):
         parts.append("pen %s" % pen)
+    if cfg.get("hardware"):
+        parts.append(cfg["hardware"])
     if cfg.get("reasoning") not in (None, "default"):
         parts.append("reasoning %s" % cfg["reasoning"])
     return " · ".join(parts)
@@ -257,8 +259,10 @@ def summary():
         cfg = cfg_for(r["folder"], r["file"])
         # the loop guard is on for every canonical run, so it is not part of the identity;
         # including it split otherwise identical samples into separate rows
+        # hardware is part of the identity here: the same weights served across two
+        # accelerators give comparable quality but not comparable timing
         sig = (r["folder"], cfg.get("ctx"), cfg.get("yarn"), cfg.get("temp"),
-               cfg.get("penalty"))
+               cfg.get("penalty"), cfg.get("hardware"))
         groups.setdefault(sig, {"chains": [], "programs": [], "cfg": cfg})
         groups[sig]["programs" if r["file"].startswith("programs_") else "chains"].append(r)
 
@@ -286,7 +290,7 @@ def summary():
                 "runs": len(cells)}
 
     rows = []
-    for (folder, _ctx, _yarn, _temp, _pen), g in sorted(groups.items(), key=lambda kv: str(kv[0])):
+    for (folder, _ctx, _yarn, _temp, _pen, _hw), g in sorted(groups.items(), key=lambda kv: str(kv[0])):
         def pick(lang):
             """Every valid full run of the language; several runs average into one cell."""
             full = [r for r in g["chains"] if r["lang"] == lang and not r["subset"] and not r.get("partial")]
